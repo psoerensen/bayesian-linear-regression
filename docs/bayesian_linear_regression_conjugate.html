@@ -103,6 +103,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -216,7 +245,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="gibbs-sampler-implementation" class="level2">
 <h2 class="anchored" data-anchor-id="gibbs-sampler-implementation">Gibbs Sampler Implementation</h2>
-<p>We use conjugate priors: - ( ^2, _b^2 (0, _b^2 I_p) ) - ( _b^2 S_b ^{-2}(v_b) ) - ( ^2 S ^{-2}(v) )</p>
+<p>We use conjugate priors:</p>
+<ul>
+<li><p><span class="math inline">\(\beta \mid \sigma^2, \sigma_b^2 \sim \mathcal{N}(0, \sigma_b^2 I_p)\)</span></p></li>
+<li><p><span class="math inline">\(\sigma_b^2 \sim S_b \chi^{-2}(v_b)\)</span></p></li>
+<li><p><span class="math inline">\(\sigma^2 \sim S \chi^{-2}(v)\)</span></p></li>
+</ul>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
