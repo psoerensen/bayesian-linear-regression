@@ -5,12 +5,28 @@ author:
     affiliation:
       - "Center for Quantitative Genetics and Genomics"
       - "Aarhus University"
-format: pdf
-execute: 
+format:
+  html:
+    theme: flatly
+    toc: true
+    code-fold: true
+    highlight-style: github
+  pdf:
+    toc: true
+    number-sections: true
+    highlight-style: kate
+    fig-pos: "H"
+    fig-width: 6
+    fig-height: 4
+    fontsize: 11pt
+    geometry:
+      - margin=1in
+execute:
   echo: false
   warning: false
   message: false
 ---
+
 
 
 # Introduction
@@ -838,6 +854,9 @@ where $\delta_i^{(t)}$ is the sampled value of $\delta_i$ in iteration $t$ of th
 
 This posterior quantity reflects our **updated belief** about whether each marker is truly associated with the trait, and is a key quantity used in Bayesian fine-mapping.
 
+```{r, include=FALSE}
+if (file.exists("notes.pdf")) file.copy("notes.pdf", "docs/notes.pdf", overwrite = TRUE)
+```
 
 
 <!-- Explain this section more later 
