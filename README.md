@@ -6,8 +6,6 @@ format:
     toc: false
 ---
 
-# Classical and Bayesian Linear Regression
-
 Welcome!  
 
 This site contains interactive **Quarto documents** demonstrating and comparing different linear regression models — from classical OLS to Bayesian approaches with Gaussian and spike-and-slab priors.  
