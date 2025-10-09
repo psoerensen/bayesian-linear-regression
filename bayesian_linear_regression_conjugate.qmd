@@ -1,0 +1,154 @@
+---
+title: "Bayesian Linear Regression with Conjugate Priors"
+format:
+  html:
+    toc: true
+    code-fold: true
+---
+
+## Introduction
+
+This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics.
+
+## Model Setup and Data Simulation
+
+```{r}
+set.seed(123)
+
+# Simulate data (same as in the classical regression example)
+n <- 100
+p <- 3
+X <- cbind(1, matrix(rnorm(n * p), n, p))
+beta_true <- c(2, 0.5, -1, 1.5)
+sigma_true <- 1
+
+y <- X %*% beta_true + rnorm(n, 0, sigma_true)
+```
+
+## Gibbs Sampler Implementation
+
+We use conjugate priors:
+- \( \beta \mid \sigma^2, \sigma_b^2 \sim \mathcal{N}(0, \sigma_b^2 I_p) \)
+- \( \sigma_b^2 \sim S_b \chi^{-2}(v_b) \)
+- \( \sigma^2 \sim S \chi^{-2}(v) \)
+
+```{r}
+# Hyperparameters
+v_b <- 4
+S_b <- 1
+v <- 4
+S <- 1
+
+# Initialization
+beta <- rep(0, ncol(X))
+sigma2 <- 1
+sigma2_b <- 1
+
+n_iter <- 5000
+burn_in <- 1000
+
+# Store samples
+beta_samples <- matrix(NA, n_iter, ncol(X))
+sigma2_samples <- numeric(n_iter)
+sigma2_b_samples <- numeric(n_iter)
+
+for (t in 1:n_iter) {
+  # Sample beta | sigma2, sigma2_b, y
+  Sigma_beta <- solve(t(X) %*% X / sigma2 + diag(1 / sigma2_b, ncol(X)))
+  mu_beta <- Sigma_beta %*% t(X) %*% y / sigma2
+  beta <- as.numeric(mu_beta + t(chol(Sigma_beta)) %*% rnorm(ncol(X)))
+  
+  # Sample sigma_b^2 | beta
+  v_b_tilde <- v_b + ncol(X)
+  S_b_tilde <- (sum(beta^2) + v_b * S_b) / v_b_tilde
+  sigma2_b <- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)
+  
+  # Sample sigma^2 | beta, y
+  v_tilde <- v + n
+  resid <- y - X %*% beta
+  S_tilde <- (sum(resid^2) + v * S) / v_tilde
+  sigma2 <- v_tilde * S_tilde / rchisq(1, df = v_tilde)
+  
+  # Store samples
+  beta_samples[t, ] <- beta
+  sigma2_samples[t] <- sigma2
+  sigma2_b_samples[t] <- sigma2_b
+}
+```
+
+## Posterior Summaries
+
+```{r}
+posterior_summary <- function(samples, probs = c(0.025, 0.5, 0.975)) {
+  c(
+    mean = mean(samples),
+    sd = sd(samples),
+    quantile(samples, probs = probs)
+  )
+}
+
+# Summaries for betas
+beta_summary <- t(apply(beta_samples[burn_in:n_iter, ], 2, posterior_summary))
+rownames(beta_summary) <- paste0("beta", 0:p)
+
+# Summaries for variance parameters
+sigma2_summary <- posterior_summary(sigma2_samples[burn_in:n_iter])
+sigma2b_summary <- posterior_summary(sigma2_b_samples[burn_in:n_iter])
+
+round(beta_summary, 4)
+round(rbind(sigma2 = sigma2_summary, sigma2_b = sigma2b_summary), 4)
+```
+
+## Trace Plots
+
+```{r}
+par(mfrow = c(2, 2))
+for (j in 1:ncol(X)) {
+  plot(beta_samples[, j], type = "l", main = paste("Trace: beta", j - 1),
+       xlab = "Iteration", ylab = expression(beta))
+  abline(h = beta_true[j], col = "red", lwd = 2, lty = 2)
+}
+```
+
+## Autocorrelation Plots
+
+```{r}
+par(mfrow = c(2, 2))
+for (j in 1:ncol(X)) {
+  acf(beta_samples[burn_in:n_iter, j], main = paste("ACF: beta", j - 1))
+}
+```
+
+## Convergence Diagnostics
+
+We compute autocorrelation, Monte Carlo standard error, Geweke Z-score, Gelman-Rubin \(\hat{R}\), and effective sample size.
+
+```{r}
+# Simple diagnostics for one chain
+convergence_stats <- function(samples) {
+  n <- length(samples)
+  ac1 <- cor(samples[-1], samples[-n])
+  mcse <- sd(samples) * sqrt((1 + ac1) / n)
+  a <- floor(0.1 * n); b <- floor(0.5 * n)
+  z <- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /
+       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)
+  ess <- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))
+  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)
+}
+
+conv_results <- t(apply(beta_samples[burn_in:n_iter, ], 2, convergence_stats))
+rownames(conv_results) <- paste0("beta", 0:p)
+round(conv_results, 4)
+```
+
+## Posterior Mean vs True Values
+
+```{r}
+par(mar = c(5, 5, 4, 2))
+plot(beta_true, beta_summary[, "mean"], pch = 19, col = "blue",
+     xlab = "True Coefficients", ylab = "Posterior Mean Estimates",
+     main = "Posterior Mean vs True Coefficients")
+abline(0, 1, col = "red", lwd = 2, lty = 2)
+legend("topleft", legend = c("Posterior Means", "y = x line"), 
+       col = c("blue", "red"), pch = c(19, NA), lty = c(NA, 2))
+```

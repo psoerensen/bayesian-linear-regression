@@ -1,0 +1,36 @@
+---
+title: "Classical and Bayesian Linear Regression"
+format:
+  html:
+    theme: flatly
+    toc: false
+---
+
+# Classical and Bayesian Linear Regression
+
+Welcome ??  
+
+This site contains **Quarto documents** that demonstrate and compare different linear regression models — from the **classical ordinary least squares (OLS)** approach to **Bayesian models** with Gaussian and spike-and-slab priors.
+
+Each document includes a short theoretical overview, commented R code, and visualizations of results and diagnostics.  
+All examples are implemented in **pure base R**, so they can run anywhere R is installed.
+
+---
+
+## ?? Overview of Materials
+
+| Section | Description |
+|----------|--------------|
+| [Notes](notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics |
+| [Classical Regression](classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) |
+| [Bayesian (Gaussian Prior)](bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling |
+| [Bayesian (Spike & Slab)](bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity |
+
+---
+
+## ?? How to Reproduce Locally
+
+You can clone or download this repository and render the documents using **Quarto** in RStudio or from the terminal.
+
+```bash
+quarto render

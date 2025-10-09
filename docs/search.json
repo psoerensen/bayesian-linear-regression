@@ -1,0 +1,170 @@
+[
+  {
+    "objectID": "classical_linear_regression_simulation.html",
+    "href": "classical_linear_regression_simulation.html",
+    "title": "Classical Linear Regression Simulation in R",
+    "section": "",
+    "text": "This document demonstrates how to simulate data from a classical linear regression model and estimate parameters using Ordinary Least Squares (OLS), including inference and prediction intervals.\nWe also visualize the estimated vs. true regression coefficients."
+  },
+  {
+    "objectID": "classical_linear_regression_simulation.html#introduction",
+    "href": "classical_linear_regression_simulation.html#introduction",
+    "title": "Classical Linear Regression Simulation in R",
+    "section": "",
+    "text": "This document demonstrates how to simulate data from a classical linear regression model and estimate parameters using Ordinary Least Squares (OLS), including inference and prediction intervals.\nWe also visualize the estimated vs. true regression coefficients."
+  },
+  {
+    "objectID": "classical_linear_regression_simulation.html#r-code",
+    "href": "classical_linear_regression_simulation.html#r-code",
+    "title": "Classical Linear Regression Simulation in R",
+    "section": "R Code",
+    "text": "R Code\n\n\nCode\n# ============================================================\n# Classical Linear Regression: Simulation + OLS Estimation\n# ============================================================\n\nset.seed(123)\n\n# --- 1. Simulate data ---------------------------------------\nn &lt;- 100          # number of observations\np &lt;- 3            # number of predictors (excluding intercept)\n\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))  # include intercept\nbeta_true &lt;- c(2, 0.5, -1, 1.5)            # true coefficients\nsigma_true &lt;- 1                            # true residual SD\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)\n\n# --- 2. Estimate parameters via OLS --------------------------\nbeta_hat &lt;- solve(t(X) %*% X) %*% t(X) %*% y\nresiduals &lt;- y - X %*% beta_hat\nsigma2_hat &lt;- as.numeric(t(residuals) %*% residuals / (n - (p + 1)))\n\n# --- 3. Inference: SEs, t-stats, p-values, CI ---------------\nvar_beta_hat &lt;- sigma2_hat * solve(t(X) %*% X)\nse_beta &lt;- sqrt(diag(var_beta_hat))\n\nt_stats &lt;- beta_hat / se_beta\np_values &lt;- 2 * (1 - pt(abs(t_stats), df = n - (p + 1)))\n\nalpha &lt;- 0.05\nt_crit &lt;- qt(1 - alpha/2, df = n - (p + 1))\nci_lower &lt;- beta_hat - t_crit * se_beta\nci_upper &lt;- beta_hat + t_crit * se_beta\n\n# Combine results into a table\nresults &lt;- data.frame(\n  Estimate = as.numeric(beta_hat),\n  SE = se_beta,\n  t_value = as.numeric(t_stats),\n  p_value = as.numeric(p_values),\n  CI_lower = as.numeric(ci_lower),\n  CI_upper = as.numeric(ci_upper)\n)\nrownames(results) &lt;-  paste0(\"beta\", 0:p)\nprint(round(results, 4))\n\n\n      Estimate     SE t_value p_value CI_lower CI_upper\nbeta0   1.9807 0.1073 18.4517   0e+00   1.7676   2.1937\nbeta1   0.4445 0.1169  3.8036   3e-04   0.2126   0.6765\nbeta2  -0.9538 0.1095 -8.7138   0e+00  -1.1711  -0.7365\nbeta3   1.4426 0.1122 12.8540   0e+00   1.2198   1.6654\n\n\nCode\n# --- 4. Prediction for a new observation ---------------------\nx_new &lt;- c(1, 0.5, -1, 1)  # include intercept term\ny_pred &lt;- as.numeric(x_new %*% beta_hat)\nvar_pred &lt;- sigma2_hat * (1 + t(x_new) %*% solve(t(X) %*% X) %*% x_new)\nse_pred &lt;- sqrt(var_pred)\n\n# 95% prediction interval\npred_interval &lt;- c(\n  lower = y_pred - t_crit * se_pred,\n  upper = y_pred + t_crit * se_pred\n)\n\ncat(\"\\nPredicted y_new =\", round(y_pred, 3), \"\\n\")\n\n\n\nPredicted y_new = 4.599 \n\n\nCode\ncat(\"95% Prediction interval: [\", round(pred_interval[1], 3), \",\",\n    round(pred_interval[2], 3), \"]\\n\")\n\n\n95% Prediction interval: [ 2.48 , 6.718 ]\n\n\nCode\n# --- 5. Visualization: True vs. Estimated Coefficients -------\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_hat, pch = 19, col = \"blue\", cex = 1.3,\n     xlab = \"True Coefficients\", ylab = \"Estimated Coefficients\",\n     main = \"OLS Estimates vs True Values\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\narrows(beta_true, ci_lower, beta_true, ci_upper, angle = 90, code = 3, length = 0.05, col = \"darkgray\")\nlegend(\"topleft\", legend = c(\"OLS Estimates\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html",
+    "href": "bayesian_linear_regression_conjugate.html",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "",
+    "text": "This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics."
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#introduction",
+    "href": "bayesian_linear_regression_conjugate.html#introduction",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "",
+    "text": "This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics."
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#model-setup-and-data-simulation",
+    "href": "bayesian_linear_regression_conjugate.html#model-setup-and-data-simulation",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Model Setup and Data Simulation",
+    "text": "Model Setup and Data Simulation\n\n\nCode\nset.seed(123)\n\n# Simulate data (same as in the classical regression example)\nn &lt;- 100\np &lt;- 3\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))\nbeta_true &lt;- c(2, 0.5, -1, 1.5)\nsigma_true &lt;- 1\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#gibbs-sampler-implementation",
+    "href": "bayesian_linear_regression_conjugate.html#gibbs-sampler-implementation",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Gibbs Sampler Implementation",
+    "text": "Gibbs Sampler Implementation\nWe use conjugate priors: - ( ^2, _b^2 (0, _b^2 I_p) ) - ( _b^2 S_b ^{-2}(v_b) ) - ( ^2 S ^{-2}(v) )\n\n\nCode\n# Hyperparameters\nv_b &lt;- 4\nS_b &lt;- 1\nv &lt;- 4\nS &lt;- 1\n\n# Initialization\nbeta &lt;- rep(0, ncol(X))\nsigma2 &lt;- 1\nsigma2_b &lt;- 1\n\nn_iter &lt;- 5000\nburn_in &lt;- 1000\n\n# Store samples\nbeta_samples &lt;- matrix(NA, n_iter, ncol(X))\nsigma2_samples &lt;- numeric(n_iter)\nsigma2_b_samples &lt;- numeric(n_iter)\n\nfor (t in 1:n_iter) {\n  # Sample beta | sigma2, sigma2_b, y\n  Sigma_beta &lt;- solve(t(X) %*% X / sigma2 + diag(1 / sigma2_b, ncol(X)))\n  mu_beta &lt;- Sigma_beta %*% t(X) %*% y / sigma2\n  beta &lt;- as.numeric(mu_beta + t(chol(Sigma_beta)) %*% rnorm(ncol(X)))\n  \n  # Sample sigma_b^2 | beta\n  v_b_tilde &lt;- v_b + ncol(X)\n  S_b_tilde &lt;- (sum(beta^2) + v_b * S_b) / v_b_tilde\n  sigma2_b &lt;- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)\n  \n  # Sample sigma^2 | beta, y\n  v_tilde &lt;- v + n\n  resid &lt;- y - X %*% beta\n  S_tilde &lt;- (sum(resid^2) + v * S) / v_tilde\n  sigma2 &lt;- v_tilde * S_tilde / rchisq(1, df = v_tilde)\n  \n  # Store samples\n  beta_samples[t, ] &lt;- beta\n  sigma2_samples[t] &lt;- sigma2\n  sigma2_b_samples[t] &lt;- sigma2_b\n}"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#posterior-summaries",
+    "href": "bayesian_linear_regression_conjugate.html#posterior-summaries",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Posterior Summaries",
+    "text": "Posterior Summaries\n\n\nCode\nposterior_summary &lt;- function(samples, probs = c(0.025, 0.5, 0.975)) {\n  c(\n    mean = mean(samples),\n    sd = sd(samples),\n    quantile(samples, probs = probs)\n  )\n}\n\n# Summaries for betas\nbeta_summary &lt;- t(apply(beta_samples[burn_in:n_iter, ], 2, posterior_summary))\nrownames(beta_summary) &lt;- paste0(\"beta\", 0:p)\n\n# Summaries for variance parameters\nsigma2_summary &lt;- posterior_summary(sigma2_samples[burn_in:n_iter])\nsigma2b_summary &lt;- posterior_summary(sigma2_b_samples[burn_in:n_iter])\n\nround(beta_summary, 4)\n\n\n         mean     sd    2.5%     50%   97.5%\nbeta0  1.9673 0.1077  1.7537  1.9669  2.1769\nbeta1  0.4405 0.1186  0.2063  0.4425  0.6727\nbeta2 -0.9460 0.1105 -1.1559 -0.9470 -0.7262\nbeta3  1.4319 0.1124  1.2171  1.4315  1.6524\n\n\nCode\nround(rbind(sigma2 = sigma2_summary, sigma2_b = sigma2b_summary), 4)\n\n\n           mean     sd  2.5%    50%  97.5%\nsigma2   1.1276 0.1638 0.852 1.1154 1.5078\nsigma2_b 1.8685 1.2652 0.625 1.5398 4.9971"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#trace-plots",
+    "href": "bayesian_linear_regression_conjugate.html#trace-plots",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Trace Plots",
+    "text": "Trace Plots\n\n\nCode\npar(mfrow = c(2, 2))\nfor (j in 1:ncol(X)) {\n  plot(beta_samples[, j], type = \"l\", main = paste(\"Trace: beta\", j - 1),\n       xlab = \"Iteration\", ylab = expression(beta))\n  abline(h = beta_true[j], col = \"red\", lwd = 2, lty = 2)\n}"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#autocorrelation-plots",
+    "href": "bayesian_linear_regression_conjugate.html#autocorrelation-plots",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Autocorrelation Plots",
+    "text": "Autocorrelation Plots\n\n\nCode\npar(mfrow = c(2, 2))\nfor (j in 1:ncol(X)) {\n  acf(beta_samples[burn_in:n_iter, j], main = paste(\"ACF: beta\", j - 1))\n}"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#convergence-diagnostics",
+    "href": "bayesian_linear_regression_conjugate.html#convergence-diagnostics",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Convergence Diagnostics",
+    "text": "Convergence Diagnostics\nWe compute autocorrelation, Monte Carlo standard error, Geweke Z-score, Gelman-Rubin (), and effective sample size.\n\n\nCode\n# Simple diagnostics for one chain\nconvergence_stats &lt;- function(samples) {\n  n &lt;- length(samples)\n  ac1 &lt;- cor(samples[-1], samples[-n])\n  mcse &lt;- sd(samples) * sqrt((1 + ac1) / n)\n  a &lt;- floor(0.1 * n); b &lt;- floor(0.5 * n)\n  z &lt;- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /\n       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)\n  ess &lt;- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))\n  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)\n}\n\nconv_results &lt;- t(apply(beta_samples[burn_in:n_iter, ], 2, convergence_stats))\nrownames(conv_results) &lt;- paste0(\"beta\", 0:p)\nround(conv_results, 4)\n\n\n      autocorr1   mcse geweke_z      ess\nbeta0   -0.0055 0.0017   1.0590 4562.500\nbeta1    0.0308 0.0019   0.8929 3641.556\nbeta2   -0.0256 0.0017  -2.4631 4014.290\nbeta3    0.0189 0.0018   0.1831 3634.925"
+  },
+  {
+    "objectID": "bayesian_linear_regression_conjugate.html#posterior-mean-vs-true-values",
+    "href": "bayesian_linear_regression_conjugate.html#posterior-mean-vs-true-values",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "section": "Posterior Mean vs True Values",
+    "text": "Posterior Mean vs True Values\n\n\nCode\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_summary[, \"mean\"], pch = 19, col = \"blue\",\n     xlab = \"True Coefficients\", ylab = \"Posterior Mean Estimates\",\n     main = \"Posterior Mean vs True Coefficients\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\nlegend(\"topleft\", legend = c(\"Posterior Means\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html",
+    "href": "bayesian_spike_and_slab.html",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "",
+    "text": "This document demonstrates Bayesian Linear Regression using spike-and-slab priors, as described in the notes. We implement a Gibbs sampler that updates parameters from their full conditionals, computes posterior summaries (including posterior inclusion probabilities), and evaluates convergence using diagnostic statistics."
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#introduction",
+    "href": "bayesian_spike_and_slab.html#introduction",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "",
+    "text": "This document demonstrates Bayesian Linear Regression using spike-and-slab priors, as described in the notes. We implement a Gibbs sampler that updates parameters from their full conditionals, computes posterior summaries (including posterior inclusion probabilities), and evaluates convergence using diagnostic statistics."
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#model-setup-and-data-simulation",
+    "href": "bayesian_spike_and_slab.html#model-setup-and-data-simulation",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Model Setup and Data Simulation",
+    "text": "Model Setup and Data Simulation\n\n\nCode\nset.seed(123)\n\n# Simulate data\nn &lt;- 100\np &lt;- 5\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))\nbeta_true &lt;- c(2, 1.2, 0, 0, 0, 1.5)  # some zeros (spike)\nsigma_true &lt;- 1\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#gibbs-sampler-implementation",
+    "href": "bayesian_spike_and_slab.html#gibbs-sampler-implementation",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Gibbs Sampler Implementation",
+    "text": "Gibbs Sampler Implementation\nWe use the following priors: - ( _i _b^2 (0, _b^2) ) - ( _i () ) - ( (a, b) ) - ( _b^2 S_b ^{-2}(v_b) ) - ( ^2 S ^{-2}(v) )\n\n\nCode\n# Hyperparameters\na_pi &lt;- 1\nb_pi &lt;- 1\nv_b &lt;- 4\nS_b &lt;- 1\nv &lt;- 4\nS &lt;- 1\n\n# Gibbs sampler setup\nn_iter &lt;- 4000\nburn_in &lt;- 1000\nchains &lt;- 2\n\n# Storage\nbeta_samples &lt;- vector(\"list\", chains)\ndelta_samples &lt;- vector(\"list\", chains)\npi_samples &lt;- vector(\"list\", chains)\nsigma2_samples &lt;- vector(\"list\", chains)\nsigma2b_samples &lt;- vector(\"list\", chains)\n\nfor (c in 1:chains) {\n  # Initial values\n  alpha &lt;- rnorm(ncol(X), 0, 1)\n  delta &lt;- rbinom(ncol(X), 1, 0.5)\n  sigma2 &lt;- 1\n  sigma2_b &lt;- 1\n  pi &lt;- 0.5\n  \n  # Containers\n  alpha_chain &lt;- matrix(NA, n_iter, ncol(X))\n  delta_chain &lt;- matrix(NA, n_iter, ncol(X))\n  sigma2_chain &lt;- numeric(n_iter)\n  sigma2b_chain &lt;- numeric(n_iter)\n  pi_chain &lt;- numeric(n_iter)\n  \n  for (t in 1:n_iter) {\n    # Sample each alpha_i given delta_i\n    for (j in 1:ncol(X)) {\n      X_j &lt;- X[, j]\n      r_j &lt;- y - X %*% (alpha * delta) + X_j * alpha[j] * delta[j]\n      \n      if (delta[j] == 1) {\n        var_j &lt;- sigma2 / (t(X_j) %*% X_j + sigma2 / sigma2_b)\n        mean_j &lt;- as.numeric(var_j * t(X_j) %*% r_j / sigma2)\n        alpha[j] &lt;- rnorm(1, mean_j, sqrt(var_j))\n      } else {\n        alpha[j] &lt;- rnorm(1, 0, sqrt(sigma2_b))  # prior draw\n      }\n    }\n    \n    # Sample delta_i given alpha_i\n    for (j in 1:ncol(X)) {\n      X_j &lt;- X[, j]\n      r_j &lt;- y - X %*% (alpha * delta) + X_j * alpha[j] * delta[j]\n      rss0 &lt;- sum((r_j)^2)\n      rss1 &lt;- sum((r_j - X_j * alpha[j])^2)\n      \n      logodds &lt;- 0.5 / sigma2 * (rss0 - rss1) + log(pi) - log(1 - pi)\n      p1 &lt;- 1 / (1 + exp(-logodds))\n      delta[j] &lt;- rbinom(1, 1, p1)\n    }\n    \n    # Update pi\n    pi &lt;- rbeta(1, a_pi + sum(delta), b_pi + ncol(X) - sum(delta))\n    \n    # Update sigma_b^2\n    p_incl &lt;- sum(delta)\n    v_b_tilde &lt;- v_b + p_incl\n    S_b_tilde &lt;- (sum((alpha * delta)^2) + v_b * S_b) / v_b_tilde\n    sigma2_b &lt;- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)\n    \n    # Update sigma^2\n    resid &lt;- y - X %*% (alpha * delta)\n    v_tilde &lt;- v + n\n    S_tilde &lt;- (sum(resid^2) + v * S) / v_tilde\n    sigma2 &lt;- v_tilde * S_tilde / rchisq(1, df = v_tilde)\n    \n    # Store\n    alpha_chain[t, ] &lt;- alpha * delta\n    delta_chain[t, ] &lt;- delta\n    pi_chain[t] &lt;- pi\n    sigma2_chain[t] &lt;- sigma2\n    sigma2b_chain[t] &lt;- sigma2_b\n  }\n  \n  beta_samples[[c]] &lt;- alpha_chain\n  delta_samples[[c]] &lt;- delta_chain\n  pi_samples[[c]] &lt;- pi_chain\n  sigma2_samples[[c]] &lt;- sigma2_chain\n  sigma2b_samples[[c]] &lt;- sigma2b_chain\n}"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#posterior-summaries",
+    "href": "bayesian_spike_and_slab.html#posterior-summaries",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Posterior Summaries",
+    "text": "Posterior Summaries\n\n\nCode\nposterior_summary &lt;- function(samples, probs = c(0.025, 0.5, 0.975)) {\n  c(mean = mean(samples), sd = sd(samples), quantile(samples, probs = probs))\n}\n\n# Combine chains\nbeta_all &lt;- do.call(rbind, beta_samples)\npi_all &lt;- unlist(pi_samples)\ndelta_all &lt;- do.call(rbind, delta_samples)\n\nbeta_summary &lt;- t(apply(beta_all[burn_in:nrow(beta_all), ], 2, posterior_summary))\nrownames(beta_summary) &lt;- paste0(\"beta\", 0:p)\n\nPIP &lt;- colMeans(delta_all[burn_in:nrow(delta_all), ])\n\nround(beta_summary, 4)\n\n\n         mean     sd    2.5%    50%  97.5%\nbeta0  1.9340 0.0975  1.7469 1.9348 2.1217\nbeta1  1.1750 0.1057  0.9651 1.1759 1.3812\nbeta2  0.0330 0.0750  0.0000 0.0000 0.2550\nbeta3  0.0027 0.0352 -0.0568 0.0000 0.1062\nbeta4 -0.0139 0.0487 -0.1804 0.0000 0.0082\nbeta5  1.6871 0.0974  1.4967 1.6865 1.8798\n\n\nCode\ncat(\"\\nPosterior Inclusion Probabilities (PIP):\\n\")\n\n\n\nPosterior Inclusion Probabilities (PIP):\n\n\nCode\nround(PIP, 3)\n\n\n[1] 1.000 1.000 0.250 0.124 0.159 1.000"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#trace-plots",
+    "href": "bayesian_spike_and_slab.html#trace-plots",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Trace Plots",
+    "text": "Trace Plots\n\n\nCode\npar(mfrow = c(3, 2))\nfor (j in 1:ncol(X)) {\n  plot(beta_samples[[1]][, j], type = \"l\", main = paste(\"Trace: beta\", j - 1, \"(chain 1)\"),\n       xlab = \"Iteration\", ylab = expression(beta))\n  abline(h = beta_true[j], col = \"red\", lwd = 2, lty = 2)\n}"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#autocorrelation-plots",
+    "href": "bayesian_spike_and_slab.html#autocorrelation-plots",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Autocorrelation Plots",
+    "text": "Autocorrelation Plots\n\n\nCode\npar(mfrow = c(3, 2))\nfor (j in 1:ncol(X)) {\n  acf(beta_samples[[1]][burn_in:n_iter, j], main = paste(\"ACF: beta\", j - 1))\n}"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#convergence-diagnostics",
+    "href": "bayesian_spike_and_slab.html#convergence-diagnostics",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Convergence Diagnostics",
+    "text": "Convergence Diagnostics\n\n\nCode\nconvergence_stats &lt;- function(samples) {\n  n &lt;- length(samples)\n  ac1 &lt;- cor(samples[-1], samples[-n])\n  mcse &lt;- sd(samples) * sqrt((1 + ac1) / n)\n  a &lt;- floor(0.1 * n); b &lt;- floor(0.5 * n)\n  z &lt;- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /\n       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)\n  ess &lt;- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))\n  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)\n}\n\n# Apply to chain 1\nconv_results &lt;- t(apply(beta_samples[[1]][burn_in:n_iter, ], 2, convergence_stats))\nrownames(conv_results) &lt;- paste0(\"beta\", 0:p)\nround(conv_results, 4)\n\n\n      autocorr1   mcse geweke_z       ess\nbeta0    0.0232 0.0018  -0.9796 2745.9833\nbeta1    0.0374 0.0020   0.5127 2185.3118\nbeta2    0.3956 0.0016   0.4830  878.5174\nbeta3    0.0291 0.0006   0.9637 2597.4558\nbeta4    0.2506 0.0010  -0.4140  971.6853\nbeta5    0.0490 0.0018  -2.8212 3758.3315\n\n\n\nGelman–Rubin R-hat\n\n\nCode\nRhat &lt;- function(ch1, ch2) {\n  n &lt;- nrow(ch1)\n  m &lt;- 2\n  chain_means &lt;- c(colMeans(ch1), colMeans(ch2))\n  overall_mean &lt;- colMeans(rbind(ch1, ch2))\n  B &lt;- n * apply(rbind(colMeans(ch1), colMeans(ch2)), 2, var)\n  W &lt;- (apply(ch1, 2, var) + apply(ch2, 2, var)) / 2\n  var_hat &lt;- ((n - 1) / n) * W + (1 / n) * B\n  sqrt(var_hat / W)\n}\n\nRhat_values &lt;- Rhat(beta_samples[[1]][burn_in:n_iter, ], beta_samples[[2]][burn_in:n_iter, ])\nround(Rhat_values, 3)\n\n\n[1] 1 1 1 1 1 1"
+  },
+  {
+    "objectID": "bayesian_spike_and_slab.html#posterior-mean-vs-true-values",
+    "href": "bayesian_spike_and_slab.html#posterior-mean-vs-true-values",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "section": "Posterior Mean vs True Values",
+    "text": "Posterior Mean vs True Values\n\n\nCode\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_summary[, \"mean\"], pch = 19, col = \"blue\",\n     xlab = \"True Coefficients\", ylab = \"Posterior Mean Estimates\",\n     main = \"Posterior Mean vs True Coefficients\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\nlegend(\"topleft\", legend = c(\"Posterior Means\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Classical and Bayesian Linear Regression",
+    "section": "",
+    "text": "Welcome ??\nThis site contains Quarto documents that demonstrate and compare different linear regression models � from the classical ordinary least squares (OLS) approach to Bayesian models with Gaussian and spike-and-slab priors.\nEach document includes a short theoretical overview, commented R code, and visualizations of results and diagnostics.\nAll examples are implemented in pure base R, so they can run anywhere R is installed.\n\n\n\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS)\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity\n\n\n\n\n\n\n\nYou can clone or download this repository and render the documents using Quarto in RStudio or from the terminal.\n```bash quarto render"
+  },
+  {
+    "objectID": "index.html#overview-of-materials",
+    "href": "index.html#overview-of-materials",
+    "title": "Classical and Bayesian Linear Regression",
+    "section": "",
+    "text": "Section\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS)\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity"
+  },
+  {
+    "objectID": "index.html#how-to-reproduce-locally",
+    "href": "index.html#how-to-reproduce-locally",
+    "title": "Classical and Bayesian Linear Regression",
+    "section": "",
+    "text": "You can clone or download this repository and render the documents using Quarto in RStudio or from the terminal.\n```bash quarto render"
+  }
+]
