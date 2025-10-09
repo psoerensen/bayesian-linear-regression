@@ -8,7 +8,7 @@ format:
 
 # Classical and Bayesian Linear Regression
 
-Welcome! ??  
+Welcome!  
 
 This site contains interactive **Quarto documents** demonstrating and comparing different linear regression models — from classical OLS to Bayesian approaches with Gaussian and spike-and-slab priors.  
 
@@ -16,7 +16,7 @@ Each section includes both **mathematical explanations** and **executable R code
 
 ---
 
-## ?? Overview
+## Overview
 
 | Topic | Description |
 |-------|--------------|
@@ -27,7 +27,7 @@ Each section includes both **mathematical explanations** and **executable R code
 
 ---
 
-## ?? Reproducibility
+## Reproducibility
 
 All examples are written in **pure base R** and can be run directly in RStudio.  
 You can explore, modify, and re-render them using Quarto:
