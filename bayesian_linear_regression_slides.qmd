@@ -866,7 +866,7 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 Bayesian linear regression provides a principled and flexible framework for modeling,  
 regularization, and interpretation in modern data analysis.  
 
----
+[← Back to main page](https://psoerensen.github.io/bayesian-linear-regression/)
 
 ```{r, include=FALSE}
 if (file.exists("bayesian_linear_regression_slides.pdf")) file.copy("bayesian_linear_regression_slides.pdf", "docs/bayesian_linear_regression_slides.pdf", overwrite = TRUE)
