@@ -9,7 +9,7 @@ format:
 
 Welcome!  
 
-This site contains **Quarto documents** that demonstrate and compare different linear regression models - from the **classical ordinary least squares (OLS)** approach to **Bayesian models** with Gaussian and spike-and-slab priors.
+This site contains **Quarto documents** that demonstrate and compare different linear regression models — from the **classical ordinary least squares (OLS)** approach to **Bayesian models** with Gaussian and spike-and-slab priors.
 
 Each document includes a short theoretical overview, commented R code, and visualizations of results and diagnostics.  
 All examples are implemented in **pure base R**, so they can run anywhere R is installed.
@@ -26,6 +26,7 @@ All examples are implemented in **pure base R**, so they can run anywhere R is i
 | [Bayesian (Spike & Slab)](bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity |
 
 [Download Notes as PDF](notes.pdf)
+[Download Slides as PDF](bayesian_linear_regression_slides.pdf)
 
 ---
 

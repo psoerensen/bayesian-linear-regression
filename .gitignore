@@ -1,1 +1,57 @@
 /.quarto/
+
+# ========================================
+# Quarto + R + Beamer + Reveal.js project
+# ========================================
+
+# --- RStudio and R temporary files ---
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Rproj
+
+# --- Quarto intermediate files ---
+*_cache/
+*_files/
+.DS_Store
+*.log
+*.aux
+*.out
+*.nav
+*.snm
+*.toc
+*.vrb
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.lof
+*.lot
+*.lol
+*.bcf
+*.run.xml
+*.gz
+
+# --- Quarto render cache ---
+.qmd-*
+__quarto_cache__/
+
+# --- LaTeX intermediate files ---
+*.tex
+*.tmp
+*.bak
+
+# --- OS / editor files ---
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# --- Quarto output directories ---
+# Ignore _site (used for local preview)
+_site/
+
+# Keep docs/ because it's used for GitHub Pages deployment
+!docs/
