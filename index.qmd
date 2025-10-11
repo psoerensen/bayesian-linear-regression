@@ -21,6 +21,7 @@ All examples are implemented in **pure base R**, so they can run anywhere R is i
 | Section | Description |
 |----------|--------------|
 | [Notes](notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics |
+| [Slides](bayesian_linear_regression_slides.html) | Theoretical slides on Bayesian linear regression, Gibbs sampling, and convergence diagnostics |
 | [Classical Regression](classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) |
 | [Bayesian (Gaussian Prior)](bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling |
 | [Bayesian (Spike & Slab)](bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity |

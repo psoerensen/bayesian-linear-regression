@@ -515,7 +515,7 @@
     "href": "index.html#overview-of-materials",
     "title": "Classical and Bayesian Linear Regression",
     "section": "Overview of Materials",
-    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS)\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity\n\n\n\nDownload Notes as PDF Download Slides as PDF"
+    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics\n\n\nSlides\nTheoretical slides on Bayesian linear regression, Gibbs sampling, and convergence diagnostics\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS)\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity\n\n\n\nDownload Notes as PDF Download Slides as PDF"
   },
   {
     "objectID": "index.html#how-to-reproduce-locally",
