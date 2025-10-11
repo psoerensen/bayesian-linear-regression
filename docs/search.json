@@ -375,7 +375,7 @@
     "href": "bayesian_linear_regression_slides.html#practical-summary",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "🧰 Practical Summary",
-    "text": "🧰 Practical Summary\n\nModel definition: specify likelihood + priors.\n\nComputation: run Gibbs sampler (3–6 conditional updates).\n\nDiagnostics: check trace plots, ESS, and \\(\\hat{R}\\).\n\nPosterior summaries:\n\n\\(\\mathbb{E}[\\beta \\mid y]\\), \\(\\text{SD}(\\beta \\mid y)\\), credible intervals.\n\nPosterior inclusion probabilities (PIPs) for feature importance.\n\n\nPrediction: simulate \\(y_{\\text{new}}\\) from posterior draws.\n\nBayesian linear regression provides a principled and flexible framework for modeling,\nregularization, and interpretation in modern data analysis.\n← Back to main page"
+    "text": "🧰 Practical Summary\n\nModel definition: specify likelihood + priors.\n\nComputation: run Gibbs sampler (3–6 conditional updates).\n\nDiagnostics: check trace plots, ESS, and \\(\\hat{R}\\).\n\nPosterior summaries:\n\n\\(\\mathbb{E}[\\beta \\mid y]\\), \\(\\text{SD}(\\beta \\mid y)\\), credible intervals.\n\nPosterior inclusion probabilities (PIPs) for feature importance.\n\n\nPrediction: simulate \\(y_{\\text{new}}\\) from posterior draws.\n\nBayesian linear regression provides a principled and flexible framework for modeling,\nregularization, and interpretation in modern data analysis."
   },
   {
     "objectID": "bayesian_linear_regression_conjugate.html",

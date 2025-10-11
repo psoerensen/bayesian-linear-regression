@@ -40,7 +40,6 @@ execute:
 ---
 
 
-
 ## Overview
 
 - **Classical Linear Regression**
@@ -866,8 +865,38 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 Bayesian linear regression provides a principled and flexible framework for modeling,  
 regularization, and interpretation in modern data analysis.  
 
-[← Back to main page](https://psoerensen.github.io/bayesian-linear-regression/)
+---
 
 ```{r, include=FALSE}
 if (file.exists("bayesian_linear_regression_slides.pdf")) file.copy("bayesian_linear_regression_slides.pdf", "docs/bayesian_linear_regression_slides.pdf", overwrite = TRUE)
 ```
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const backBtn = document.createElement("a");
+  backBtn.href = "index.html";
+  backBtn.target = "_self";
+  backBtn.textContent = "← Back to Main Page";
+  backBtn.style.cssText = `
+    position: fixed; top: 10px; right: 20px;
+    background: #fff; color: #000;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid #000;
+    font-weight: 600; font-family: sans-serif;
+    text-decoration: none; font-size: 14px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
+    z-index: 9999;
+  `;
+  backBtn.onmouseover = () => {
+    backBtn.style.background = '#000';
+    backBtn.style.color = '#fff';
+  };
+  backBtn.onmouseout = () => {
+    backBtn.style.background = '#fff';
+    backBtn.style.color = '#000';
+  };
+  document.body.appendChild(backBtn);
+});
+</script>
