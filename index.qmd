@@ -25,8 +25,8 @@ Explore the sections below to find the corresponding materials.
 | [**Bayesian (Gaussian Prior)**](bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling. |
 | [**Bayesian (Spike & Slab)**](bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity. |
 
-?? [Download Notes (PDF)](notes.pdf)  
-?? [Download Slides (PDF)](bayesian_linear_regression_slides.pdf)
+[Download Notes (PDF)](notes.pdf)  
+[Download Slides (PDF)](bayesian_linear_regression_slides.pdf)
 
 ---
 
