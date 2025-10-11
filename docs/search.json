@@ -360,8 +360,8 @@
     "objectID": "bayesian_linear_regression_slides.html#model-diagnostics",
     "href": "bayesian_linear_regression_slides.html#model-diagnostics",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "🔍 Model Diagnostics",
-    "text": "🔍 Model Diagnostics\n\nConvergence diagnostics ensure valid posterior inference:\n\nTrace plots → mixing and stationarity.\n\nAutocorrelation / ESS → assess independence of samples.\n\nGelman–Rubin (\\(\\hat{R}\\)) → compare across chains.\n\nGeweke \\(Z\\)-test → early vs late chain segments.\n\n\nReliable inference requires well-mixed, stationary chains."
+    "section": "Model Diagnostics",
+    "text": "Model Diagnostics\n\nConvergence diagnostics ensure valid posterior inference:\n\nTrace plots → mixing and stationarity.\n\nAutocorrelation / ESS → assess independence of samples.\n\nGelman–Rubin (\\(\\hat{R}\\)) → compare across chains.\n\nGeweke \\(Z\\)-test → early vs late chain segments.\n\n\nReliable inference requires well-mixed, stationary chains."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#key-takeaways",

@@ -831,7 +831,7 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
 ---
 
-## 🔍 Model Diagnostics
+## Model Diagnostics
 
 - Convergence diagnostics ensure valid posterior inference:  
   - **Trace plots** → mixing and stationarity.  
