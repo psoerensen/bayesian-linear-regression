@@ -12,7 +12,7 @@ format:
     transition: fade
     slide-number: true
     toc: false
-    incremental: true
+    incremental: false
     smaller: true
     auto-scale: true
     font-size: 85%
@@ -793,7 +793,7 @@ $$
 PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
 
-## 🧠 Classical vs Bayesian Linear Regression
+## Classical vs Bayesian Linear Regression
 
 - **Classical (OLS)**  
   - Estimates parameters by minimizing residual sum of squares.  
@@ -807,7 +807,7 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
 ---
 
-## ⚙️ Computation & Inference
+## Computation & Inference
 
 - Bayesian inference often relies on **MCMC** to approximate the posterior.  
 - **Gibbs sampling** is efficient when full conditionals are available in closed form.  
@@ -818,7 +818,7 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
 ---
 
-## 🧩 Spike-and-Slab Priors
+## Spike-and-Slab Priors
 
 - Extends BLR to enable **variable selection** and **sparsity**.  
 - Each coefficient:  
@@ -842,7 +842,7 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
 ---
 
-## 📊 Key Takeaways
+## Key Takeaways
 
 - Bayesian regression integrates **prior knowledge** and **uncertainty**.  
 - Conjugate priors → **closed-form Gibbs updates** and efficient inference.  
@@ -852,7 +852,7 @@ PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
 ---
 
-## 🧰 Practical Summary
+## Practical Summary
 
 - **Model definition**: specify likelihood + priors.  
 - **Computation**: run Gibbs sampler (3–6 conditional updates).  
