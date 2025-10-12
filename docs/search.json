@@ -326,7 +326,7 @@
     "href": "bayesian_linear_regression_slides.html#gibbs-sampling-for-spike-and-slab-blr",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Gibbs Sampling for Spike-and-Slab BLR",
-    "text": "Gibbs Sampling for Spike-and-Slab BLR\nInference proceeds via Gibbs sampling, cycling through these conditional updates:\n\n\\(\\alpha \\mid D\\)\n\n\\(\\delta \\mid D\\)\n\n\\(\\pi \\mid D\\)\n\n\\(\\sigma_b^2 \\mid D\\)\n\n\\(\\sigma^2 \\mid D\\)\n\nEach has a standard distribution (Normal, Bernoulli, Beta, scaled-\\(\\chi^{-2}\\)). Iterating these updates generates samples from the joint posterior."
+    "text": "Gibbs Sampling for Spike-and-Slab BLR\nInference proceeds via Gibbs sampling, cycling through these conditional updates:\n\n\\(\\alpha \\mid D\\)\n\n\\(\\delta \\mid D\\)\n\n\\(\\pi \\mid D\\)\n\n\\(\\sigma_b^2 \\mid D\\)\n\n\\(\\sigma^2 \\mid D\\)\n\nHere, \\(D\\) denotes the data and all other current parameter values.\nEach conditional follows a standard distribution (Normal, Bernoulli, Beta, scaled-\\(\\chi^{-2}\\)).\nIterating these updates generates samples from the joint posterior."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#posterior-inclusion-probabilities",
@@ -347,7 +347,7 @@
     "href": "bayesian_linear_regression_slides.html#applications-in-genomics-1",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Applications in Genomics",
-    "text": "Applications in Genomics\nWe have now seen the basic framework of Bayesian Linear Regression (BLR)\nand will illustrate how it provides a unified approach for analyzing genetic and genomic data.\n\nGenome-Wide Association Studies (GWAS) and fine-mapping of causal variants.\n\nGenetic prediction and heritability estimation.\n\nPathway and gene-set enrichment analyses.\n\nIntegrative multi-omics modeling (genome, transcriptome, epigenome).\n\nThese examples show how BLR connects statistical modeling with biological interpretation in quantitative genetics."
+    "text": "Applications in Genomics\nWe have now seen the basic framework of Bayesian Linear Regression (BLR)\nand will illustrate how it provides a unified approach for analyzing genetic and genomic data.\n\nGenome-Wide Association Studies (GWAS) and fine-mapping of causal variants.\n\nGenetic prediction and heritability estimation.\n\nPathway and gene-set enrichment analyses.\n\nThese examples show how BLR connects statistical modeling with biological interpretation in quantitative genetics."
   },
   {
     "objectID": "bayesian_linear_regression_conjugate.html",

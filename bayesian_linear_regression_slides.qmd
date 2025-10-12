@@ -765,7 +765,7 @@ This captures our **updated beliefs** about effects, inclusion indicators, and v
 
 ## Gibbs Sampling for Spike-and-Slab BLR
 
-Inference proceeds via **Gibbs sampling**,  cycling through these conditional updates:
+Inference proceeds via **Gibbs sampling**, cycling through these conditional updates:  
 
 1. $\alpha \mid D$  
 2. $\delta \mid D$  
@@ -773,7 +773,9 @@ Inference proceeds via **Gibbs sampling**,  cycling through these conditional up
 4. $\sigma_b^2 \mid D$  
 5. $\sigma^2 \mid D$
 
-Each has a **standard distribution** (Normal, Bernoulli, Beta, scaled-$\chi^{-2}$). Iterating these updates generates samples from the joint posterior.
+Here, **$D$** denotes the data and all other current parameter values.  
+Each conditional follows a **standard distribution** (Normal, Bernoulli, Beta, scaled-$\chi^{-2}$).  
+Iterating these updates generates samples from the joint posterior.
 
 
 ---
@@ -814,7 +816,6 @@ and will illustrate how it provides a **unified approach** for analyzing genetic
 - **Genome-Wide Association Studies (GWAS)** and **fine-mapping** of causal variants.  
 - **Genetic prediction** and **heritability estimation**.  
 - **Pathway** and **gene-set enrichment** analyses.  
-- Integrative **multi-omics** modeling (genome, transcriptome, epigenome).  
 
 These examples show how BLR connects **statistical modeling** with **biological interpretation** in quantitative genetics.
 
