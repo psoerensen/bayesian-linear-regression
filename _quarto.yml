@@ -24,3 +24,9 @@ format:
     toc: true
     code-fold: true
     highlight-style: github
+
+author:
+  - name: "Peter Sørensen"
+    affiliation:
+      - "Center for Quantitative Genetics and Genomics"
+      - "Aarhus University"
