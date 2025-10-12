@@ -1,5 +1,10 @@
 # Classical and Bayesian Linear Regression
 
+**Author:** [Peter Sørensen](https://psoerensen.github.io/)  
+**Affiliation:** Center for Quantitative Genetics and Genomics, Aarhus University  
+
+---
+
 This repository contains theoretical notes, slides, and practical examples for learning and teaching **Bayesian Linear Regression** and related topics.  
 It covers both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.
 
