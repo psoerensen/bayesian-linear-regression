@@ -28,9 +28,11 @@ Explore the sections below to find the corresponding materials.
 
 ---
 
-## How to Reproduce Locally
+---
 
-You can clone or download this repository and render the documents using **Quarto** in RStudio or from the terminal:
+### Further Reading
 
-```bash
-quarto render
+Further details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in  
+**[Sorensen, D. (2025). *Statistical Learning in Genetics: An Introduction Using R*. Springer.](https://link.springer.com/book/10.1007/978-3-031-86274-8)**  
+
+This book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in **quantitative genetics and genomics**.

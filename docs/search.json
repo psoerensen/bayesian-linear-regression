@@ -515,13 +515,6 @@
     "href": "index.html#overview-of-materials",
     "title": "Classical and Bayesian Linear Regression",
     "section": "Overview of Materials",
-    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics.\n\n\nSlides\nLecture slides summarizing key theoretical concepts and derivations.\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS).\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling.\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity.\n\n\n\nDownload Notes (PDF)\nDownload Slides (PDF)"
-  },
-  {
-    "objectID": "index.html#how-to-reproduce-locally",
-    "href": "index.html#how-to-reproduce-locally",
-    "title": "Classical and Bayesian Linear Regression",
-    "section": "How to Reproduce Locally",
-    "text": "How to Reproduce Locally\nYou can clone or download this repository and render the documents using Quarto in RStudio or from the terminal:\n```bash quarto render"
+    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics.\n\n\nSlides\nLecture slides summarizing key theoretical concepts and derivations.\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS).\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling.\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity.\n\n\n\nDownload Notes (PDF)\nDownload Slides (PDF)\n\n\n\nFurther Reading\nFurther details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in\nSorensen, D. (2025). Statistical Learning in Genetics: An Introduction Using R. Springer.\nThis book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in quantitative genetics and genomics."
   }
 ]
