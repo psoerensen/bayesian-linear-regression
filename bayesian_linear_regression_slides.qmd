@@ -792,78 +792,32 @@ $$
 
 PIPs summarize **variable relevance** and drive **Bayesian feature selection**.
 
+---
 
-## Classical vs Bayesian Linear Regression
+## Summary of Bayesian Linear Regression
 
-- **Classical (OLS)**  
-  - Estimates parameters by minimizing residual sum of squares.  
-  - Provides point estimates and asymptotic uncertainty (SEs, $t$-tests).  
-  - Struggles with collinearity or when $p > n$.  
+**Bayesian Linear Regression** combines **likelihood** and **prior** to form the **posterior**, enabling principled modeling, regularization, and uncertainty quantification.  
 
-- **Bayesian (BLR)**  
-  - Combines **likelihood** and **prior** to form the **posterior**.  
-  - Incorporates **regularization** through priors.  
-  - Provides **full uncertainty quantification** via posterior samples.  
+- Inference via **MCMC** (often **Gibbs sampling**) with posterior draws for **means**, **credible intervals**, and **predictions**.  
+- **Spike-and-slab priors** enable **sparsity** and **variable selection**, assigning **exact zeros** to irrelevant predictors and identifying key variables via **posterior inclusion probabilities (PIPs)**.  
+- **Conjugate and mixture priors** yield **efficient** and **robust inference**, even when **$p > n$**.  
+- With **proper convergence checks**, Bayesian models provide **stable and reliable inference** across a wide range of data settings.  
+
 
 ---
 
-## Computation & Inference
+## Applications in Genomics
 
-- Bayesian inference often relies on **MCMC** to approximate the posterior.  
-- **Gibbs sampling** is efficient when full conditionals are available in closed form.  
-- After convergence, posterior draws are used to:  
-  - Estimate **posterior means**, **medians**, and **credible intervals**.  
-  - Compute **posterior inclusion probabilities (PIPs)**.  
-  - Generate **posterior predictions** with uncertainty intervals.  
+We have now seen the basic framework of **Bayesian Linear Regression (BLR)**  
+and will illustrate how it provides a **unified approach** for analyzing genetic and genomic data.
 
----
+- **Genome-Wide Association Studies (GWAS)** and **fine-mapping** of causal variants.  
+- **Genetic prediction** and **heritability estimation**.  
+- **Pathway** and **gene-set enrichment** analyses.  
+- Integrative **multi-omics** modeling (genome, transcriptome, epigenome).  
 
-## Spike-and-Slab Priors
+These examples show how BLR connects **statistical modeling** with **biological interpretation** in quantitative genetics.
 
-- Extends BLR to enable **variable selection** and **sparsity**.  
-- Each coefficient:  
-  $$
-  b_i \sim \pi \, \mathcal{N}(0, \sigma_b^2) + (1 - \pi)\, \delta_0
-  $$
-- Allows **exact zeros** for irrelevant predictors.  
-- Posterior inclusion probabilities identify important variables.  
-- Balances **prediction** (retain weak signals) and **detection** (highlight strong effects).  
-
----
-
-## Model Diagnostics
-
-- Convergence diagnostics ensure valid posterior inference:  
-  - **Trace plots** → mixing and stationarity.  
-  - **Autocorrelation / ESS** → assess independence of samples.  
-  - **Gelman–Rubin ($\hat{R}$)** → compare across chains.  
-  - **Geweke $Z$-test** → early vs late chain segments.  
-- Reliable inference requires **well-mixed, stationary chains**.  
-
----
-
-## Key Takeaways
-
-- Bayesian regression integrates **prior knowledge** and **uncertainty**.  
-- Conjugate priors → **closed-form Gibbs updates** and efficient inference.  
-- Spike-and-slab priors → **sparse**, **interpretable**, **high-dimensional** models.  
-- Posterior sampling enables comprehensive **uncertainty quantification**.  
-- With proper convergence checks, Bayesian models provide robust inference even when **$p > n$**.  
-
----
-
-## Practical Summary
-
-- **Model definition**: specify likelihood + priors.  
-- **Computation**: run Gibbs sampler (3–6 conditional updates).  
-- **Diagnostics**: check trace plots, ESS, and $\hat{R}$.  
-- **Posterior summaries**:  
-  - $\mathbb{E}[\beta \mid y]$, $\text{SD}(\beta \mid y)$, credible intervals.  
-  - Posterior inclusion probabilities (PIPs) for feature importance.  
-- **Prediction**: simulate $y_{\text{new}}$ from posterior draws.  
-
-Bayesian linear regression provides a principled and flexible framework for modeling,  
-regularization, and interpretation in modern data analysis.  
 
 ```{r, include=FALSE}
 if (file.exists("bayesian_linear_regression_slides.pdf")) file.copy("bayesian_linear_regression_slides.pdf", "docs/bayesian_linear_regression_slides.pdf", overwrite = TRUE)

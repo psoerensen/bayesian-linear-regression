@@ -775,111 +775,33 @@ p(\sigma^2)
 </ul>
 <p>PIPs summarize <strong>variable relevance</strong> and drive <strong>Bayesian feature selection</strong>.</p>
 </section>
-<section id="classical-vs-bayesian-linear-regression" class="slide level2">
-<h2>Classical vs Bayesian Linear Regression</h2>
+<section id="summary-of-bayesian-linear-regression" class="slide level2">
+<h2>Summary of Bayesian Linear Regression</h2>
+<p><strong>Bayesian Linear Regression</strong> combines <strong>likelihood</strong> and <strong>prior</strong> to form the <strong>posterior</strong>, enabling principled modeling, regularization, and uncertainty quantification.</p>
 <ul>
-<li><strong>Classical (OLS)</strong>
-<ul>
-<li>Estimates parameters by minimizing residual sum of squares.<br>
+<li>Inference via <strong>MCMC</strong> (often <strong>Gibbs sampling</strong>) with posterior draws for <strong>means</strong>, <strong>credible intervals</strong>, and <strong>predictions</strong>.<br>
 </li>
-<li>Provides point estimates and asymptotic uncertainty (SEs, <span class="math inline">\(t\)</span>-tests).<br>
+<li><strong>Spike-and-slab priors</strong> enable <strong>sparsity</strong> and <strong>variable selection</strong>, assigning <strong>exact zeros</strong> to irrelevant predictors and identifying key variables via <strong>posterior inclusion probabilities (PIPs)</strong>.<br>
 </li>
-<li>Struggles with collinearity or when <span class="math inline">\(p &gt; n\)</span>.</li>
-</ul></li>
-<li><strong>Bayesian (BLR)</strong>
-<ul>
-<li>Combines <strong>likelihood</strong> and <strong>prior</strong> to form the <strong>posterior</strong>.<br>
+<li><strong>Conjugate and mixture priors</strong> yield <strong>efficient</strong> and <strong>robust inference</strong>, even when <strong><span class="math inline">\(p &gt; n\)</span></strong>.<br>
 </li>
-<li>Incorporates <strong>regularization</strong> through priors.<br>
-</li>
-<li>Provides <strong>full uncertainty quantification</strong> via posterior samples.</li>
-</ul></li>
+<li>With <strong>proper convergence checks</strong>, Bayesian models provide <strong>stable and reliable inference</strong> across a wide range of data settings.</li>
 </ul>
 </section>
-<section id="computation-inference" class="slide level2">
-<h2>Computation &amp; Inference</h2>
+<section id="applications-in-genomics-1" class="slide level2">
+<h2>Applications in Genomics</h2>
+<p>We have now seen the basic framework of <strong>Bayesian Linear Regression (BLR)</strong><br>
+and will illustrate how it provides a <strong>unified approach</strong> for analyzing genetic and genomic data.</p>
 <ul>
-<li>Bayesian inference often relies on <strong>MCMC</strong> to approximate the posterior.<br>
+<li><strong>Genome-Wide Association Studies (GWAS)</strong> and <strong>fine-mapping</strong> of causal variants.<br>
 </li>
-<li><strong>Gibbs sampling</strong> is efficient when full conditionals are available in closed form.<br>
+<li><strong>Genetic prediction</strong> and <strong>heritability estimation</strong>.<br>
 </li>
-<li>After convergence, posterior draws are used to:
-<ul>
-<li>Estimate <strong>posterior means</strong>, <strong>medians</strong>, and <strong>credible intervals</strong>.<br>
+<li><strong>Pathway</strong> and <strong>gene-set enrichment</strong> analyses.<br>
 </li>
-<li>Compute <strong>posterior inclusion probabilities (PIPs)</strong>.<br>
-</li>
-<li>Generate <strong>posterior predictions</strong> with uncertainty intervals.</li>
-</ul></li>
+<li>Integrative <strong>multi-omics</strong> modeling (genome, transcriptome, epigenome).</li>
 </ul>
-</section>
-<section id="spike-and-slab-priors" class="slide level2">
-<h2>Spike-and-Slab Priors</h2>
-<ul>
-<li>Extends BLR to enable <strong>variable selection</strong> and <strong>sparsity</strong>.<br>
-</li>
-<li>Each coefficient:<br>
-<span class="math display">\[
-b_i \sim \pi \, \mathcal{N}(0, \sigma_b^2) + (1 - \pi)\, \delta_0
-\]</span></li>
-<li>Allows <strong>exact zeros</strong> for irrelevant predictors.<br>
-</li>
-<li>Posterior inclusion probabilities identify important variables.<br>
-</li>
-<li>Balances <strong>prediction</strong> (retain weak signals) and <strong>detection</strong> (highlight strong effects).</li>
-</ul>
-</section>
-<section id="model-diagnostics" class="slide level2">
-<h2>Model Diagnostics</h2>
-<ul>
-<li>Convergence diagnostics ensure valid posterior inference:
-<ul>
-<li><strong>Trace plots</strong> → mixing and stationarity.<br>
-</li>
-<li><strong>Autocorrelation / ESS</strong> → assess independence of samples.<br>
-</li>
-<li><strong>Gelman–Rubin (<span class="math inline">\(\hat{R}\)</span>)</strong> → compare across chains.<br>
-</li>
-<li><strong>Geweke <span class="math inline">\(Z\)</span>-test</strong> → early vs late chain segments.<br>
-</li>
-</ul></li>
-<li>Reliable inference requires <strong>well-mixed, stationary chains</strong>.</li>
-</ul>
-</section>
-<section id="key-takeaways" class="slide level2">
-<h2>Key Takeaways</h2>
-<ul>
-<li>Bayesian regression integrates <strong>prior knowledge</strong> and <strong>uncertainty</strong>.<br>
-</li>
-<li>Conjugate priors → <strong>closed-form Gibbs updates</strong> and efficient inference.<br>
-</li>
-<li>Spike-and-slab priors → <strong>sparse</strong>, <strong>interpretable</strong>, <strong>high-dimensional</strong> models.<br>
-</li>
-<li>Posterior sampling enables comprehensive <strong>uncertainty quantification</strong>.<br>
-</li>
-<li>With proper convergence checks, Bayesian models provide robust inference even when <strong><span class="math inline">\(p &gt; n\)</span></strong>.</li>
-</ul>
-</section>
-<section id="practical-summary" class="slide level2">
-<h2>Practical Summary</h2>
-<ul>
-<li><strong>Model definition</strong>: specify likelihood + priors.<br>
-</li>
-<li><strong>Computation</strong>: run Gibbs sampler (3–6 conditional updates).<br>
-</li>
-<li><strong>Diagnostics</strong>: check trace plots, ESS, and <span class="math inline">\(\hat{R}\)</span>.<br>
-</li>
-<li><strong>Posterior summaries</strong>:
-<ul>
-<li><span class="math inline">\(\mathbb{E}[\beta \mid y]\)</span>, <span class="math inline">\(\text{SD}(\beta \mid y)\)</span>, credible intervals.<br>
-</li>
-<li>Posterior inclusion probabilities (PIPs) for feature importance.<br>
-</li>
-</ul></li>
-<li><strong>Prediction</strong>: simulate <span class="math inline">\(y_{\text{new}}\)</span> from posterior draws.</li>
-</ul>
-<p>Bayesian linear regression provides a principled and flexible framework for modeling,<br>
-regularization, and interpretation in modern data analysis.</p>
+<p>These examples show how BLR connects <strong>statistical modeling</strong> with <strong>biological interpretation</strong> in quantitative genetics.</p>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const backBtn = document.createElement("a");
