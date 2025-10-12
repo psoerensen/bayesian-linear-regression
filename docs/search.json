@@ -508,7 +508,7 @@
     "href": "index.html",
     "title": "Classical and Bayesian Linear Regression",
     "section": "",
-    "text": "Author: Peter S�rensen\nAffiliation: Center for Quantitative Genetics and Genomics, Aarhus University\nThis website provides theoretical notes, slides, and practical examples for learning and teaching Bayesian Linear Regression and related topics. The materials cover both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.\nExplore the sections below to find the corresponding materials."
+    "text": "This website provides theoretical notes, slides, and practical examples for learning and teaching Bayesian Linear Regression and related topics. The materials cover both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.\nExplore the sections below to find the corresponding materials."
   },
   {
     "objectID": "index.html#overview-of-materials",

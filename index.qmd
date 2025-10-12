@@ -6,12 +6,6 @@ format:
     toc: false
 ---
 
-**Author:** [Peter Sørensen](https://psoerensen.github.io/)  
-**Affiliation:** Center for Quantitative Genetics and Genomics, Aarhus University  
-
----
-
-
 This website provides theoretical notes, slides, and practical examples for learning and teaching **Bayesian Linear Regression** and related topics. The materials cover both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.
 
 Explore the sections below to find the corresponding materials.
