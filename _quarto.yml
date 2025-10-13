@@ -6,6 +6,8 @@ project:
 
 website:
   title: "Bayesian Linear Regression"
+  site-url: "https://psoerensen.github.io/bayesian-linear-regression/"
+  base-url: "/bayesian-linear-regression/"
   description: "Notes and Quarto demonstrations comparing classical, conjugate Bayesian, and spike-and-slab regression models."
   navbar:
     left:
