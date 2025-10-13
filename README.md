@@ -5,8 +5,8 @@
 
 ---
 
-This repository contains theoretical notes, slides, and practical examples for learning and teaching **Bayesian Linear Regression** and related topics.  
-It covers both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.
+This repository includes theoretical notes, slides, and hands-on R examples for exploring **Bayesian Linear Regression**.
+It introduces both classical and Bayesian regression methods, showing how to estimate parameters, define priors, perform posterior inference via Gibbs sampling, and assess convergence - all through practical R code.
 
 The full rendered website is available here:  
 **[https://psoerensen.github.io/bayesian-linear-regression/](https://psoerensen.github.io/bayesian-linear-regression/)**
@@ -19,9 +19,9 @@ The full rendered website is available here:
 |--------------|----------------|
 | [**Notes**](https://psoerensen.github.io/bayesian-linear-regression/notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
 | [**Slides**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations. |
-| [**Classical Regression**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS). |
-| [**Bayesian (Gaussian Prior)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling. |
-| [**Bayesian (Spike & Slab)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity. |
+| [**Classical Regression**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) **in R**. |
+| [**Bayesian (Gaussian Prior)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling **in R**. |
+| [**Bayesian (Spike & Slab)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity **in R**. |
 
 [Download Notes (PDF)](https://psoerensen.github.io/bayesian-linear-regression/notes.pdf)  
 [Download Slides (PDF)](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_slides.pdf)
