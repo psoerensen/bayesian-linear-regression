@@ -1,14 +1,6 @@
 project:
   type: website
   output-dir: _site
-  render:
-    - index.qmd
-    - notes.qmd
-    - bayesian_linear_regression_slides.qmd
-    - narrated_bayesian_linear_regression_slides.qmd
-    - classical_linear_regression_simulation.qmd
-    - bayesian_linear_regression_conjugate.qmd
-    - bayesian_spike_and_slab.qmd
   resources:
     - narration/**
 
