@@ -6,7 +6,7 @@ format:
     toc: false
 ---
 
-This repository includes theoretical notes, slides, and hands-on R examples for exploring **Bayesian Linear Regression**.
+The following materials include theoretical notes, slides, and practical R examples for exploring **Bayesian Linear Regression**.
 It introduces both classical and Bayesian regression methods, showing how to estimate parameters, define priors, perform posterior inference via Gibbs sampling, and assess convergence - all through practical R code.
 
 Explore the sections below to find the corresponding materials.
