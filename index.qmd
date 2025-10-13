@@ -1,12 +1,12 @@
 ---
-title: "Classical and Bayesian Linear Regression"
+title: "Bayesian Linear Regression"
 format:
   html:
     theme: flatly
     toc: false
 ---
 
-This website provides theoretical notes, slides, and practical examples for learning and teaching **Bayesian Linear Regression** and related topics. The materials cover both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.
+This website provides theoretical notes, slides, and practical examples for a brief introduction to **Bayesian Linear Regression** and related topics. The materials cover both classical and Bayesian approaches to regression, including model estimation, prior specification, Gibbs sampling, and convergence diagnostics.
 
 Explore the sections below to find the corresponding materials.
 

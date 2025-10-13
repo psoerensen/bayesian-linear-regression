@@ -1,4 +1,4 @@
-# Classical and Bayesian Linear Regression
+# Bayesian Linear Regression
 
 **Author:** [Peter Sørensen](https://psoerensen.github.io/)  
 **Affiliation:** Center for Quantitative Genetics and Genomics, Aarhus University  

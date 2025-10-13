@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "Classical and Bayesian Linear Regression"
+  title: "Bayesian Linear Regression"
   description: "Notes and Quarto demonstrations comparing classical, conjugate Bayesian, and spike-and-slab regression models."
   navbar:
     left:
