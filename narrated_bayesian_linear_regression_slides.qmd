@@ -19,20 +19,6 @@ format:
     math:
       scale: 0.9
     css: slides.css   
-  beamer:
-    theme: default
-    slide-level: 2
-    keep-tex: true
-    pdf-engine: lualatex
-    fontsize: 11pt
-    header-includes: |
-      \setbeamertemplate{itemize item}{\textendash}
-      \setbeamertemplate{itemize subitem}{\textbullet}
-      \setbeamertemplate{itemize subsubitem}{$\cdot$}
-      \makeatletter
-      \patchcmd{\beamer@framesetup}{\centering}{}{}{}
-      \makeatother
-
 execute: 
   echo: false
   warning: false
@@ -147,6 +133,18 @@ $$
 
 Inference via standard errors and $t$-tests, confidence intervals, and prediction intervals.
 
+::: notes
+In classical linear regression, estimation of the model parameters is achieved using the method of least squares.  
+The estimated regression coefficients, denoted by beta hat, are obtained by minimizing the sum of squared residuals.  
+Mathematically, this solution is given by \( \hat{\beta} = (X^\top X)^{-1} X^\top y \).  
+Intuitively, this means we’re finding the set of coefficients that produces the best linear fit to the data, in the sense of minimizing the vertical distances between observed and predicted values.  
+Once the coefficients are estimated, we can compute the residual variance, denoted \( \hat{\sigma}^2 \), which measures the average squared deviation between observed outcomes and model predictions.  
+This variance provides a key measure of unexplained variability, and it underlies inference through standard errors, t-tests, confidence intervals, and prediction intervals.  
+Altogether, these quantities form the backbone of classical regression inference before introducing Bayesian perspectives.
+:::
+
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block05.mp3"></audio>
+
 ---
 
 ## Limitations
@@ -155,6 +153,17 @@ Inference via standard errors and $t$-tests, confidence intervals, and predictio
 - Sensitive when **collinearity** is high
 - **Not identifiable** when **$p>n$**
 - Uncertainty largely **asymptotic** unless normality assumptions hold
+
+::: notes
+While classical linear regression provides a simple and powerful framework, it also has important limitations that motivate Bayesian alternatives.  
+First, the model does not allow us to explicitly control the distribution of effect sizes — all regression coefficients are treated symmetrically, regardless of prior knowledge about their likely magnitudes.  
+Second, the estimates become unstable in the presence of collinearity, when predictors are highly correlated, leading to inflated variances and unreliable inference.  
+Third, the model is not identifiable when the number of predictors exceeds the number of observations, that is, when \( p > n \); in such cases, there are infinitely many solutions that fit the data equally well.  
+Finally, classical inference relies heavily on asymptotic approximations and normality assumptions, which can underestimate uncertainty in small or complex data sets.  
+These limitations highlight why Bayesian frameworks, which introduce prior structure and probabilistic uncertainty, are often preferred in modern genomics and high-dimensional settings.
+:::
+
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block06.mp3"></audio>
 
 
 ---
@@ -171,6 +180,17 @@ Inference via standard errors and $t$-tests, confidence intervals, and predictio
 - **Stable when $p > n$** due to prior information.  
 - Provides **full posterior distributions** for $\beta$ and $\sigma^2$.
 
+::: notes
+Bayesian linear regression extends the classical framework by introducing prior information and combining it with the likelihood to obtain a posterior distribution.  
+The likelihood represents what the data tell us about the parameters, while the prior expresses our beliefs about plausible effect sizes before observing the data.  
+Different choices of priors reflect different assumptions: a normal prior assumes that most effects are small and centered around zero, whereas a spike-and-slab prior encourages sparsity, allowing a few large effects while setting many others exactly to zero.  
+This incorporation of prior structure acts as a form of regularization — it naturally shrinks small or noisy estimates toward zero, while preserving larger, well-supported effects.  
+An additional advantage is that the model remains identifiable and stable even when the number of predictors exceeds the number of observations, that is, when \( p > n \).  
+Finally, Bayesian inference provides full posterior distributions for both the regression coefficients and the residual variance, giving us direct probabilistic measures of uncertainty instead of relying on asymptotic approximations.
+:::
+
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block07.mp3"></audio>
+
 ---
 
 ## Overview: Bayesian Linear Regression
@@ -180,6 +200,17 @@ Inference via standard errors and $t$-tests, confidence intervals, and predictio
 - Uses **conjugate priors** to yield closed-form full conditionals.  
 - Employs **Gibbs sampling** to approximate the posterior distribution.  
 - Estimates **parameters, uncertainty, and predictions** from posterior draws.
+
+::: notes
+This slide provides an overview of the Bayesian linear regression framework and how it differs operationally from the classical approach.  
+At its core, Bayesian inference combines prior knowledge and observed data through Bayes’ rule to obtain the posterior distribution of the model parameters.  
+In practice, we often choose conjugate priors because they lead to closed-form full conditional distributions, which greatly simplify posterior computation.  
+To explore these posterior distributions, we employ Gibbs sampling — a form of Markov chain Monte Carlo that iteratively samples each parameter from its conditional distribution, given the others.  
+From the resulting posterior draws, we can estimate not only the parameters themselves, but also their uncertainty and predictive distributions for new observations.  
+This process provides a coherent, probabilistic framework for inference, prediction, and model interpretation.
+:::
+
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block08.mp3"></audio>
 
 ---
 

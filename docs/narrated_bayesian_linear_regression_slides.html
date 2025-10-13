@@ -282,6 +282,27 @@ This framework forms the foundation for both frequentist estimation — through 
 \hat{\sigma}^2 = \frac{1}{n-p}\sum_i (y_i - x_i^\top \hat{\beta})^2
 \]</span></p>
 <p>Inference via standard errors and <span class="math inline">\(t\)</span>-tests, confidence intervals, and prediction intervals.</p>
+<aside class="notes">
+<p>In classical linear regression, estimation of the model parameters is achieved using the method of least squares.<br>
+The estimated regression coefficients, denoted by beta hat, are obtained by minimizing the sum of squared residuals.<br>
+Mathematically, this solution is given by ( = (X<sup>X)</sup>{-1} X^y ).<br>
+Intuitively, this means we’re finding the set of coefficients that produces the best linear fit to the data, in the sense of minimizing the vertical distances between observed and predicted values.<br>
+Once the coefficients are estimated, we can compute the residual variance, denoted ( ^2 ), which measures the average squared deviation between observed outcomes and model predictions.<br>
+This variance provides a key measure of unexplained variability, and it underlies inference through standard errors, t-tests, confidence intervals, and prediction intervals.<br>
+Altogether, these quantities form the backbone of classical regression inference before introducing Bayesian perspectives.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<audio controls="" preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block05.mp3">
+</audio>
 </section>
 <section id="limitations" class="slide level2">
 <h2>Limitations</h2>
@@ -291,6 +312,26 @@ This framework forms the foundation for both frequentist estimation — through 
 <li><strong>Not identifiable</strong> when <strong><span class="math inline">\(p&gt;n\)</span></strong></li>
 <li>Uncertainty largely <strong>asymptotic</strong> unless normality assumptions hold</li>
 </ul>
+<aside class="notes">
+<p>While classical linear regression provides a simple and powerful framework, it also has important limitations that motivate Bayesian alternatives.<br>
+First, the model does not allow us to explicitly control the distribution of effect sizes — all regression coefficients are treated symmetrically, regardless of prior knowledge about their likely magnitudes.<br>
+Second, the estimates become unstable in the presence of collinearity, when predictors are highly correlated, leading to inflated variances and unreliable inference.<br>
+Third, the model is not identifiable when the number of predictors exceeds the number of observations, that is, when ( p &gt; n ); in such cases, there are infinitely many solutions that fit the data equally well.<br>
+Finally, classical inference relies heavily on asymptotic approximations and normality assumptions, which can underestimate uncertainty in small or complex data sets.<br>
+These limitations highlight why Bayesian frameworks, which introduce prior structure and probabilistic uncertainty, are often preferred in modern genomics and high-dimensional settings.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<audio controls="" preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block06.mp3">
+</audio>
 </section>
 <section id="why-bayesian-linear-regression" class="slide level2">
 <h2>Why Bayesian Linear Regression?</h2>
@@ -315,6 +356,26 @@ This framework forms the foundation for both frequentist estimation — through 
 </li>
 <li>Provides <strong>full posterior distributions</strong> for <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma^2\)</span>.</li>
 </ul>
+<aside class="notes">
+<p>Bayesian linear regression extends the classical framework by introducing prior information and combining it with the likelihood to obtain a posterior distribution.<br>
+The likelihood represents what the data tell us about the parameters, while the prior expresses our beliefs about plausible effect sizes before observing the data.<br>
+Different choices of priors reflect different assumptions: a normal prior assumes that most effects are small and centered around zero, whereas a spike-and-slab prior encourages sparsity, allowing a few large effects while setting many others exactly to zero.<br>
+This incorporation of prior structure acts as a form of regularization — it naturally shrinks small or noisy estimates toward zero, while preserving larger, well-supported effects.<br>
+An additional advantage is that the model remains identifiable and stable even when the number of predictors exceeds the number of observations, that is, when ( p &gt; n ).<br>
+Finally, Bayesian inference provides full posterior distributions for both the regression coefficients and the residual variance, giving us direct probabilistic measures of uncertainty instead of relying on asymptotic approximations.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<audio controls="" preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block07.mp3">
+</audio>
 </section>
 <section id="overview-bayesian-linear-regression" class="slide level2">
 <h2>Overview: Bayesian Linear Regression</h2>
@@ -327,6 +388,26 @@ This framework forms the foundation for both frequentist estimation — through 
 </li>
 <li>Estimates <strong>parameters, uncertainty, and predictions</strong> from posterior draws.</li>
 </ul>
+<aside class="notes">
+<p>This slide provides an overview of the Bayesian linear regression framework and how it differs operationally from the classical approach.<br>
+At its core, Bayesian inference combines prior knowledge and observed data through Bayes’ rule to obtain the posterior distribution of the model parameters.<br>
+In practice, we often choose conjugate priors because they lead to closed-form full conditional distributions, which greatly simplify posterior computation.<br>
+To explore these posterior distributions, we employ Gibbs sampling — a form of Markov chain Monte Carlo that iteratively samples each parameter from its conditional distribution, given the others.<br>
+From the resulting posterior draws, we can estimate not only the parameters themselves, but also their uncertainty and predictive distributions for new observations.<br>
+This process provides a coherent, probabilistic framework for inference, prediction, and model interpretation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<audio controls="" preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block08.mp3">
+</audio>
 </section>
 <section id="bayesian-linear-regression-with-gaussian-priors" class="slide level2">
 <h2>Bayesian Linear Regression with Gaussian Priors</h2>
