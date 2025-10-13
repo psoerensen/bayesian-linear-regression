@@ -61,7 +61,7 @@ Finally, we will cover computational methods such as Markov chain Monte Carlo an
 The goal is to provide both conceptual understanding and hands-on perspective for applying these models in real research.
 :::
 
-<audio controls preload="auto" src="narration/bayesian_linear_regression_slides_with_narration_block01.mp3"></audio>
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block01.mp3"></audio>
                                
 ---
 
@@ -104,7 +104,7 @@ Beyond single-variant analysis, Bayesian frameworks are used for pathway or gene
 Overall, Bayesian regression provides a flexible and coherent approach to studying molecular and genetic variation.
 :::
 
-<audio controls preload="auto" src="narration/bayesian_linear_regression_slides_with_narration_block02.mp3"></audio>
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block03.mp3"></audio>
 
 ---
 
@@ -120,6 +120,16 @@ $$
 - $\beta$: coefficients  
 - $e$: are the residuals  
 - $\sigma^2$: residual variance  
+
+::: notes
+We now transition from the broader applications of Bayesian methods to a review of classical linear regression, which serves as our starting point for building Bayesian intuition.  
+In this model, the response variable \( y \) is explained as a linear combination of predictors in the design matrix \( X \), weighted by regression coefficients \( \beta \), plus a residual error term \( e \).  
+The residuals are assumed to follow a normal distribution with mean zero and variance \( \sigma^2 \), implying that deviations from the regression line are random and homoscedastic.  
+Each term has a specific role: \( y \) represents the observed outcomes, \( X \) contains the predictors or explanatory variables, \( \beta \) captures the strength and direction of their effects, and \( e \) accounts for unexplained variability.  
+This framework forms the foundation for both frequentist estimation — through least squares — and for Bayesian extensions, where we will later introduce priors and infer posterior distributions for \( \beta \) and \( \sigma^2 \).
+:::
+
+<audio controls preload="auto" src="narration/narrated_bayesian_linear_regression_slides_block04.mp3"></audio>
 
 ---
 

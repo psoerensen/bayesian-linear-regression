@@ -3,10 +3,14 @@ library(fs)
 library(jsonlite)
 
 # Path to your main slide file
-qmd_files <- "bayesian_linear_regression_slides_with_narration.qmd"
+qmd_files <- "narrated_bayesian_linear_regression_slides.qmd"
 
 # Ensure narration folder exists
 dir_create("narration", recurse = TRUE)
+
+# 🔧 Control behavior:
+# Set to TRUE to regenerate all narration files (even if they exist)
+update_all <- FALSE  # change to TRUE if you want to re-record everything
 
 for (qfile in qmd_files) {
   lines <- readLines(qfile, warn = FALSE)
@@ -24,6 +28,14 @@ for (qfile in qmd_files) {
     out_name <- sprintf("%s_block%02d.mp3", base, i)
     out_path <- path("narration", out_name)
     
+    # 🎯 Skip existing MP3s unless update_all = TRUE
+    if (file_exists(out_path) && !update_all) {
+      message("⏩ Skipping existing narration: ", out_path)
+      next
+    }
+    
+    message("🎙️ Generating narration for block ", i, " ...")
+    
     payload <- toJSON(list(
       model = "gpt-4o-mini-tts",
       voice = "alloy",
@@ -39,6 +51,11 @@ for (qfile in qmd_files) {
     )
     
     system(cmd)
-    message("✅ Generated narration: ", out_path)
+    
+    if (file_exists(out_path) && file_info(out_path)$size > 1000) {
+      message("✅ Generated narration: ", out_path)
+    } else {
+      warning("⚠️ Failed or empty output for: ", out_path)
+    }
   }
 }
