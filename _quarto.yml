@@ -5,7 +5,7 @@ project:
     - index.qmd
     - notes.qmd
     - bayesian_linear_regression_slides.qmd
-    - bayesian_linear_regression_slides_with_narration.qmd
+    - narrated_bayesian_linear_regression_slides.qmd
     - classical_linear_regression_simulation.qmd
     - bayesian_linear_regression_conjugate.qmd
     - bayesian_spike_and_slab.qmd
@@ -24,7 +24,7 @@ website:
       - text: "Slides"
         href: bayesian_linear_regression_slides.html
       - text: "Narrated Slides"
-        href: bayesian_linear_regression_slides_with_narration.html
+        href: narrated_bayesian_linear_regression_slides.html
       - text: "Classical Regression"
         href: classical_linear_regression_simulation.html
       - text: "Bayesian (Gaussian Prior)"
