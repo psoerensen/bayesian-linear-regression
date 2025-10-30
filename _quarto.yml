@@ -9,8 +9,6 @@ website:
   description: "Notes and Quarto demonstrations comparing classical, conjugate Bayesian, and spike-and-slab regression models."
   navbar:
     left:
-      - text: "Home"
-        href: index.html
       - text: "Notes"
         href: notes.html
       - text: "BLR slides"
