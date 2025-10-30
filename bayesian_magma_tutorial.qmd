@@ -26,7 +26,7 @@ This results in **posterior inclusion probabilities (PIPs)** for each gene set, 
 Gene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.  
 The approach can also be extended to **multi-trait analyses**, enabling cross-trait exploration of pathway relevance.
 
-See full details in *Gholipourshahraki et al., 2024*.
+See full details in *Gholipourshahraki T, et al.  PLOS Genet. 20, e1011463 (2024)*.
 
 <br>
 
@@ -39,7 +39,8 @@ Figure 1. Schematic overview of the Bayesian MAGMA workflow.
 
 ## Simulation set up
 
-This tutorial demonstrates how to simulate **gene-level association statistics** and **overlapping gene sets (pathways)** for gene set enrichment analysis using **MAGMA-style** or **Bayesian methods**.  
+This tutorial demonstrates how to simulate **gene-level association statistics** and **overlapping gene sets (pathways)** for enrichment analysis using MAGMA-style approaches, implemented either as OLS joint estimation or via Bayesian inference with BayesC or BayesR priors.
+
 You will learn to:
 
 1. Simulate gene-level Z-scores with causal genes.  
@@ -63,10 +64,10 @@ library(ggplot2)
 
 ```{r}
 n_genes <- 20000
-n_assoc <-
+n_assoc <-  100
 n_pathways <- 100
-effect_mean <- 3
-sd = effect_sd <- 1
+effect_mean <- 1
+effect_sd <- 1
 
 ```
 
