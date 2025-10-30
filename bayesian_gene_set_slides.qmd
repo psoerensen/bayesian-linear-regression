@@ -1,0 +1,1129 @@
+---
+title: "Gene Set Analyses using Bayesian Linear Regression Models"
+author:
+  - name: "Peter Sørensen"
+    affiliation:
+      - "Center for Quantitative Genetics and Genomics, Aarhus University, Denmark"
+format: 
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    toc: false
+    incremental: false
+    smaller: true
+    auto-scale: true
+    font-size: 85%
+    math:
+      scale: 0.9
+    css: slides.css   
+  beamer:
+    theme: default
+    slide-level: 2
+    keep-tex: true
+    pdf-engine: lualatex
+    fontsize: 11pt
+    header-includes: |
+      \setbeamertemplate{itemize item}{\textendash}
+      \setbeamertemplate{itemize subitem}{\textbullet}
+      \setbeamertemplate{itemize subsubitem}{$\cdot$}
+      \makeatletter
+      \patchcmd{\beamer@framesetup}{\centering}{}{}{}
+      \makeatother
+
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+
+## Overview
+
+<div style="font-size: 1.5em; line-height: 1.8;">
+
+- **Introduction to Bayesian Linear Regression Models used in Gene Set Analyses**  
+- **Gene Set Analyses using Bayesian MAGMA**
+- **Integrative Genomics Analyses using the *gact* and *qgg* R packages**  
+
+</div>
+
+
+---
+
+# Introduction to Bayesian Linear Regression Models used Gene Set Analyses {.center-title}
+
+---
+
+## Bayesian Linear Regression Models
+
+**Bayesian Linear Regression Models** provide a flexible statistical framework for modeling complex biological and healthcare data. They support key applications such as:
+
+- **Genome-wide association studies (GWAS)** and **fine-mapping** of causal variants  
+- **Polygenic risk scoring (PRS)** for predicting complex traits and disease risk  
+- **Gene and pathway enrichment analyses** to test biological hypotheses  
+- **Integrative multi-omics modeling** across the genome, transcriptome, epigenome, and proteome  
+- Applications to **registry-based healthcare data**, enabling population-level **risk prediction** and **disease modeling** 
+
+<!---
+
+
+## The Response Matrix (or Vector) $\mathbf{Y}$
+
+$\mathbf{Y}$ represents the **observed outcomes** or **association measures** corresponding to the features in $\mathbf{X}$.
+
+Each **element** (or row) can represent:
+
+- A **phenotypic value** (e.g., trait measurement, case/control status)  
+- A **summary statistic** (e.g., $z$-score, $p$-value, or $\hat{\beta}$ estimate)  
+- A **molecular-level signal** for a marker, gene, or protein  
+
+In multi-trait or multi-omics contexts, $\mathbf{Y}$ can be **multivariate**, containing parallel outcomes across traits or biological layers.
+
+
+---
+
+## The Feature Matrix $\mathbf{X}$
+
+$\mathbf{X}$ represents **molecular or genomic predictors** (e.g., genotypes, gene scores, annotations, pathway indicators).  
+
+- Each **row** corresponds to an observation or association in $\mathbf{Y}$  
+- Each **column** corresponds to a feature (e.g., SNP, gene, or pathway indicator)  
+
+Entries may be:
+
+- **Binary (0/1):** presence or absence  
+- **Categorical (0/1/2):** genotype dosage or discrete state  
+- **Continuous:** quantitative molecular values (e.g., expression, methylation)
+
+---
+
+## Linking $\mathbf{Y}$ and $\mathbf{X}$
+
+Having defined our data structures (**Y** and **X**), we now link them through a linear model:
+
+$$
+\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, \qquad
+\boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})
+$$
+
+- $\mathbf{Y}$ — observed **outcomes** such as phenotypes or molecular traits  
+- $\mathbf{X}$ — **features** representing genetic, transcriptomic, or other biological layers  
+- $\boldsymbol{\beta}$ — **effect sizes** quantifying how features in $\mathbf{X}$ explain variation in $\mathbf{Y}$  
+- $\boldsymbol{\varepsilon}$ — **residual noise** capturing unexplained variation  
+
+This linear relationship forms the foundation for jointly modeling how genetic and molecular variation drives complex traits.
+
+--->
+
+---
+
+## The Bayesian Linear Regression Model
+
+The **Bayesian Linear Regression (BLR)** model builds:
+
+$$
+\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, \qquad
+\boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})
+$$
+
+- $\mathbf{Y}$ represents the **observed outcomes** or **association measures** corresponding to the features in $\mathbf{X}$.
+- $\mathbf{X}$ represents **molecular or genomic predictors** (e.g., genotypes, gene scores, annotations, pathway indicators).  
+- $\boldsymbol{\beta}$ — **effect sizes** quantifying how features in $\mathbf{X}$ explain variation in $\mathbf{Y}$  
+- $\boldsymbol{\varepsilon}$ — **residual noise** capturing unexplained variation  
+
+In the **Bayesian** formulation, each $\beta_j$ is assigned a **prior distribution** reflecting beliefs about **effect size magnitude or sparsity** and determine how **information is shared** across features or biological layers.
+
+---
+
+## Why Bayesian Linear Regression Models?
+
+Regression effects can be estimated in many ways, but we focus on a **Bayesian hierarchical framework** because it:
+
+- **Combines data and prior knowledge** to improve inference  
+- Provides a **natural way to regularize** and handle noisy or high-dimensional data  
+- Enables **flexible modeling** of diverse effect patterns:  
+  - Many small vs. few large effects  
+  - Structured effects (e.g., by pathway, gene set, or omic layer)  
+- Returns **uncertainty estimates** for all parameters → improving interpretability and model comparison
+
+Through their **hierarchical structure**, BLR models naturally **integrate multiple biological layers** — linking genomic, transcriptomic, and other molecular data  
+
+---
+
+## Hyperpriors in Bayesian Modeling
+
+The BLR model extends the linear framework by introducing **hierarchical priors** on parameters. Suppose we model regression coefficients $b_j$ with a normal prior:
+
+$$
+b_j \sim \mathcal{N}(0, \sigma_b^2)
+$$
+
+Here, $\sigma_b^2$ (the variance of the prior) controls how large the effects $b_j$ are expected to be. 
+
+Instead of fixing $\sigma_b^2$ we treat it as unknown and assign it its own prior — the **hyperprior**:
+
+$$
+\sigma_b^2 \sim \text{Inv-}\chi^2(\nu, S^2)
+$$
+
+In practice, this parameter is **learned from the data** during estimation rather than fixed in advance.
+
+---
+
+## Hierarchical Structure
+
+The three levels in the model:
+
+<div style="font-size: 0.95em">
+
+| Level | Description | Example |
+|:------|:-------------|:---------|
+| **1** | Describes how data are generated given parameters | $y \sim \mathcal{N}(Xb, \sigma^2 I)$ |
+| **2** | Describes our beliefs about the parameters before seeing data | $b_i \sim \mathcal{N}(0, \sigma_b^2)$ |
+| **3** | Describes uncertainty about the prior’s parameters | $\sigma_b^2 \sim \text{Inv-}\chi^2(\nu, S^2)$ |
+
+</div>
+
+<br>
+
+This hierarchical structure allows the model to learn how strongly to shrink effect estimates from the data, while accounting for uncertainty in prior parameters and automatically regularizing effect sizes.
+
+Simple and robust, but may not capture diverse effect-size distributions.
+
+---
+
+## Adapting to Complex Biological Architectures
+
+Complex traits arise from **heterogeneous effect-size distributions** — some features have large effects, many have small, and others are likely null.  To capture this diversity, the BLR framework can be extended in two ways:
+
+- **Data-driven grouping** of molecular features:  
+  The model *learns effect-size classes* from the data using a **mixture of variances** $\{\tau_k^2\}$ with probabilities $\{\pi_k\}$.
+
+- **Biologically informed grouping** of molecular features:  
+  The model uses *prior biological knowledge* to assign features to groups *a priori*, each with its own variance $\tau_g^2$ capturing within-group variability.
+
+Both approaches enable the model to **adapt to complex genetic and molecular architectures** and **share information** across related features or omic layers  
+
+---
+
+## Multiple-Component BLR
+
+A more flexible formulation assumes that effects come from a **mixture of normal distributions**:
+
+$$
+\beta_j \mid d_j = k \sim \mathcal{N}(0, \tau_k^2), \qquad
+P(d_j = k) = \pi_k
+$$
+
+- $d_j$ is a **latent indicator variable** assigning effect $j$ to component $k$.  
+- Each component $k$ has its own variance $\tau_k^2$, controlling expected effect size.  
+- $\pi_k$ represents the **probability of membership** in each component.  
+
+This structure allows the model to **capture both large and small effects**, including potential nulls.  
+In practice, both $\pi_k$ and $\tau_k^2$ are **learned from the data**, making the model **data-driven and adaptive**, though not necessarily **biologically informed**.
+
+---
+
+## Hierarchical (Group-Structured) BLR
+
+In this **biologically informed extension**, we assign features to predefined **groups** (e.g., genes, pathways, or protein complexes) *a priori* and model group-specific variances:
+
+$$
+\beta_j \sim \mathcal{N}\!\big(0, \tau_{g(j)}^2\big), \qquad
+\tau_g^2 \sim p(\tau_g^2)
+$$
+
+- Each feature $j$ belongs to a group $g(j)$ defined before analysis.  
+- Each group $g$ has its own variance $\tau_g^2$, controlling effect size variability within that group.  
+
+This approach allows the model to **share information among related features** and **test enrichment across biological groups**.  
+In practice, the group-level variances $\tau_g^2$ are **learned from the data**, enabling the model to **adapt shrinkage across biological structures**.
+
+---
+
+## Indicator Variables and Posterior Inclusion Probabilities
+
+In Bayesian variable selection, each feature $j$ is assigned an **indicator variable**:
+
+$$
+\delta_j =
+\begin{cases}
+1, & \text{if feature $j$ has a non-zero effect} \\
+0, & \text{if feature $j$ has no effect.}
+\end{cases}
+$$
+
+The model can be written as:
+$$
+\beta_j = \alpha_j \, \delta_j, \qquad 
+\alpha_j \sim \mathcal{N}(0, \tau^2), \quad
+\delta_j \sim \text{Bernoulli}(\pi)
+$$
+
+where $\pi$ is the prior inclusion probability.  
+
+After inference, we estimate $\text{PIP}_j = P(\delta_j = 1 \mid \text{data})$ — the **posterior inclusion probability** for feature *j*.
+
+---
+
+## Understanding the Outputs of Bayesian Linear Regression (BLR)
+
+The BLR model produces **posterior summaries** that describe  the evidence, magnitude, and uncertainty of feature effects.
+
+Key outputs:
+
+1. **Posterior means of $\boldsymbol{\beta}$** (effect sizes)  
+2. **Posterior inclusion probabilities (PIPs)**  
+3. **Variance component estimates** ($\sigma^2$, $\tau^2$, …)
+
+Each plays a distinct and complementary role in interpretation.
+
+---
+
+##  Posterior Means of Effect Sizes ($\boldsymbol{\beta}$)
+
+- Represent the **estimated effect** of each feature (gene, SNP, or set)  
+- Computed as posterior averages:  
+  $$
+  \hat{\beta}_j = \mathbb{E}[\beta_j \mid \mathbf{Y}, \mathbf{X}]
+  $$
+- Interpretation:
+  - Magnitude → **direction and strength** of association  
+  - Sign → **positive or negative effect**  
+  - Shrinkage → smaller estimates for weak or uncertain effects  
+
+- These are directly analogous to regression coefficients,  but account for prior information and uncertainty.
+
+---
+
+##  Posterior Inclusion Probabilities (PIPs)
+
+- Represent the **probability** that feature $j$ has a nonzero effect:
+  $$
+  \text{PIP}_j = \Pr(\beta_j \neq 0 \mid \mathbf{Y}, \mathbf{X})
+  $$
+
+- Quantifies **evidence of inclusion** in the model:
+  - High PIP → strong support for inclusion  
+  - Low PIP → likely irrelevant or redundant feature  
+
+- Interpretation:
+  - PIPs act as **Bayesian significance measures**  
+  - Useful for **ranking**, **fine-mapping**, and **feature prioritization**
+
+In pathway analyses (e.g., Bayesian MAGMA), PIPs correspond to **gene- or set-level importance scores**.
+
+---
+
+## Variance Component Estimates ($\tau^2$, $\sigma^2$)
+
+Variance components describe **uncertainty** and **heterogeneity** in effect sizes:
+
+$$
+\beta_j \sim \mathcal{N}(0, \tau^2)
+\qquad \text{and} \qquad
+\varepsilon_i \sim \mathcal{N}(0, \sigma^2)
+$$
+
+**$\tau^2$** is the variance component for the effect sizes  
+- Small $\tau^2$: most effects are close to zero  
+- Large $\tau^2$: more large-effect features expected  
+
+**$\sigma^2$** is the variance component for the residuals  
+- Captures unexplained variation after accounting for $\mathbf{X}$  
+
+Together, these components describe the **genetic architecture**, enabling **heritability estimation**, **uncertainty quantification**, and **enrichment analysis** across sets or traits.
+
+---
+
+##  Interpreting the Outputs Together
+
+| Quantity | Interpretation | Typical use |
+|-----------|----------------|--------------|
+| $\hat{\beta}_j$ | Direction and magnitude of effect | Effect estimation, prediction |
+| $\text{PIP}_j$ | Probability feature is truly associated | Fine-mapping, feature ranking |
+| $\tau^2$, $\sigma^2$ | Variance in effect sizes and residuals | Genetic architecture, model fit |
+
+These summaries are **synergistic**:  
+
+ - $\boldsymbol{\beta}$ tells *how much*  
+ - PIP tells *how confident*  
+ - Variance components tell *how complex*  
+
+
+---
+
+## Summary of BLR Model Structures
+
+<div style="font-size: 0.85em">
+
+| **Model Type** | **Prior Structure** | **Biological Interpretation** |
+|:----------------|:--------------------|:-------------------------------|
+| **Single-component BLR** | One global variance $\tau^2$ | All features (across layers) share the same level of shrinkage — equal contribution assumption |
+| **Multiple-component BLR** | Mixture of variances $\{\tau_k^2\}$ | Features belong to different effect-size classes (e.g., large, small, null); grouping learned from data |
+| **Hierarchical (Biologically informed) BLR** | Group-specific **mixtures of variances** $\{\tau_{gk}^2\}$ | Features grouped *a priori* (e.g., by genes, pathways, or omic layers); within each group, effects can vary in size and sparsity |
+
+</div>
+
+These models form a hierarchy of increasing flexibility and biological realism —  
+from **global shrinkage** → to **data-driven heterogeneity** → to **biologically structured mixtures** that model variation *within and between* feature sets.
+
+---
+
+## Motivation for Multivariate BLR
+
+Many traits and molecular layers are **correlated** — they share genetic architecture and biological pathways.  
+
+<br>
+
+To model these dependencies, we extend BLR to the **multivariate** setting:
+
+- **Jointly models multiple traits or omic layers**  
+  → captures shared genetic or molecular effects  
+- **Borrows strength across correlated traits**  
+  → improves fine-mapping resolution and prediction accuracy  
+- **Estimates cross-trait effect patterns**  
+  → helps identify pleiotropic genes and shared biological pathways  
+
+---
+
+## The Multivariate Bayesian Linear Regression (MV-BLR) Model
+
+In the **multivariate BLR** model, we model **multiple correlated outcomes** jointly:
+
+$$
+\mathbf{Y} = \mathbf{X}\mathbf{B} + \mathbf{E}
+$$
+
+- $\mathbf{Y}$: $(n \times T)$ matrix of outcomes  
+  (e.g., association measures for $T$ traits or omic layers)  
+- $\mathbf{X}$: $(n \times p)$ feature matrix  
+- $\mathbf{B}$: $(p \times T)$ matrix of effect sizes  
+- $\mathbf{E}$: $(n \times T)$ residual matrix  
+
+Each row of $\mathbf{Y}$ corresponds to an observation or gene,  and each column to a trait, phenotype, or molecular layer.
+
+---
+
+## Multivariate Error and Effect Priors
+
+We extend the univariate priors to the multivariate setting:
+
+$$
+\mathbf{e}_{i\cdot} \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_e)
+$$
+$$
+\mathbf{b}_j \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_b)
+$$
+
+- $\boldsymbol{\Sigma}_e$: residual covariance among traits  
+- $\boldsymbol{\Sigma}_b$: covariance of effect sizes across traits  
+- When $\boldsymbol{\Sigma}_e$ and $\boldsymbol{\Sigma}_b$ are diagonal,  the model reduces to $T$ independent univariate BLR models.
+
+Allows **information sharing across correlated traits or omic layers** and can be used to identify **pleiotropic effects** and **cross-trait genetic architectures**.
+
+---
+
+## Multivariate BLR (Structured MV-BLR)
+
+The hierarchical structure can be extended to model **multiple traits**  
+while preserving **biological grouping** of features:
+
+$$
+\mathbf{b}_j \sim \mathcal{N}_T\!\big(\mathbf{0}, \boldsymbol{\Sigma}_{b, g(j)}\big), \qquad
+\boldsymbol{\Sigma}_{b, g} \sim p(\boldsymbol{\Sigma}_{b, g})
+$$
+
+- Each biological group $g$ has its own **trait-level covariance matrix** $\boldsymbol{\Sigma}_{b,g}$  
+- $\boldsymbol{\Sigma}_{b,g}$ captures **correlations and scale of effects** across traits within that group  
+
+Enables information sharing both **within biological sets** and **across correlated traits**.  
+
+
+---
+
+## Indicator Variables and PIPs (Multivariate BLR)
+
+In the **multivariate BLR**, each feature $j$ may affect multiple outcomes (traits).  
+We extend the indicator variable to capture **cross-trait activity patterns**:
+
+$$
+\boldsymbol{\delta}_j =
+\begin{bmatrix}
+\delta_{j1} \\ \delta_{j2} \\ \vdots \\ \delta_{jT}
+\end{bmatrix},
+\qquad
+\delta_{jt} =
+\begin{cases}
+1, & \text{if feature $j$ affects trait $t$} \\
+0, & \text{otherwise.}
+\end{cases}
+$$
+
+After inference, we estimate $\text{PIP}_{jt} = P(\delta_{jt} = 1 \mid \text{data})$ —  the **posterior inclusion probability** that feature *j* affects trait *t*.
+
+---
+
+## Multivariate BLR Outputs
+
+In the multivariate setting, we generalize each posterior quantity:
+
+| Parameter | Interpretation |
+|------------|----------------|
+| $\mathbf{B} = [\beta_{jt}]$ | Effect matrix across traits ($j$: feature, $t$: trait) |
+| $\text{PIP}_j$ | Probability that feature $j$ affects ≥1 trait |
+| $\boldsymbol{\Sigma}_b$ | Covariance of effects across traits |
+| $\boldsymbol{\Sigma}_e$ | Residual covariance among traits |
+
+These allow us to identify:
+
+ - **Shared genetic effects** (pleiotropy)  
+ - **Trait-specific vs. shared signals**  
+ - **Cross-trait enrichment** of biological sets
+
+---
+
+## Overview of BLR Models used in Gene Set Analyses
+
+<div style="font-size: 0.75em">
+
+| **Model Type** | **Feature Integration** | **Grouping Basis** | **Prior Structure** | **What It Captures** |
+|:----------------|:------------------------|:-------------------|:--------------------|:---------------------|
+| **Single-component BLR** | Combines all biological features in one model | None | One global variance ($\tau^2$) | All features contribute equally; uniform shrinkage |
+| **Multiple-component BLR** | Integrates all layers but allows heterogeneous contributions | Learned from data | Mixture of variances ($\{\tau_k^2\}$) | Large, small, and null effect classes |
+| **Hierarchical BLR** | Groups features by biological structure (e.g., genes, pathways) | Defined *a priori* | Group-specific **mixture of variances** ($\{\tau_{gk}^2\}$) | Within-group heterogeneity; enrichment and structured shrinkage |
+| **Multivariate BLR** | Jointly models multiple correlated traits or outcomes | None or by trait | Shared covariance ($\boldsymbol{\Sigma}_b$) across traits | Genetic/molecular correlations; pleiotropy |
+| **Hierarchical MV-BLR** | Combines biological grouping and multiple outcomes | Defined *a priori* | Group- and trait-specific covariance mixtures ($\{\boldsymbol{\Sigma}_{b,gk}\}$) | Shared biological mechanisms across traits and layers |
+
+</div>
+
+
+---
+
+## Learning at Different Levels
+
+<div style="font-size: 0.7em">
+
+| **Model Level** | **Key Parameters Learned** | **What They Represent** | **How They Are Learned** | **What We Learn Biologically** |
+|:-----------------|:---------------------------|:-------------------------|:--------------------------|:-------------------------------|
+| **Effect sizes** | $\boldsymbol{\beta}$ | Strength and direction of association for each feature | Posterior mean/median given priors and data | Which features drive the outcome |
+| **Indicator variables** | $\delta_j$ (single trait), $\boldsymbol{\delta}_j$ (multi-trait) | Whether feature $j$ is active (and for which traits) | Estimated as posterior inclusion probabilities (PIPs) | Which features are relevant, and whether effects are shared or trait-specific |
+| **Variance components** | $\tau^2$, $\{\tau_k^2\}$, $\{\tau_{gk}^2\}$ | Magnitude of expected effect sizes; heterogeneity across layers or groups | Inferred hierarchically from the data (via MCMC or EM) | How strongly different groups or omic layers contribute |
+| **Covariance components** | $\boldsymbol{\Sigma}_b$, $\{\boldsymbol{\Sigma}_{b,g}\}$ | Correlation of effects across traits or molecular layers | Estimated from joint posterior | Shared pathways, pleiotropy, and cross-layer architecture |
+
+</div>
+
+---
+
+## Estimating Variance Components During Model Fitting
+
+In Bayesian Linear Regression, the **variance components** are *not fixed* —  they are **estimated jointly** with the effect sizes $\boldsymbol{\beta}$.
+
+- The model defines hierarchical priors:
+  $$
+  \beta_j \sim \mathcal{N}(0, \tau^2)
+  \qquad \text{and} \qquad
+  \varepsilon_i \sim \mathcal{N}(0, \sigma^2)
+  $$
+  where $\tau^2$ and $\sigma^2$ are **unknown parameters**.
+
+- These variances are updated iteratively during MCMC or EM optimization:
+  - **$\tau^2$** reflects the inferred spread of true effects  
+  - **$\sigma^2$** reflects residual noise or unexplained variability  
+
+Inference alternates between sampling (or updating) $\boldsymbol{\beta}$  and re-estimating the variance components given the data and current effects.
+
+---
+
+## Hierarchical Structure: Full Bayesian Estimation
+
+Each variance component has its own prior, enabling uncertainty propagation:
+
+$$
+\begin{aligned}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, & \boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2\mathbf{I}) \\
+\beta_j &\sim \mathcal{N}(0, \tau^2) & \tau^2 \sim \text{Inv-}\chi^2(\nu_\tau, S_\tau^2) \\
+\sigma^2 &\sim \text{Inv-}\chi^2(\nu_\sigma, S_\sigma^2)
+\end{aligned}
+$$
+
+- The model integrates over the **uncertainty in $\tau^2$ and $\sigma^2$**,  
+  not just point estimates  
+- Posterior samples of these parameters describe:
+  - The **degree of polygenicity** (via $\tau^2$)  
+  - The **signal-to-noise ratio** (via $\tau^2 / \sigma^2$)
+
+This full hierarchical treatment improves stability and interpretability  compared to fixing variance components a priori.
+
+---
+
+## In Grouped or Multi-Component BLR Models
+
+Variance components can be **set-specific** or **mixture-specific**,  
+and are all estimated from the data:
+
+$$
+\beta_j \sim \mathcal{N}\!\big(0, \tau_{g(j)}^2\big), \qquad
+\tau_g^2 \sim p(\tau_g^2)
+$$
+
+or
+
+$$
+\beta_j \sim \sum_{k=1}^{K} \pi_k\,\mathcal{N}(0, \tau_k^2), \qquad
+\tau_k^2 \sim p(\tau_k^2)
+$$
+
+- Each $\tau_g^2$ (or $\tau_k^2$) is **estimated adaptively**  
+- Groups or components with strong evidence receive **larger $\tau^2$**  
+  (less shrinkage, more signal)  
+- Noisy or irrelevant groups shrink toward **smaller $\tau^2$**  
+
+Variance components act as *adaptive shrinkage parameters*, controlling model complexity based on the data.
+
+---
+
+## In the Multivariate BLR Model
+
+Variance components generalize to covariance matrices:
+
+$$
+\mathbf{b}_j \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_b), \qquad
+\mathbf{E}_{i\cdot} \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_e)
+$$
+
+- $\boldsymbol{\Sigma}_b$: covariance of effects across traits  
+  → estimated from shared signal among outcomes  
+- $\boldsymbol{\Sigma}_e$: residual covariance among traits  
+  → estimated from correlated noise or shared environment
+
+Estimating $\boldsymbol{\Sigma}_b$ and $\boldsymbol{\Sigma}_e$  enables discovery of **pleiotropy** and **cross-trait genetic structure**.
+
+---
+
+## Why Variance Component Estimation Matters
+
+<div style="font-size: 0.8em">
+
+| Parameter | Role | Interpretation |
+|------------|------|----------------|
+| $\tau^2$ | Effect-size variance | How much true genetic signal exists |
+| $\sigma^2$ | Residual variance | How much variation remains unexplained |
+| $\tau_g^2$ / $\tau_k^2$ | Group or component variance | Which sets/components are enriched |
+| $\boldsymbol{\Sigma}_b$ | Cross-trait covariance | Pleiotropy or shared mechanisms |
+
+</div>
+
+These variance components are not tuning parameters — they are **learned quantities** that describe the underlying biology. Their estimation is central to the interpretability of BLR.
+
+---
+
+
+## Summary: Variance Components as Model-Driven Insights
+
+- Estimated **jointly** with effect sizes and inclusion probabilities  
+- Control the **degree of shrinkage and complexity** in the model  
+- Reveal **biological structure** (e.g., gene-set enrichments, trait correlations)  
+- Provide **model-based evidence** for:
+  - Polygenicity  
+  - Pleiotropy  
+  - Biological pathway relevance  
+
+In short, variance components are *learned descriptors of architecture*,  not just technical parameters and are a cornerstone of the BLR framework.
+
+---
+
+## References
+
+<div style="font-size: 0.6em; line-height: 1.5;">
+
+**Sørensen P, Rohde PD.**  *A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.*  
+**medRxiv** (2025). [https://doi.org/10.1101/2025.10.01.25337099](https://doi.org/10.1101/2025.10.01.25337099)
+
+**Sørensen IF, Sørensen P.**  *Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.*  
+**medRxiv** (2025). [https://doi.org/10.1101/2025.07.30.25332448](https://doi.org/10.1101/2025.07.30.25332448)
+
+**Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.**  *Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.06.13.25329590](https://doi.org/10.1101/2025.06.13.25329590)
+
+**Gholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases.*  **PLOS Genetics** 20(11): e1011463 (2025). [https://doi.org/10.1371/journal.pgen.1011463](https://doi.org/10.1371/journal.pgen.1011463)
+
+**Bai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.** *Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods.*  **BMC Genomics** 25(1): 1236 (2024). [https://doi.org/10.1186/s12864-024-11026-2](https://doi.org/10.1186/s12864-024-11026-2)
+
+**Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures.*  **PLOS Genetics** 21(7): e1011783 (2025). [https://doi.org/10.1371/journal.pgen.1011783](https://doi.org/10.1371/journal.pgen.1011783)
+
+**Kunkel D, Sørensen P, Shankar V, Morgante F.**  *Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes.*  **PLOS Genetics** 21(1): e1011519 (2025). [https://doi.org/10.1371/journal.pgen.1011519](https://doi.org/10.1371/journal.pgen.1011519)
+
+**Rohde P, Sørensen IF, Sørensen P.**  *Expanded Utility of the R Package qgg with Applications within Genomic Medicine.*  **Bioinformatics** 39:11 (2023). [https://doi.org/10.1093/bioinformatics/btad656](https://doi.org/10.1093/bioinformatics/btad656)
+
+**Rohde P, Sørensen IF, Sørensen P.**  *qgg: An R Package for Large-Scale Quantitative Genetic Analyses.*  **Bioinformatics** 36(8): 2614–2615 (2020). [https://doi.org/10.1093/bioinformatics/btz955](https://doi.org/10.1093/bioinformatics/btz955)
+
+</div>
+
+
+---
+
+# Gene Set Analyses using Bayesian MAGMA {.center-title}
+
+---
+
+## Gene Set Analyses
+
+Gene and biological pathway prioritization can provide valuable insights into the underlying biology of diseases and potential drug targets.
+
+<br>
+
+**MAGMA**: Multi-marker Analysis of GenoMic Annotation (Leuww et al 2015) generalized gene set analysis of GWAS data
+
+- Compute gene-level association statistics (**$y$**)
+- Create a design matrix based on annotation (**$X$**)
+- Fits single or multiple regression models (**$y=Xb$**)  
+- Identifies associated features using standard procedures (e.g., *t*-tests)
+
+---
+
+## Gene-level Association Statistics 
+
+::: {.center}
+![](Images/gene_level_statistics.png){width=80%}
+:::
+
+Compute gene-level (or other feature-level) association statistics:
+
+- Account for correlation among marker statistics (i.e., linkage disequilibrium, LD)
+- Different LD-adjustment methods (e.g., SVD, clumping and thresholding, BLR)
+- The choice of method depends on the quality of the available GWAS summary statistics and LD reference panel
+
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+Bai et al., 2025
+</div>
+
+---
+
+## Bayesian MAGMA 
+
+
+::: {.center}
+![](Images/Bayesian_MAGMA.png){width=70%}
+:::
+
+- Fits a Bayesian regression model that allows **regularization** and **variable selection**  
+- Supports **single- or multi-trait** analyses  
+- Identifies associated features based on **posterior inclusion probabilities** (PIPs) for the regression effects
+
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+Gholipourshahraki et al., 2024
+</div>
+
+---
+
+
+
+## Bayesian MAGMA – KEGG Pathway
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+- GWAS summary statistics from nine studies (**T2D**, **CAD**, **CKD**, **HTN**, **BMI**, **WHR**, **Hb1Ac**, **TG**, **SBP**)
+- **Gene sets** are defined by genes linked to **KEGG pathways**.  
+- **Posterior inclusion probabilities (PIPs)** quantify the degree of association between gene set and diseases  
+- Pathways relevant to **diabetes** are associated with **Type 2 Diabetes (T2D)** and correlated traits  
+- Enables identification of **cross-disease patterns** to better understand **comorbidities**
+
+:::
+
+::: {.column width="50%" .vcenter}
+
+<div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+  <img src="Images/bayesian_magma_kegg.png" alt="KEGG Pathway Associations" style="max-width: 100%; max-height: 90%;">
+</div>
+
+:::
+
+:::
+
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+Gholipourshahraki et al., 2024
+</div>
+
+---
+
+
+## Bayesian MAGMA – DGIdb
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+- **Gene sets** are defined by genes linked to the **Anatomical Therapeutic Chemical (ATC)** classification system using the **Drug–Gene Interaction Database (DGIdb)**  
+- **Drug gene sets relevant to diabetes** show associations with **Type 2 Diabetes (T2D)** and related traits  
+- **Novel drug–gene set associations** may reveal opportunities for **drug repurposing**  
+
+:::
+
+::: {.column width="50%" .vcenter}
+<div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+  <img src="Images/bayesian_magma_dgidb.png" alt="Drug Gene Set Associations (DGIdb)" style="max-width: 80%; max-height: 70%;">
+</div>
+:::
+
+:::
+
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+Hjelholt et al., 2025
+</div>
+
+---
+
+## Bayesian MAGMA – Across Ancestries
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+- **Gene sets** are defined by genes linked to **KEGG pathways**.  
+- Joint analysis of **T2D** across three ancestries (**EUR**, **EAS**, **SAS**).  
+- Pathways relevant to **diabetes** show associations with **Type 2 Diabetes (T2D)** across two of the ancestries (**EUR** and **EAS**).  
+- Comparing these associations helps reveal **ancestry-specific biological mechanisms**.
+
+:::
+
+::: {.column width="50%" .vcenter}
+<div style="display: flex; align-items: center; justify-content: center;">
+  <img src="Images/bayesian_magma_ancestry.png" alt="Cross-Ancestry Pathway Associations" style="width: 120%; height: 100%;">
+</div>
+:::
+
+:::
+
+
+---
+
+# Integrative Genomics Analyses using the *gact* and *qgg* R packages  
+
+---
+
+## Why Integrate Diverse Data Sources?
+
+- Complex traits arise from **interacting molecular layers** — genetic, transcriptomic, proteomic, and metabolic.  
+- Single data types provide only **partial insights** complex biological systems (**GWAS: DNA → disease phenotype**)  
+- Integration connects **variants → genes → pathways → phenotypes** may help reveal molecular mechanisms that drive traits and diseases.
+- Enables **functional interpretation**, **better prediction**, and **new discoveries** across molecular systems.  
+
+<!---
+## Challenges Integrating Biological Data
+
+- **Fragmented data sources** — genomic, transcriptomic, proteomic, and metabolomic data stored in different databases and formats.  
+- **Inconsistent identifiers and annotations** — linking SNPs, genes, proteins, and pathways requires multiple reference systems.  
+- **Variable data quality and coverage** — heterogeneous QC, missing metadata, and species bias reduce comparability.  
+- **High technical barriers** — integration often depends on manual downloads, custom scripts, and one-off pipelines.  
+
+
+---
+
+## Toward Integrative Genomics
+
+- **Connecting molecular layers** — translating genetic variants into biological mechanisms requires structured links across omics.  
+- **Scalability and efficiency** — multi-omic integration for thousands of traits demands organized, high-performance data processing.  
+- **Reproducibility and transparency** — ad hoc analyses make it hard to reproduce or extend results.  
+- **Need for unified frameworks** — few resources combine database management, biological context, and modeling tools.  
+
+---
+--->
+
+## From Data Integration to Discovery
+
+::: {.center}
+![](Images/Concept.png){width=80%}
+:::
+
+---
+
+## The *gact* R Package
+
+[**gact**](https://github.com/psoerensen/gact) provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:
+
+- Establishing and populating a database of genomic associations  
+- Downloading and processing biological databases  
+- Handling and processing GWAS summary statistics  
+- Linking genetic markers to genes, proteins, metabolites, and biological pathways  
+- Integrates with statistical machine learning tools in the [**qgg**](https://github.com/psoerensen/qgg) R package  
+
+[**gact**](https://github.com/psoerensen/gact) is intended to serve as **a practical implementation of integrative genomics**, bridging **statistical modeling** and **biological interpretation**, and supporting **reproducible** and **extensible** workflows.
+
+---
+
+## Integrating Data with *gact*
+
+The **`gact()`** function is a single R command that creates and populates the *Genomic Association of Complex Traits (GACT)* database.  
+
+<br>
+
+It automates three main tasks:
+
+- **Infrastructure creation** – sets up a structured folder-based database  
+  (`glist`, `gstat`, `gsets`, `marker`, `gtex`, `download`, etc.)
+- **Data acquisition** – downloads and organizes multiple biological data sources  
+  (e.g., GWAS Catalog, Ensembl, GTEx, Reactome, STRING, STITCH, DGIdb)
+- **Marker and feature set generation** - integrates data across sources to create
+curated genomic feature sets that form the basis for the integrative genomic analyses.
+
+---
+
+## Biological Databases Used by *gact*
+
+*gact* constructs gene and marker sets from a wide range of curated biological databases:
+
+::: {.smaller}
+
+- **Ensembl** — genes, transcripts, and proteins  
+- **Ensembl Regulation** — regulatory genomic features  
+- **GO**, **Reactome**, **KEGG** — ontology and pathway sets  
+- **STRING**, **STITCH** — protein and chemical complexes  
+- **DrugBank**, **ATC** — drug–gene and drug-class associations  
+- **DISEASE** — disease–gene associations  
+- **GTEx** — eQTL-based gene sets  
+- **GWAS Catalog** — trait-associated variants and genes  
+- **VEP** — functional variant annotations
+
+*We plan to add additional biological resources in* **gact**.
+
+:::
+
+---
+
+## From Database to Model Inputs
+
+The *gact* R package includes utility functions to extract and structure data from the GACT database into analysis-ready inputs — **$\mathbf{Y}$** (e.g., summary statistic outcomes) and **$\mathbf{X}$** (genomic or biological features).
+
+- `getMarkerStat()` — retrieve GWAS summary statistics (**Y’s**)  
+- `getFeatureStat()` — extract gene-, protein-, or pathway-level results  (**Y’s**)  
+- `getMarkerSets()` — define biological groupings (basis for **X’s**)  
+- `designMatrix()` — build feature matrices (**X**) linking variants or genes to biological feature sets  
+
+Together, these functions form a **reproducible workflow** for generating **standardized input data** for **Bayesian Hierarchical Models** and other **machine learning** approaches.
+
+---
+
+## The *qgg* R Package
+
+[**qgg**](https://github.com/psoerensen/qgg) provides tools for statistical modeling and analysis of large-scale genomic data, including:
+
+- Fine-mapping of genomic regions using **Bayesian Linear Regression (BLR) models**  
+- Polygenic scoring using **Bayesian Linear Regression (BLR) models**  
+- Gene set enrichment analysis using **Bayesian Linear Regression (BLR) models**  
+
+*qgg* handles large-scale genomic data through **efficient algorithms** and **sparse matrix techniques**, combined with **multi-core processing** using **OpenMP**, **multithreaded matrix operations** via **BLAS** libraries (e.g., OpenBLAS, ATLAS, or MKL), and **fast, memory-efficient batch processing** of genotype data stored in  
+binary formats such as **PLINK `.bed` files**.
+
+
+---
+
+## Tutorials using the *qgg* and *gact* R packages
+
+<div style="font-size: 0.75em">
+
+- [Gene analysis using VEGAS](Document/Gene_analysis_vegas.html):
+Gene analysis using the VEGAS (Versatile Gene-based Association Study)
+approach using the 1000G LD reference data processed above,  
+
+- [Gene set analysis using Bayesian MAGMA](Document/Gene_set_analysis_bayesian_magma.html): Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).  
+
+- [Gene ranking using PoPS](Document/Gene_ranking_bayesian_pops.html): Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level
+statistics derived from VEGAS (work in progress).  
+
+- [Finemapping using BLR models](Document/Finemapping_bayesian_linear_regression_real_data.html): Finemapping of gene and LD regions using single trait Bayesian Linear
+Regression models (Shrestha et al.2025).  
+
+- [Polygenic scoring using BLR models](Document/Polygenic_scoring_bayesian_linear_regression.html): Polygenic scoring (PGS) using Bayesian Linear Regression models and
+biological pathway information (work in progress).  
+
+- [Polygenic scoring using PGS Catalog](Document/Polygenic_scoring_pgscatalog.html): Polygenic scoring (PGS) using summary statistics from PGS catalog and
+biological pathway information.  
+
+- [LD score regression](Document/LD_score_regression.html): LD score regression for estimating genomic heritability and
+correlations.  
+
+</div>
+
+
+
+<!---
+
+---
+
+## Summary 
+
+
+**From Data Integration to Modeling** 
+
+- Bridges data integration, statistical modeling and biological interpretation, enabling reproducible and extensible workflows.
+
+- **Integrates biological information** across molecular layers — from **genome** to **pathways**, **complexes**, and **drug–gene interactions**  
+- **Uses structured priors and hierarchical modeling** to share information, regularize effect estimates, and quantify uncertainty  
+- **Enables data-driven discovery and prediction**
+
+**Next Steps**
+
+ - Apply the framework to new and relevant use cases  
+ - Expand integration with more biological data resources  
+ - Incorporate additional statistical and machine learning methods  
+
+
+## Further Reading and Collaboration
+
+💡 **We are open to collaboration!**  
+
+If you’re interested in applying **BLR methods** or contributing to the **gact** framework, please reach out.
+
+<br>
+
+**Further Reading**
+
+- [**Bayesian Linear Regression** – teaching materials](https://psoerensen.github.io/bayesian-linear-regression/)  
+- [**gact** – R package documentation](https://psoerensen.github.io/gact/)  
+- [**qgg** – R package documentation](https://psoerensen.github.io/qgg/)
+
+
+--->
+<!---
+
+
+## Modeling and Machine Learning
+
+- **Creates QC’ed, standardized Y’s and X’s**  
+  Curated phenotypes and molecular features ready for statistical and ML analyses.  
+
+- **Reveals new biology**  
+  Associations between Y’s and X’s provide insight into molecular mechanisms and trait architecture.  
+
+- **Enables integrative and predictive modeling**  
+  Large, well-defined datasets support BLR, multi-omic integration, and predictive modeling (*qgg*).  
+
+- **Training and benchmarking resource**  
+  Could serve as a standardized foundation for developing and comparing ML and deep learning methods.  
+
+--->
+
+
+<!---
+
+## What the GACT Database Contains
+
+After running `gact()`, the database includes:
+
+- **Marker and feature sets** (genes, proteins, pathways, complexes)  
+- **GWAS and Bayesian summary statistics** (from pre-processed data)  
+- **Gene set and enrichment results** (from pre-processed data)  
+- **Drug–gene and protein–chemical interaction data**  
+- **Annotation and mapping files** for linking biological entities  
+
+The resulting QC’ed *marker* and *feature* sets serve as the foundation for **Bayesian Linear Regression (BLR)** models, **machine learning**,  and **integrative genomics analyses**.
+
+---
+--->
+
+
+<!---
+
+## What's Next
+
+- **What *gact* enables today**  
+  - Produces **QC’ed, standardized** $\mathbf{Y}$’s and $\mathbf{X}$’s ready for statistical and machine learning analyses  
+  - Reveals **associations between molecular features and traits**, uncovering underlying biological mechanisms  
+  - Integrates seamlessly with *qgg* for **Bayesian Linear Regression (BLR)** and predictive modeling  
+
+- **Where *gact* is heading**  
+  - Provide a **foundation for large-scale, integrative modeling** across omic layers  
+  - Serve as a **benchmarking resource** for machine learning and deep learning methods  
+  - Enable **reproducible and extensible workflows** that accelerate biological discovery  
+
+---
+
+## Current Limitations of *gact*
+
+While *gact* provides a solid infrastructure for integrative genomics, several limitations remain:
+
+- **Data dependency and versioning**  
+  - Relies on multiple external databases (e.g., Ensembl, GTEx, STRING) that are updated independently — requiring ongoing maintenance and version tracking.  
+
+- **Missingness and bias in input data**  
+  - GWAS summary statistics, biological annotations, and gene–set mappings may be incomplete, unevenly distributed across traits or populations, or biased toward well-studied genes and pathways.  
+
+- **Limited multi-omic data integration**  
+  - Primarily supports genomic and gene-level information; quantitative transcriptomic, proteomic, and metabolomic data are not yet integrated directly.  
+
+- **Scalability and performance**  
+  - The folder-based database and R-based workflow may become slow or memory-intensive for very large GWAS or fine-mapping datasets.  
+
+- **Limited parallelization and cloud support**  
+  - Most functions are optimized for local execution; distributed or cloud-based workflows (e.g., AWS, GCP, or HPC clusters) are not yet implemented.  
+
+- **Annotation bias and incompleteness**  
+  - Dependent on existing biological databases that vary in coverage and quality; missing or biased annotations can propagate into analyses and interpretations.  
+
+- **Visualization and user interface**  
+  - Lacks a graphical dashboard or web interface; currently requires R scripting for all operations and exploration.  
+
+
+---
+
+## Future Directions for *gact*
+
+To address current limitations and expand functionality, upcoming development will focus on:
+
+- **Improved data management and versioning**  
+  - Automated tracking of database versions and metadata to ensure reproducibility across analyses.  
+
+- **Handling missingness and bias**  
+  - Implement QC pipelines for GWAS and annotation data, harmonize population-specific resources, and flag incomplete mappings.  
+
+- **Expanded multi-omics integration**  
+  - Incorporate quantitative transcriptomic, proteomic, and metabolomic datasets to support integrative modeling.  
+
+- **Enhanced scalability and performance**  
+  - Optimize file I/O, adopt sparse data structures, and enable distributed computation for large-scale analyses.  
+
+- **Cloud and HPC compatibility**  
+  - Add support for parallel execution and storage on cloud or cluster environments (e.g., AWS, GCP, SLURM).  
+
+- **Richer annotation ecosystem**  
+  - Integrate additional databases and functional genomics resources to improve biological coverage and reduce bias.  
+
+- **Visualization and user accessibility**  
+  - Develop interactive dashboards and R Shiny tools for exploring associations, enrichment results, and model outputs.  
+
+--->
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const backBtn = document.createElement("a");
+  backBtn.href = "https://psoerensen.github.io/gact/";  // ✅ full URL
+  backBtn.target = "_self";  // opens in same tab
+  backBtn.textContent = "← Back to Main Page";
+  backBtn.style.cssText = `
+    position: fixed; top: 10px; right: 20px;
+    background: #fff; color: #000;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid #000;
+    font-weight: 600; font-family: sans-serif;
+    text-decoration: none; font-size: 14px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
+    z-index: 9999;
+  `;
+  backBtn.onmouseover = () => {
+    backBtn.style.background = '#000';
+    backBtn.style.color = '#fff';
+  };
+  backBtn.onmouseout = () => {
+    backBtn.style.background = '#fff';
+    backBtn.style.color = '#000';
+  };
+  document.body.appendChild(backBtn);
+});
+</script>
+

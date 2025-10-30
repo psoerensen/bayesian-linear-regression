@@ -18,7 +18,8 @@ Explore the sections below to find the corresponding materials.
 | **Section** | **Description** |
 |--------------|----------------|
 | [**Notes**](notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
-| [**Slides**](bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations. |
+| [**BLR slides**](bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations. |
+| [**GSEA slides**](bayesian_gene_set_slides.html) | Lecture slides introduing Bayesian Gene Set Analyses. |
 | [**Classical Regression**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
 | [**Bayesian (Gaussian Prior)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R. |
 | [**Bayesian (Spike & Slab)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity in R. |

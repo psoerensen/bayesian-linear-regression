@@ -25,7 +25,7 @@
     "href": "index.html#overview-of-materials",
     "title": "Bayesian Linear Regression",
     "section": "Overview of Materials",
-    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics.\n\n\nSlides\nLecture slides summarizing key theoretical concepts and derivations.\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS) in R.\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R.\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity in R.\n\n\nBayesian MAGMA\nBayesian gene set analysis in R.\n\n\n\nDownload Notes (PDF)\nDownload Slides (PDF)\n\n\n\nFurther Reading\nFurther details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in\nSorensen, D. (2025). Statistical Learning in Genetics: An Introduction Using R. Springer.\nThis book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in quantitative genetics and genomics."
+    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nNotes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics.\n\n\nBLR slides\nLecture slides summarizing key theoretical concepts and derivations.\n\n\nGSEA slides\nLecture slides introduing Bayesian Gene Set Analyses.\n\n\nClassical Regression\nSimulation and estimation using ordinary least squares (OLS) in R.\n\n\nBayesian (Gaussian Prior)\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R.\n\n\nBayesian (Spike & Slab)\nBayesian regression with spike-and-slab priors for variable selection and sparsity in R.\n\n\nBayesian MAGMA\nBayesian gene set analysis in R.\n\n\n\nDownload Notes (PDF)\nDownload Slides (PDF)\n\n\n\nFurther Reading\nFurther details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in\nSorensen, D. (2025). Statistical Learning in Genetics: An Introduction Using R. Springer.\nThis book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in quantitative genetics and genomics."
   },
   {
     "objectID": "index.html#the-qgg-r-package",
@@ -427,6 +427,321 @@
     "text": "Applications in Genomics\nWe have now seen the basic framework of Bayesian Linear Regression (BLR)\nand will illustrate how it provides a unified approach for analyzing genetic and genomic data.\n\nGenome-Wide Association Studies (GWAS) and fine-mapping of causal variants.\n\nGenetic prediction and heritability estimation.\n\nPathway and gene-set enrichment analyses.\n\nThese examples show how BLR connects statistical modeling with biological interpretation in quantitative genetics."
   },
   {
+    "objectID": "bayesian_gene_set_slides.html#overview",
+    "href": "bayesian_gene_set_slides.html#overview",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Overview",
+    "text": "Overview\n\n\nIntroduction to Bayesian Linear Regression Models used in Gene Set Analyses\n\nGene Set Analyses using Bayesian MAGMA\nIntegrative Genomics Analyses using the gact and qgg R packages"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#bayesian-linear-regression-models",
+    "href": "bayesian_gene_set_slides.html#bayesian-linear-regression-models",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Bayesian Linear Regression Models",
+    "text": "Bayesian Linear Regression Models\nBayesian Linear Regression Models provide a flexible statistical framework for modeling complex biological and healthcare data. They support key applications such as:\n\nGenome-wide association studies (GWAS) and fine-mapping of causal variants\n\nPolygenic risk scoring (PRS) for predicting complex traits and disease risk\n\nGene and pathway enrichment analyses to test biological hypotheses\n\nIntegrative multi-omics modeling across the genome, transcriptome, epigenome, and proteome\n\nApplications to registry-based healthcare data, enabling population-level risk prediction and disease modeling"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#the-bayesian-linear-regression-model",
+    "href": "bayesian_gene_set_slides.html#the-bayesian-linear-regression-model",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "The Bayesian Linear Regression Model",
+    "text": "The Bayesian Linear Regression Model\nThe Bayesian Linear Regression (BLR) model builds:\n\\[\n\\mathbf{Y} = \\mathbf{X}\\boldsymbol{\\beta} + \\boldsymbol{\\varepsilon}, \\qquad\n\\boldsymbol{\\varepsilon} \\sim \\mathcal{N}(0, \\sigma^2 \\mathbf{I})\n\\]\n\n\\(\\mathbf{Y}\\) represents the observed outcomes or association measures corresponding to the features in \\(\\mathbf{X}\\).\n\\(\\mathbf{X}\\) represents molecular or genomic predictors (e.g., genotypes, gene scores, annotations, pathway indicators).\n\n\\(\\boldsymbol{\\beta}\\) — effect sizes quantifying how features in \\(\\mathbf{X}\\) explain variation in \\(\\mathbf{Y}\\)\n\n\\(\\boldsymbol{\\varepsilon}\\) — residual noise capturing unexplained variation\n\nIn the Bayesian formulation, each \\(\\beta_j\\) is assigned a prior distribution reflecting beliefs about effect size magnitude or sparsity and determine how information is shared across features or biological layers."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#why-bayesian-linear-regression-models",
+    "href": "bayesian_gene_set_slides.html#why-bayesian-linear-regression-models",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Why Bayesian Linear Regression Models?",
+    "text": "Why Bayesian Linear Regression Models?\nRegression effects can be estimated in many ways, but we focus on a Bayesian hierarchical framework because it:\n\nCombines data and prior knowledge to improve inference\n\nProvides a natural way to regularize and handle noisy or high-dimensional data\n\nEnables flexible modeling of diverse effect patterns:\n\nMany small vs. few large effects\n\nStructured effects (e.g., by pathway, gene set, or omic layer)\n\n\nReturns uncertainty estimates for all parameters → improving interpretability and model comparison\n\nThrough their hierarchical structure, BLR models naturally integrate multiple biological layers — linking genomic, transcriptomic, and other molecular data"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#hyperpriors-in-bayesian-modeling",
+    "href": "bayesian_gene_set_slides.html#hyperpriors-in-bayesian-modeling",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Hyperpriors in Bayesian Modeling",
+    "text": "Hyperpriors in Bayesian Modeling\nThe BLR model extends the linear framework by introducing hierarchical priors on parameters. Suppose we model regression coefficients \\(b_j\\) with a normal prior:\n\\[\nb_j \\sim \\mathcal{N}(0, \\sigma_b^2)\n\\]\nHere, \\(\\sigma_b^2\\) (the variance of the prior) controls how large the effects \\(b_j\\) are expected to be.\nInstead of fixing \\(\\sigma_b^2\\) we treat it as unknown and assign it its own prior — the hyperprior:\n\\[\n\\sigma_b^2 \\sim \\text{Inv-}\\chi^2(\\nu, S^2)\n\\]\nIn practice, this parameter is learned from the data during estimation rather than fixed in advance."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#hierarchical-structure",
+    "href": "bayesian_gene_set_slides.html#hierarchical-structure",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Hierarchical Structure",
+    "text": "Hierarchical Structure\nThe three levels in the model:\n\n\n\n\n\n\n\n\n\nLevel\nDescription\nExample\n\n\n\n\n1\nDescribes how data are generated given parameters\n\\(y \\sim \\mathcal{N}(Xb, \\sigma^2 I)\\)\n\n\n2\nDescribes our beliefs about the parameters before seeing data\n\\(b_i \\sim \\mathcal{N}(0, \\sigma_b^2)\\)\n\n\n3\nDescribes uncertainty about the prior’s parameters\n\\(\\sigma_b^2 \\sim \\text{Inv-}\\chi^2(\\nu, S^2)\\)\n\n\n\n\n\nThis hierarchical structure allows the model to learn how strongly to shrink effect estimates from the data, while accounting for uncertainty in prior parameters and automatically regularizing effect sizes.\nSimple and robust, but may not capture diverse effect-size distributions."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#adapting-to-complex-biological-architectures",
+    "href": "bayesian_gene_set_slides.html#adapting-to-complex-biological-architectures",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Adapting to Complex Biological Architectures",
+    "text": "Adapting to Complex Biological Architectures\nComplex traits arise from heterogeneous effect-size distributions — some features have large effects, many have small, and others are likely null. To capture this diversity, the BLR framework can be extended in two ways:\n\nData-driven grouping of molecular features:\nThe model learns effect-size classes from the data using a mixture of variances \\(\\{\\tau_k^2\\}\\) with probabilities \\(\\{\\pi_k\\}\\).\nBiologically informed grouping of molecular features:\nThe model uses prior biological knowledge to assign features to groups a priori, each with its own variance \\(\\tau_g^2\\) capturing within-group variability.\n\nBoth approaches enable the model to adapt to complex genetic and molecular architectures and share information across related features or omic layers"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#multiple-component-blr",
+    "href": "bayesian_gene_set_slides.html#multiple-component-blr",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Multiple-Component BLR",
+    "text": "Multiple-Component BLR\nA more flexible formulation assumes that effects come from a mixture of normal distributions:\n\\[\n\\beta_j \\mid d_j = k \\sim \\mathcal{N}(0, \\tau_k^2), \\qquad\nP(d_j = k) = \\pi_k\n\\]\n\n\\(d_j\\) is a latent indicator variable assigning effect \\(j\\) to component \\(k\\).\n\nEach component \\(k\\) has its own variance \\(\\tau_k^2\\), controlling expected effect size.\n\n\\(\\pi_k\\) represents the probability of membership in each component.\n\nThis structure allows the model to capture both large and small effects, including potential nulls.\nIn practice, both \\(\\pi_k\\) and \\(\\tau_k^2\\) are learned from the data, making the model data-driven and adaptive, though not necessarily biologically informed."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#hierarchical-group-structured-blr",
+    "href": "bayesian_gene_set_slides.html#hierarchical-group-structured-blr",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Hierarchical (Group-Structured) BLR",
+    "text": "Hierarchical (Group-Structured) BLR\nIn this biologically informed extension, we assign features to predefined groups (e.g., genes, pathways, or protein complexes) a priori and model group-specific variances:\n\\[\n\\beta_j \\sim \\mathcal{N}\\!\\big(0, \\tau_{g(j)}^2\\big), \\qquad\n\\tau_g^2 \\sim p(\\tau_g^2)\n\\]\n\nEach feature \\(j\\) belongs to a group \\(g(j)\\) defined before analysis.\n\nEach group \\(g\\) has its own variance \\(\\tau_g^2\\), controlling effect size variability within that group.\n\nThis approach allows the model to share information among related features and test enrichment across biological groups.\nIn practice, the group-level variances \\(\\tau_g^2\\) are learned from the data, enabling the model to adapt shrinkage across biological structures."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#indicator-variables-and-posterior-inclusion-probabilities",
+    "href": "bayesian_gene_set_slides.html#indicator-variables-and-posterior-inclusion-probabilities",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Indicator Variables and Posterior Inclusion Probabilities",
+    "text": "Indicator Variables and Posterior Inclusion Probabilities\nIn Bayesian variable selection, each feature \\(j\\) is assigned an indicator variable:\n\\[\n\\delta_j =\n\\begin{cases}\n1, & \\text{if feature $j$ has a non-zero effect} \\\\\n0, & \\text{if feature $j$ has no effect.}\n\\end{cases}\n\\]\nThe model can be written as: \\[\n\\beta_j = \\alpha_j \\, \\delta_j, \\qquad\n\\alpha_j \\sim \\mathcal{N}(0, \\tau^2), \\quad\n\\delta_j \\sim \\text{Bernoulli}(\\pi)\n\\]\nwhere \\(\\pi\\) is the prior inclusion probability.\nAfter inference, we estimate \\(\\text{PIP}_j = P(\\delta_j = 1 \\mid \\text{data})\\) — the posterior inclusion probability for feature j."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#understanding-the-outputs-of-bayesian-linear-regression-blr",
+    "href": "bayesian_gene_set_slides.html#understanding-the-outputs-of-bayesian-linear-regression-blr",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Understanding the Outputs of Bayesian Linear Regression (BLR)",
+    "text": "Understanding the Outputs of Bayesian Linear Regression (BLR)\nThe BLR model produces posterior summaries that describe the evidence, magnitude, and uncertainty of feature effects.\nKey outputs:\n\nPosterior means of \\(\\boldsymbol{\\beta}\\) (effect sizes)\n\nPosterior inclusion probabilities (PIPs)\n\nVariance component estimates (\\(\\sigma^2\\), \\(\\tau^2\\), …)\n\nEach plays a distinct and complementary role in interpretation."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#posterior-means-of-effect-sizes-boldsymbolbeta",
+    "href": "bayesian_gene_set_slides.html#posterior-means-of-effect-sizes-boldsymbolbeta",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Posterior Means of Effect Sizes (\\(\\boldsymbol{\\beta}\\))",
+    "text": "Posterior Means of Effect Sizes (\\(\\boldsymbol{\\beta}\\))\n\nRepresent the estimated effect of each feature (gene, SNP, or set)\n\nComputed as posterior averages:\n\\[\n\\hat{\\beta}_j = \\mathbb{E}[\\beta_j \\mid \\mathbf{Y}, \\mathbf{X}]\n\\]\nInterpretation:\n\nMagnitude → direction and strength of association\n\nSign → positive or negative effect\n\nShrinkage → smaller estimates for weak or uncertain effects\n\nThese are directly analogous to regression coefficients, but account for prior information and uncertainty."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#posterior-inclusion-probabilities-pips",
+    "href": "bayesian_gene_set_slides.html#posterior-inclusion-probabilities-pips",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Posterior Inclusion Probabilities (PIPs)",
+    "text": "Posterior Inclusion Probabilities (PIPs)\n\nRepresent the probability that feature \\(j\\) has a nonzero effect: \\[\n\\text{PIP}_j = \\Pr(\\beta_j \\neq 0 \\mid \\mathbf{Y}, \\mathbf{X})\n\\]\nQuantifies evidence of inclusion in the model:\n\nHigh PIP → strong support for inclusion\n\nLow PIP → likely irrelevant or redundant feature\n\nInterpretation:\n\nPIPs act as Bayesian significance measures\n\nUseful for ranking, fine-mapping, and feature prioritization\n\n\nIn pathway analyses (e.g., Bayesian MAGMA), PIPs correspond to gene- or set-level importance scores."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#variance-component-estimates-tau2-sigma2",
+    "href": "bayesian_gene_set_slides.html#variance-component-estimates-tau2-sigma2",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Variance Component Estimates (\\(\\tau^2\\), \\(\\sigma^2\\))",
+    "text": "Variance Component Estimates (\\(\\tau^2\\), \\(\\sigma^2\\))\nVariance components describe uncertainty and heterogeneity in effect sizes:\n\\[\n\\beta_j \\sim \\mathcal{N}(0, \\tau^2)\n\\qquad \\text{and} \\qquad\n\\varepsilon_i \\sim \\mathcal{N}(0, \\sigma^2)\n\\]\n\\(\\tau^2\\) is the variance component for the effect sizes\n- Small \\(\\tau^2\\): most effects are close to zero\n- Large \\(\\tau^2\\): more large-effect features expected\n\\(\\sigma^2\\) is the variance component for the residuals\n- Captures unexplained variation after accounting for \\(\\mathbf{X}\\)\nTogether, these components describe the genetic architecture, enabling heritability estimation, uncertainty quantification, and enrichment analysis across sets or traits."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#interpreting-the-outputs-together",
+    "href": "bayesian_gene_set_slides.html#interpreting-the-outputs-together",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Interpreting the Outputs Together",
+    "text": "Interpreting the Outputs Together\n\n\n\n\n\n\n\n\nQuantity\nInterpretation\nTypical use\n\n\n\n\n\\(\\hat{\\beta}_j\\)\nDirection and magnitude of effect\nEffect estimation, prediction\n\n\n\\(\\text{PIP}_j\\)\nProbability feature is truly associated\nFine-mapping, feature ranking\n\n\n\\(\\tau^2\\), \\(\\sigma^2\\)\nVariance in effect sizes and residuals\nGenetic architecture, model fit\n\n\n\nThese summaries are synergistic:\n\n\\(\\boldsymbol{\\beta}\\) tells how much\n\nPIP tells how confident\n\nVariance components tell how complex"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#summary-of-blr-model-structures",
+    "href": "bayesian_gene_set_slides.html#summary-of-blr-model-structures",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Summary of BLR Model Structures",
+    "text": "Summary of BLR Model Structures\n\n\n\n\n\n\n\n\n\nModel Type\nPrior Structure\nBiological Interpretation\n\n\n\n\nSingle-component BLR\nOne global variance \\(\\tau^2\\)\nAll features (across layers) share the same level of shrinkage — equal contribution assumption\n\n\nMultiple-component BLR\nMixture of variances \\(\\{\\tau_k^2\\}\\)\nFeatures belong to different effect-size classes (e.g., large, small, null); grouping learned from data\n\n\nHierarchical (Biologically informed) BLR\nGroup-specific mixtures of variances \\(\\{\\tau_{gk}^2\\}\\)\nFeatures grouped a priori (e.g., by genes, pathways, or omic layers); within each group, effects can vary in size and sparsity\n\n\n\n\nThese models form a hierarchy of increasing flexibility and biological realism —\nfrom global shrinkage → to data-driven heterogeneity → to biologically structured mixtures that model variation within and between feature sets."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#motivation-for-multivariate-blr",
+    "href": "bayesian_gene_set_slides.html#motivation-for-multivariate-blr",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Motivation for Multivariate BLR",
+    "text": "Motivation for Multivariate BLR\nMany traits and molecular layers are correlated — they share genetic architecture and biological pathways.\n\nTo model these dependencies, we extend BLR to the multivariate setting:\n\nJointly models multiple traits or omic layers\n→ captures shared genetic or molecular effects\n\nBorrows strength across correlated traits\n→ improves fine-mapping resolution and prediction accuracy\n\nEstimates cross-trait effect patterns\n→ helps identify pleiotropic genes and shared biological pathways"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#the-multivariate-bayesian-linear-regression-mv-blr-model",
+    "href": "bayesian_gene_set_slides.html#the-multivariate-bayesian-linear-regression-mv-blr-model",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "The Multivariate Bayesian Linear Regression (MV-BLR) Model",
+    "text": "The Multivariate Bayesian Linear Regression (MV-BLR) Model\nIn the multivariate BLR model, we model multiple correlated outcomes jointly:\n\\[\n\\mathbf{Y} = \\mathbf{X}\\mathbf{B} + \\mathbf{E}\n\\]\n\n\\(\\mathbf{Y}\\): \\((n \\times T)\\) matrix of outcomes\n(e.g., association measures for \\(T\\) traits or omic layers)\n\n\\(\\mathbf{X}\\): \\((n \\times p)\\) feature matrix\n\n\\(\\mathbf{B}\\): \\((p \\times T)\\) matrix of effect sizes\n\n\\(\\mathbf{E}\\): \\((n \\times T)\\) residual matrix\n\nEach row of \\(\\mathbf{Y}\\) corresponds to an observation or gene, and each column to a trait, phenotype, or molecular layer."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#multivariate-error-and-effect-priors",
+    "href": "bayesian_gene_set_slides.html#multivariate-error-and-effect-priors",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Multivariate Error and Effect Priors",
+    "text": "Multivariate Error and Effect Priors\nWe extend the univariate priors to the multivariate setting:\n\\[\n\\mathbf{e}_{i\\cdot} \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_e)\n\\] \\[\n\\mathbf{b}_j \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_b)\n\\]\n\n\\(\\boldsymbol{\\Sigma}_e\\): residual covariance among traits\n\n\\(\\boldsymbol{\\Sigma}_b\\): covariance of effect sizes across traits\n\nWhen \\(\\boldsymbol{\\Sigma}_e\\) and \\(\\boldsymbol{\\Sigma}_b\\) are diagonal, the model reduces to \\(T\\) independent univariate BLR models.\n\nAllows information sharing across correlated traits or omic layers and can be used to identify pleiotropic effects and cross-trait genetic architectures."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#multivariate-blr-structured-mv-blr",
+    "href": "bayesian_gene_set_slides.html#multivariate-blr-structured-mv-blr",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Multivariate BLR (Structured MV-BLR)",
+    "text": "Multivariate BLR (Structured MV-BLR)\nThe hierarchical structure can be extended to model multiple traits\nwhile preserving biological grouping of features:\n\\[\n\\mathbf{b}_j \\sim \\mathcal{N}_T\\!\\big(\\mathbf{0}, \\boldsymbol{\\Sigma}_{b, g(j)}\\big), \\qquad\n\\boldsymbol{\\Sigma}_{b, g} \\sim p(\\boldsymbol{\\Sigma}_{b, g})\n\\]\n\nEach biological group \\(g\\) has its own trait-level covariance matrix \\(\\boldsymbol{\\Sigma}_{b,g}\\)\n\n\\(\\boldsymbol{\\Sigma}_{b,g}\\) captures correlations and scale of effects across traits within that group\n\nEnables information sharing both within biological sets and across correlated traits."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#indicator-variables-and-pips-multivariate-blr",
+    "href": "bayesian_gene_set_slides.html#indicator-variables-and-pips-multivariate-blr",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Indicator Variables and PIPs (Multivariate BLR)",
+    "text": "Indicator Variables and PIPs (Multivariate BLR)\nIn the multivariate BLR, each feature \\(j\\) may affect multiple outcomes (traits).\nWe extend the indicator variable to capture cross-trait activity patterns:\n\\[\n\\boldsymbol{\\delta}_j =\n\\begin{bmatrix}\n\\delta_{j1} \\\\ \\delta_{j2} \\\\ \\vdots \\\\ \\delta_{jT}\n\\end{bmatrix},\n\\qquad\n\\delta_{jt} =\n\\begin{cases}\n1, & \\text{if feature $j$ affects trait $t$} \\\\\n0, & \\text{otherwise.}\n\\end{cases}\n\\]\nAfter inference, we estimate \\(\\text{PIP}_{jt} = P(\\delta_{jt} = 1 \\mid \\text{data})\\) — the posterior inclusion probability that feature j affects trait t."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#multivariate-blr-outputs",
+    "href": "bayesian_gene_set_slides.html#multivariate-blr-outputs",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Multivariate BLR Outputs",
+    "text": "Multivariate BLR Outputs\nIn the multivariate setting, we generalize each posterior quantity:\n\n\n\n\n\n\n\nParameter\nInterpretation\n\n\n\n\n\\(\\mathbf{B} = [\\beta_{jt}]\\)\nEffect matrix across traits (\\(j\\): feature, \\(t\\): trait)\n\n\n\\(\\text{PIP}_j\\)\nProbability that feature \\(j\\) affects ≥1 trait\n\n\n\\(\\boldsymbol{\\Sigma}_b\\)\nCovariance of effects across traits\n\n\n\\(\\boldsymbol{\\Sigma}_e\\)\nResidual covariance among traits\n\n\n\nThese allow us to identify:\n\nShared genetic effects (pleiotropy)\n\nTrait-specific vs. shared signals\n\nCross-trait enrichment of biological sets"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#overview-of-blr-models-used-in-gene-set-analyses",
+    "href": "bayesian_gene_set_slides.html#overview-of-blr-models-used-in-gene-set-analyses",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Overview of BLR Models used in Gene Set Analyses",
+    "text": "Overview of BLR Models used in Gene Set Analyses\n\n\n\n\n\n\n\n\n\n\n\nModel Type\nFeature Integration\nGrouping Basis\nPrior Structure\nWhat It Captures\n\n\n\n\nSingle-component BLR\nCombines all biological features in one model\nNone\nOne global variance (\\(\\tau^2\\))\nAll features contribute equally; uniform shrinkage\n\n\nMultiple-component BLR\nIntegrates all layers but allows heterogeneous contributions\nLearned from data\nMixture of variances (\\(\\{\\tau_k^2\\}\\))\nLarge, small, and null effect classes\n\n\nHierarchical BLR\nGroups features by biological structure (e.g., genes, pathways)\nDefined a priori\nGroup-specific mixture of variances (\\(\\{\\tau_{gk}^2\\}\\))\nWithin-group heterogeneity; enrichment and structured shrinkage\n\n\nMultivariate BLR\nJointly models multiple correlated traits or outcomes\nNone or by trait\nShared covariance (\\(\\boldsymbol{\\Sigma}_b\\)) across traits\nGenetic/molecular correlations; pleiotropy\n\n\nHierarchical MV-BLR\nCombines biological grouping and multiple outcomes\nDefined a priori\nGroup- and trait-specific covariance mixtures (\\(\\{\\boldsymbol{\\Sigma}_{b,gk}\\}\\))\nShared biological mechanisms across traits and layers"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#learning-at-different-levels",
+    "href": "bayesian_gene_set_slides.html#learning-at-different-levels",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Learning at Different Levels",
+    "text": "Learning at Different Levels\n\n\n\n\n\n\n\n\n\n\n\nModel Level\nKey Parameters Learned\nWhat They Represent\nHow They Are Learned\nWhat We Learn Biologically\n\n\n\n\nEffect sizes\n\\(\\boldsymbol{\\beta}\\)\nStrength and direction of association for each feature\nPosterior mean/median given priors and data\nWhich features drive the outcome\n\n\nIndicator variables\n\\(\\delta_j\\) (single trait), \\(\\boldsymbol{\\delta}_j\\) (multi-trait)\nWhether feature \\(j\\) is active (and for which traits)\nEstimated as posterior inclusion probabilities (PIPs)\nWhich features are relevant, and whether effects are shared or trait-specific\n\n\nVariance components\n\\(\\tau^2\\), \\(\\{\\tau_k^2\\}\\), \\(\\{\\tau_{gk}^2\\}\\)\nMagnitude of expected effect sizes; heterogeneity across layers or groups\nInferred hierarchically from the data (via MCMC or EM)\nHow strongly different groups or omic layers contribute\n\n\nCovariance components\n\\(\\boldsymbol{\\Sigma}_b\\), \\(\\{\\boldsymbol{\\Sigma}_{b,g}\\}\\)\nCorrelation of effects across traits or molecular layers\nEstimated from joint posterior\nShared pathways, pleiotropy, and cross-layer architecture"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#estimating-variance-components-during-model-fitting",
+    "href": "bayesian_gene_set_slides.html#estimating-variance-components-during-model-fitting",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Estimating Variance Components During Model Fitting",
+    "text": "Estimating Variance Components During Model Fitting\nIn Bayesian Linear Regression, the variance components are not fixed — they are estimated jointly with the effect sizes \\(\\boldsymbol{\\beta}\\).\n\nThe model defines hierarchical priors: \\[\n\\beta_j \\sim \\mathcal{N}(0, \\tau^2)\n\\qquad \\text{and} \\qquad\n\\varepsilon_i \\sim \\mathcal{N}(0, \\sigma^2)\n\\] where \\(\\tau^2\\) and \\(\\sigma^2\\) are unknown parameters.\nThese variances are updated iteratively during MCMC or EM optimization:\n\n\\(\\tau^2\\) reflects the inferred spread of true effects\n\n\\(\\sigma^2\\) reflects residual noise or unexplained variability\n\n\nInference alternates between sampling (or updating) \\(\\boldsymbol{\\beta}\\) and re-estimating the variance components given the data and current effects."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#hierarchical-structure-full-bayesian-estimation",
+    "href": "bayesian_gene_set_slides.html#hierarchical-structure-full-bayesian-estimation",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Hierarchical Structure: Full Bayesian Estimation",
+    "text": "Hierarchical Structure: Full Bayesian Estimation\nEach variance component has its own prior, enabling uncertainty propagation:\n\\[\n\\begin{aligned}\n\\mathbf{Y} &= \\mathbf{X}\\boldsymbol{\\beta} + \\boldsymbol{\\varepsilon}, & \\boldsymbol{\\varepsilon} \\sim \\mathcal{N}(0, \\sigma^2\\mathbf{I}) \\\\\n\\beta_j &\\sim \\mathcal{N}(0, \\tau^2) & \\tau^2 \\sim \\text{Inv-}\\chi^2(\\nu_\\tau, S_\\tau^2) \\\\\n\\sigma^2 &\\sim \\text{Inv-}\\chi^2(\\nu_\\sigma, S_\\sigma^2)\n\\end{aligned}\n\\]\n\nThe model integrates over the uncertainty in \\(\\tau^2\\) and \\(\\sigma^2\\),\nnot just point estimates\n\nPosterior samples of these parameters describe:\n\nThe degree of polygenicity (via \\(\\tau^2\\))\n\nThe signal-to-noise ratio (via \\(\\tau^2 / \\sigma^2\\))\n\n\nThis full hierarchical treatment improves stability and interpretability compared to fixing variance components a priori."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#in-grouped-or-multi-component-blr-models",
+    "href": "bayesian_gene_set_slides.html#in-grouped-or-multi-component-blr-models",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "In Grouped or Multi-Component BLR Models",
+    "text": "In Grouped or Multi-Component BLR Models\nVariance components can be set-specific or mixture-specific,\nand are all estimated from the data:\n\\[\n\\beta_j \\sim \\mathcal{N}\\!\\big(0, \\tau_{g(j)}^2\\big), \\qquad\n\\tau_g^2 \\sim p(\\tau_g^2)\n\\]\nor\n\\[\n\\beta_j \\sim \\sum_{k=1}^{K} \\pi_k\\,\\mathcal{N}(0, \\tau_k^2), \\qquad\n\\tau_k^2 \\sim p(\\tau_k^2)\n\\]\n\nEach \\(\\tau_g^2\\) (or \\(\\tau_k^2\\)) is estimated adaptively\n\nGroups or components with strong evidence receive larger \\(\\tau^2\\)\n(less shrinkage, more signal)\n\nNoisy or irrelevant groups shrink toward smaller \\(\\tau^2\\)\n\nVariance components act as adaptive shrinkage parameters, controlling model complexity based on the data."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#in-the-multivariate-blr-model",
+    "href": "bayesian_gene_set_slides.html#in-the-multivariate-blr-model",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "In the Multivariate BLR Model",
+    "text": "In the Multivariate BLR Model\nVariance components generalize to covariance matrices:\n\\[\n\\mathbf{b}_j \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_b), \\qquad\n\\mathbf{E}_{i\\cdot} \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_e)\n\\]\n\n\\(\\boldsymbol{\\Sigma}_b\\): covariance of effects across traits\n→ estimated from shared signal among outcomes\n\n\\(\\boldsymbol{\\Sigma}_e\\): residual covariance among traits\n→ estimated from correlated noise or shared environment\n\nEstimating \\(\\boldsymbol{\\Sigma}_b\\) and \\(\\boldsymbol{\\Sigma}_e\\) enables discovery of pleiotropy and cross-trait genetic structure."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#why-variance-component-estimation-matters",
+    "href": "bayesian_gene_set_slides.html#why-variance-component-estimation-matters",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Why Variance Component Estimation Matters",
+    "text": "Why Variance Component Estimation Matters\n\n\n\n\n\n\n\n\n\nParameter\nRole\nInterpretation\n\n\n\n\n\\(\\tau^2\\)\nEffect-size variance\nHow much true genetic signal exists\n\n\n\\(\\sigma^2\\)\nResidual variance\nHow much variation remains unexplained\n\n\n\\(\\tau_g^2\\) / \\(\\tau_k^2\\)\nGroup or component variance\nWhich sets/components are enriched\n\n\n\\(\\boldsymbol{\\Sigma}_b\\)\nCross-trait covariance\nPleiotropy or shared mechanisms\n\n\n\n\nThese variance components are not tuning parameters — they are learned quantities that describe the underlying biology. Their estimation is central to the interpretability of BLR."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#summary-variance-components-as-model-driven-insights",
+    "href": "bayesian_gene_set_slides.html#summary-variance-components-as-model-driven-insights",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Summary: Variance Components as Model-Driven Insights",
+    "text": "Summary: Variance Components as Model-Driven Insights\n\nEstimated jointly with effect sizes and inclusion probabilities\n\nControl the degree of shrinkage and complexity in the model\n\nReveal biological structure (e.g., gene-set enrichments, trait correlations)\n\nProvide model-based evidence for:\n\nPolygenicity\n\nPleiotropy\n\nBiological pathway relevance\n\n\nIn short, variance components are learned descriptors of architecture, not just technical parameters and are a cornerstone of the BLR framework."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#references",
+    "href": "bayesian_gene_set_slides.html#references",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "References",
+    "text": "References\n\nSørensen P, Rohde PD. A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.\nmedRxiv (2025). https://doi.org/10.1101/2025.10.01.25337099\nSørensen IF, Sørensen P. Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.\nmedRxiv (2025). https://doi.org/10.1101/2025.07.30.25332448\nHjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P. Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes. medRxiv (2025). https://doi.org/10.1101/2025.06.13.25329590\nGholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases. PLOS Genetics 20(11): e1011463 (2025). https://doi.org/10.1371/journal.pgen.1011463\nBai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods. BMC Genomics 25(1): 1236 (2024). https://doi.org/10.1186/s12864-024-11026-2\nShrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures. PLOS Genetics 21(7): e1011783 (2025). https://doi.org/10.1371/journal.pgen.1011783\nKunkel D, Sørensen P, Shankar V, Morgante F. Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes. PLOS Genetics 21(1): e1011519 (2025). https://doi.org/10.1371/journal.pgen.1011519\nRohde P, Sørensen IF, Sørensen P. Expanded Utility of the R Package qgg with Applications within Genomic Medicine. Bioinformatics 39:11 (2023). https://doi.org/10.1093/bioinformatics/btad656\nRohde P, Sørensen IF, Sørensen P. qgg: An R Package for Large-Scale Quantitative Genetic Analyses. Bioinformatics 36(8): 2614–2615 (2020). https://doi.org/10.1093/bioinformatics/btz955"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#gene-set-analyses",
+    "href": "bayesian_gene_set_slides.html#gene-set-analyses",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Gene Set Analyses",
+    "text": "Gene Set Analyses\nGene and biological pathway prioritization can provide valuable insights into the underlying biology of diseases and potential drug targets.\n\nMAGMA: Multi-marker Analysis of GenoMic Annotation (Leuww et al 2015) generalized gene set analysis of GWAS data\n\nCompute gene-level association statistics (\\(y\\))\nCreate a design matrix based on annotation (\\(X\\))\nFits single or multiple regression models (\\(y=Xb\\))\n\nIdentifies associated features using standard procedures (e.g., t-tests)"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#gene-level-association-statistics",
+    "href": "bayesian_gene_set_slides.html#gene-level-association-statistics",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Gene-level Association Statistics",
+    "text": "Gene-level Association Statistics\n\n\n\nCompute gene-level (or other feature-level) association statistics:\n\nAccount for correlation among marker statistics (i.e., linkage disequilibrium, LD)\nDifferent LD-adjustment methods (e.g., SVD, clumping and thresholding, BLR)\nThe choice of method depends on the quality of the available GWAS summary statistics and LD reference panel\n\n\nBai et al., 2025"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#bayesian-magma",
+    "href": "bayesian_gene_set_slides.html#bayesian-magma",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Bayesian MAGMA",
+    "text": "Bayesian MAGMA\n\n\n\n\nFits a Bayesian regression model that allows regularization and variable selection\n\nSupports single- or multi-trait analyses\n\nIdentifies associated features based on posterior inclusion probabilities (PIPs) for the regression effects\n\n\nGholipourshahraki et al., 2024"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#bayesian-magma-kegg-pathway",
+    "href": "bayesian_gene_set_slides.html#bayesian-magma-kegg-pathway",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Bayesian MAGMA – KEGG Pathway",
+    "text": "Bayesian MAGMA – KEGG Pathway\n\n\n\nGWAS summary statistics from nine studies (T2D, CAD, CKD, HTN, BMI, WHR, Hb1Ac, TG, SBP)\nGene sets are defined by genes linked to KEGG pathways.\n\nPosterior inclusion probabilities (PIPs) quantify the degree of association between gene set and diseases\n\nPathways relevant to diabetes are associated with Type 2 Diabetes (T2D) and correlated traits\n\nEnables identification of cross-disease patterns to better understand comorbidities\n\n\n\n\n\n\n\nGholipourshahraki et al., 2024"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#bayesian-magma-dgidb",
+    "href": "bayesian_gene_set_slides.html#bayesian-magma-dgidb",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Bayesian MAGMA – DGIdb",
+    "text": "Bayesian MAGMA – DGIdb\n\n\n\nGene sets are defined by genes linked to the Anatomical Therapeutic Chemical (ATC) classification system using the Drug–Gene Interaction Database (DGIdb)\n\nDrug gene sets relevant to diabetes show associations with Type 2 Diabetes (T2D) and related traits\n\nNovel drug–gene set associations may reveal opportunities for drug repurposing\n\n\n\n\n\n\n\nHjelholt et al., 2025"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#bayesian-magma-across-ancestries",
+    "href": "bayesian_gene_set_slides.html#bayesian-magma-across-ancestries",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Bayesian MAGMA – Across Ancestries",
+    "text": "Bayesian MAGMA – Across Ancestries\n\n\n\nGene sets are defined by genes linked to KEGG pathways.\n\nJoint analysis of T2D across three ancestries (EUR, EAS, SAS).\n\nPathways relevant to diabetes show associations with Type 2 Diabetes (T2D) across two of the ancestries (EUR and EAS).\n\nComparing these associations helps reveal ancestry-specific biological mechanisms."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#why-integrate-diverse-data-sources",
+    "href": "bayesian_gene_set_slides.html#why-integrate-diverse-data-sources",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Why Integrate Diverse Data Sources?",
+    "text": "Why Integrate Diverse Data Sources?\n\nComplex traits arise from interacting molecular layers — genetic, transcriptomic, proteomic, and metabolic.\n\nSingle data types provide only partial insights complex biological systems (GWAS: DNA → disease phenotype)\n\nIntegration connects variants → genes → pathways → phenotypes may help reveal molecular mechanisms that drive traits and diseases.\nEnables functional interpretation, better prediction, and new discoveries across molecular systems."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#from-data-integration-to-discovery",
+    "href": "bayesian_gene_set_slides.html#from-data-integration-to-discovery",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "From Data Integration to Discovery",
+    "text": "From Data Integration to Discovery"
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#the-gact-r-package",
+    "href": "bayesian_gene_set_slides.html#the-gact-r-package",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "The gact R Package",
+    "text": "The gact R Package\ngact provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:\n\nEstablishing and populating a database of genomic associations\n\nDownloading and processing biological databases\n\nHandling and processing GWAS summary statistics\n\nLinking genetic markers to genes, proteins, metabolites, and biological pathways\n\nIntegrates with statistical machine learning tools in the qgg R package\n\ngact is intended to serve as a practical implementation of integrative genomics, bridging statistical modeling and biological interpretation, and supporting reproducible and extensible workflows."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#integrating-data-with-gact",
+    "href": "bayesian_gene_set_slides.html#integrating-data-with-gact",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Integrating Data with gact",
+    "text": "Integrating Data with gact\nThe gact() function is a single R command that creates and populates the Genomic Association of Complex Traits (GACT) database.\n\nIt automates three main tasks:\n\nInfrastructure creation – sets up a structured folder-based database\n(glist, gstat, gsets, marker, gtex, download, etc.)\nData acquisition – downloads and organizes multiple biological data sources\n(e.g., GWAS Catalog, Ensembl, GTEx, Reactome, STRING, STITCH, DGIdb)\nMarker and feature set generation - integrates data across sources to create curated genomic feature sets that form the basis for the integrative genomic analyses."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#biological-databases-used-by-gact",
+    "href": "bayesian_gene_set_slides.html#biological-databases-used-by-gact",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Biological Databases Used by gact",
+    "text": "Biological Databases Used by gact\ngact constructs gene and marker sets from a wide range of curated biological databases:\n\n\nEnsembl — genes, transcripts, and proteins\n\nEnsembl Regulation — regulatory genomic features\n\nGO, Reactome, KEGG — ontology and pathway sets\n\nSTRING, STITCH — protein and chemical complexes\n\nDrugBank, ATC — drug–gene and drug-class associations\n\nDISEASE — disease–gene associations\n\nGTEx — eQTL-based gene sets\n\nGWAS Catalog — trait-associated variants and genes\n\nVEP — functional variant annotations\n\nWe plan to add additional biological resources in gact."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#from-database-to-model-inputs",
+    "href": "bayesian_gene_set_slides.html#from-database-to-model-inputs",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "From Database to Model Inputs",
+    "text": "From Database to Model Inputs\nThe gact R package includes utility functions to extract and structure data from the GACT database into analysis-ready inputs — \\(\\mathbf{Y}\\) (e.g., summary statistic outcomes) and \\(\\mathbf{X}\\) (genomic or biological features).\n\ngetMarkerStat() — retrieve GWAS summary statistics (Y’s)\n\ngetFeatureStat() — extract gene-, protein-, or pathway-level results (Y’s)\n\ngetMarkerSets() — define biological groupings (basis for X’s)\n\ndesignMatrix() — build feature matrices (X) linking variants or genes to biological feature sets\n\nTogether, these functions form a reproducible workflow for generating standardized input data for Bayesian Hierarchical Models and other machine learning approaches."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#the-qgg-r-package",
+    "href": "bayesian_gene_set_slides.html#the-qgg-r-package",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "The qgg R Package",
+    "text": "The qgg R Package\nqgg provides tools for statistical modeling and analysis of large-scale genomic data, including:\n\nFine-mapping of genomic regions using Bayesian Linear Regression (BLR) models\n\nPolygenic scoring using Bayesian Linear Regression (BLR) models\n\nGene set enrichment analysis using Bayesian Linear Regression (BLR) models\n\nqgg handles large-scale genomic data through efficient algorithms and sparse matrix techniques, combined with multi-core processing using OpenMP, multithreaded matrix operations via BLAS libraries (e.g., OpenBLAS, ATLAS, or MKL), and fast, memory-efficient batch processing of genotype data stored in\nbinary formats such as PLINK .bed files."
+  },
+  {
+    "objectID": "bayesian_gene_set_slides.html#tutorials-using-the-qgg-and-gact-r-packages",
+    "href": "bayesian_gene_set_slides.html#tutorials-using-the-qgg-and-gact-r-packages",
+    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "section": "Tutorials using the qgg and gact R packages",
+    "text": "Tutorials using the qgg and gact R packages\n\n\nGene analysis using VEGAS: Gene analysis using the VEGAS (Versatile Gene-based Association Study) approach using the 1000G LD reference data processed above,\nGene set analysis using Bayesian MAGMA: Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).\nGene ranking using PoPS: Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level statistics derived from VEGAS (work in progress).\nFinemapping using BLR models: Finemapping of gene and LD regions using single trait Bayesian Linear Regression models (Shrestha et al.2025).\nPolygenic scoring using BLR models: Polygenic scoring (PGS) using Bayesian Linear Regression models and biological pathway information (work in progress).\nPolygenic scoring using PGS Catalog: Polygenic scoring (PGS) using summary statistics from PGS catalog and biological pathway information.\nLD score regression: LD score regression for estimating genomic heritability and correlations."
+  },
+  {
     "objectID": "bayesian_linear_regression_conjugate.html",
     "href": "bayesian_linear_regression_conjugate.html",
     "title": "Bayesian Linear Regression with Conjugate Priors",
@@ -536,7 +851,7 @@
     "href": "bayesian_magma_tutorial.html#step-3-draw-realistic-gene-set-sizes",
     "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
     "section": "Step 3: Draw Realistic Gene Set Sizes",
-    "text": "Step 3: Draw Realistic Gene Set Sizes\nWe use a log-normal distribution to simulate pathway sizes, resulting in a right-skewed distribution (many small pathways, few large ones).\n\n\nCode\nsizes_raw &lt;- round(rlnorm(n_pathways, meanlog = log(80), sdlog = 0.6))\nsizes &lt;- pmin(pmax(sizes_raw, 15), 500)  # truncate to 15–500\nsummary(sizes)\n\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  19.00   53.75   79.50   92.22  111.00  299.00"
+    "text": "Step 3: Draw Realistic Gene Set Sizes\nWe use a log-normal distribution to simulate pathway sizes, resulting in a right-skewed distribution (many small pathways, few large ones).\n\n\nCode\nsizes_raw &lt;- round(rlnorm(n_pathways, meanlog = log(80), sdlog = 0.6))\nsizes &lt;- pmin(pmax(sizes_raw, 15), 500)  # truncate to 15–500\nsummary(sizes)\n\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n   17.0    58.0    91.0   107.0   142.8   363.0"
   },
   {
     "objectID": "bayesian_magma_tutorial.html#step-4-create-overlapping-pathways",
@@ -550,7 +865,7 @@
     "href": "bayesian_magma_tutorial.html#step-5-create-causal-pathways",
     "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
     "section": "Step 5: Create Causal Pathways",
-    "text": "Step 5: Create Causal Pathways\nWe enrich 1–2 pathways with truly associated genes to simulate signal.\n\n\nCode\nn_enriched_paths &lt;- 2\nenriched_paths &lt;- sample(names(pathway_list), n_enriched_paths)\n\nfor (p in enriched_paths) {\n  n_enriched_genes &lt;- 30\n  enriched_genes &lt;- sample(associated_genes, n_enriched_genes)\n  pathway_list[[p]] &lt;- unique(c(pathway_list[[p]], enriched_genes))\n}\n\ncat(\"Created\", n_pathways, \"pathways (15–500 genes each)\\n\")\n\n\nCreated 100 pathways (15–500 genes each)\n\n\nCode\ncat(\"Causal pathways:\", paste(enriched_paths, collapse = \", \"), \"\\n\")\n\n\nCausal pathways: Pathway_17, Pathway_97"
+    "text": "Step 5: Create Causal Pathways\nWe enrich 1–2 pathways with truly associated genes to simulate signal.\n\n\nCode\nn_enriched_paths &lt;- 2\nenriched_paths &lt;- sample(names(pathway_list), n_enriched_paths)\n\nfor (p in enriched_paths) {\n  n_enriched_genes &lt;- 30\n  enriched_genes &lt;- sample(associated_genes, n_enriched_genes)\n  pathway_list[[p]] &lt;- unique(c(pathway_list[[p]], enriched_genes))\n}\n\ncat(\"Created\", n_pathways, \"pathways (15–500 genes each)\\n\")\n\n\nCreated 100 pathways (15–500 genes each)\n\n\nCode\ncat(\"Causal pathways:\", paste(enriched_paths, collapse = \", \"), \"\\n\")\n\n\nCausal pathways: Pathway_26, Pathway_65"
   },
   {
     "objectID": "bayesian_magma_tutorial.html#step-6-visualize-pathway-size-distribution",
@@ -571,7 +886,7 @@
     "href": "bayesian_magma_tutorial.html#step-8-run-and-compare-magma-style-gene-set-analyses",
     "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
     "section": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses",
-    "text": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses\nHere we compare three approaches implemented in qgg::magma():\n\n\n\n\n\n\n\n\n\nMethod\nModel Type\nConcept\nOutput\n\n\n\n\nJoint (fitM)\nLinear regression\nTests all pathways simultaneously\nβ-coefficients, SEs, p-values\n\n\nBayesC (fitC)\nBayesian spike-and-slab\nSelects relevant pathways by posterior inclusion probability (PIP)\nPosterior means, PIPs\n\n\nBayesR (fitR)\nBayesian mixture prior\nAllows pathways to have small, moderate, or large effects\nPosterior means, PIPs\n\n\n\n\nClassical joint model (standard MAGMA-style regression)\n\n\nCode\nfitM &lt;- magma(stat = z_scores, sets = pathway_list, type = \"joint\")\nhead(fitM)\n\n\n             ID   m      b    seb      z            p\n17   Pathway_17 129 0.0706 0.0090 7.8736 1.723346e-15\n97   Pathway_97 169 0.0672 0.0087 7.7576 4.326393e-15\n76   Pathway_76  43 0.0167 0.0072 2.3134 1.034961e-02\n39   Pathway_39  78 0.0174 0.0085 2.0381 2.077132e-02\n40   Pathway_40  63 0.0174 0.0086 2.0302 2.116897e-02\n100 Pathway_100  51 0.0147 0.0074 1.9828 2.369664e-02\n\n\n\n\nBayesian sparse model (BayesC)\n\n\nCode\nfitC &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesC\")\nhead(fitC)\n\n\n           ID   m       b    PIP\n97 Pathway_97 169  0.0569 1.0000\n17 Pathway_17 129  0.0462 0.9964\n12 Pathway_12  55 -0.0136 0.4291\n62 Pathway_62  83 -0.0125 0.3735\n30 Pathway_30  83 -0.0043 0.1542\n28 Pathway_28  70 -0.0042 0.1522\n\n\n\n\nBayesian mixture model (BayesR)\n\n\nCode\nfitR &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesR\")\nhead(fitR)\n\n\n           ID   m       b    PIP\n17 Pathway_17 129  0.0590 1.0000\n97 Pathway_97 169  0.0653 1.0000\n62 Pathway_62  83 -0.0286 0.8704\n12 Pathway_12  55 -0.0256 0.8432\n28 Pathway_28  70 -0.0178 0.6657\n30 Pathway_30  83 -0.0117 0.4593\n\n\n\n\nSummarize and Compare Outputs\n\n\nCode\n# Extract comparable metrics\nresults &lt;- list(\n  Joint = fitM[, c(\"ID\", \"b\", \"p\")],\n  BayesC = fitC[, c(\"ID\", \"b\", \"PIP\")],\n  BayesR = fitR[, c(\"ID\", \"b\", \"PIP\")]\n)\n\n# Merge results by Pathway ID\nmerged_results &lt;- Reduce(function(x, y) merge(x, y, by = \"ID\", all = TRUE), results)\ncolnames(merged_results) &lt;- c(\"Pathway\", \"b_joint\", \"p_joint\", \"b_bayesC\", \"PIP_bayesC\", \"b_bayesR\", \"PIP_bayesR\")\nmerged_results$is_enriched &lt;- merged_results$Pathway %in% enriched_paths\n\nhead(merged_results[order(-merged_results$PIP_bayesC), ])\n\n\n      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR\n98 Pathway_97  0.0672 4.326393e-15   0.0569     1.0000   0.0653     1.0000\n10 Pathway_17  0.0706 1.723346e-15   0.0462     0.9964   0.0590     1.0000\n5  Pathway_12 -0.0260 9.957009e-01  -0.0136     0.4291  -0.0256     0.8432\n60 Pathway_62 -0.0336 9.999219e-01  -0.0125     0.3735  -0.0286     0.8704\n25 Pathway_30 -0.0195 9.732562e-01  -0.0043     0.1542  -0.0117     0.4593\n22 Pathway_28 -0.0230 9.964680e-01  -0.0042     0.1522  -0.0178     0.6657\n   is_enriched\n98        TRUE\n10        TRUE\n5        FALSE\n60       FALSE\n25       FALSE\n22       FALSE\n\n\n\n\nVisualize Comparison of Evidence\n\n\nCode\nlibrary(ggplot2)\n\nggplot(merged_results, aes(x = -log10(p_joint), y = PIP_bayesC, color = is_enriched)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text(data = subset(merged_results, is_enriched), aes(label = Pathway),\n            vjust = -1, size = 3.2) +\n  scale_color_manual(values = c(\"FALSE\" = \"grey60\", \"TRUE\" = \"firebrick\")) +\n  labs(\n    x = expression(-log[10](italic(p))~~\"(Joint model)\"),\n    y = \"Posterior Inclusion Probability (BayesC)\",\n    title = \"Comparison of Classical and Bayesian MAGMA Results\"\n  ) +\n  theme_minimal(base_size = 13)\n\n\n\n\n\n\n\n\n\n\n\nInterpretation\nThe joint linear model detects a broad set of pathways with small effects but cannot quantify inclusion evidence. BayesC and BayesR provide posterior probabilities reflecting uncertainty and sparsity. In this simulation, truly enriched pathways (in red) show both low p-values and high PIPs (&gt;0.9), illustrating consistency between classical and Bayesian inference while offering a probabilistic measure of pathway relevance."
+    "text": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses\nHere we compare three approaches implemented in qgg::magma():\n\n\n\n\n\n\n\n\n\nMethod\nModel Type\nConcept\nOutput\n\n\n\n\nJoint (fitM)\nLinear regression\nTests all pathways simultaneously\nβ-coefficients, SEs, p-values\n\n\nBayesC (fitC)\nBayesian spike-and-slab\nSelects relevant pathways by posterior inclusion probability (PIP)\nPosterior means, PIPs\n\n\nBayesR (fitR)\nBayesian mixture prior\nAllows pathways to have small, moderate, or large effects\nPosterior means, PIPs\n\n\n\n\nClassical joint model (standard MAGMA-style regression)\n\n\nCode\nfitM &lt;- magma(stat = z_scores, sets = pathway_list, type = \"joint\")\nhead(fitM)\n\n\n           ID   m      b    seb      z            p\n26 Pathway_26 121 0.0792 0.0082 9.6492 2.477975e-22\n65 Pathway_65 140 0.0529 0.0076 6.9347 2.035041e-12\n62 Pathway_62  96 0.0191 0.0073 2.6306 4.261592e-03\n43 Pathway_43  74 0.0210 0.0086 2.4357 7.431827e-03\n15 Pathway_15 140 0.0180 0.0087 2.0782 1.884358e-02\n39 Pathway_39 128 0.0131 0.0071 1.8507 3.210561e-02\n\n\n\n\nBayesian sparse model (BayesC)\n\n\nCode\nfitC &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesC\")\nhead(fitC)\n\n\n           ID   m       b    PIP\n26 Pathway_26 121  0.0626 1.0000\n65 Pathway_65 140  0.0455 1.0000\n45 Pathway_45  88 -0.0151 0.4755\n64 Pathway_64  54 -0.0003 0.0132\n43 Pathway_43  74  0.0002 0.0090\n11 Pathway_11 314 -0.0001 0.0062\n\n\n\n\nBayesian mixture model (BayesR)\n\n\nCode\nfitR &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesR\")\nhead(fitR)\n\n\n           ID   m       b    PIP\n26 Pathway_26 121  0.0683 1.0000\n65 Pathway_65 140  0.0453 1.0000\n45 Pathway_45  88 -0.0283 0.9100\n64 Pathway_64  54 -0.0027 0.1362\n43 Pathway_43  74  0.0023 0.1204\n11 Pathway_11 314 -0.0016 0.0838\n\n\n\n\nSummarize and Compare Outputs\n\n\nCode\n# Extract comparable metrics\nresults &lt;- list(\n  Joint = fitM[, c(\"ID\", \"b\", \"p\")],\n  BayesC = fitC[, c(\"ID\", \"b\", \"PIP\")],\n  BayesR = fitR[, c(\"ID\", \"b\", \"PIP\")]\n)\n\n# Merge results by Pathway ID\nmerged_results &lt;- Reduce(function(x, y) merge(x, y, by = \"ID\", all = TRUE), results)\ncolnames(merged_results) &lt;- c(\"Pathway\", \"b_joint\", \"p_joint\", \"b_bayesC\", \"PIP_bayesC\", \"b_bayesR\", \"PIP_bayesR\")\nmerged_results$is_enriched &lt;- merged_results$Pathway %in% enriched_paths\n\nhead(merged_results[order(-merged_results$PIP_bayesC), ])\n\n\n      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR\n20 Pathway_26  0.0792 2.477975e-22   0.0626     1.0000   0.0683     1.0000\n63 Pathway_65  0.0529 2.035041e-12   0.0455     1.0000   0.0453     1.0000\n41 Pathway_45 -0.0302 9.999584e-01  -0.0151     0.4755  -0.0283     0.9100\n62 Pathway_64 -0.0184 9.937911e-01  -0.0003     0.0132  -0.0027     0.1362\n39 Pathway_43  0.0210 7.431827e-03   0.0002     0.0090   0.0023     0.1204\n4  Pathway_11 -0.0197 9.757243e-01  -0.0001     0.0062  -0.0016     0.0838\n   is_enriched\n20        TRUE\n63        TRUE\n41       FALSE\n62       FALSE\n39       FALSE\n4        FALSE\n\n\n\n\nVisualize Comparison of Evidence\n\n\nCode\nlibrary(ggplot2)\n\nggplot(merged_results, aes(x = -log10(p_joint), y = PIP_bayesC, color = is_enriched)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text(data = subset(merged_results, is_enriched), aes(label = Pathway),\n            vjust = -1, size = 3.2) +\n  scale_color_manual(values = c(\"FALSE\" = \"grey60\", \"TRUE\" = \"firebrick\")) +\n  labs(\n    x = expression(-log[10](italic(p))~~\"(Joint model)\"),\n    y = \"Posterior Inclusion Probability (BayesC)\",\n    title = \"Comparison of Classical and Bayesian MAGMA Results\"\n  ) +\n  theme_minimal(base_size = 13)\n\n\n\n\n\n\n\n\n\n\n\nInterpretation\nThe joint linear model detects a broad set of pathways with small effects but cannot quantify inclusion evidence. BayesC and BayesR provide posterior probabilities reflecting uncertainty and sparsity. In this simulation, truly enriched pathways (in red) show both low p-values and high PIPs (&gt;0.9), illustrating consistency between classical and Bayesian inference while offering a probabilistic measure of pathway relevance."
   },
   {
     "objectID": "classical_linear_regression_simulation.html",
