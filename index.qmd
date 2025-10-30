@@ -68,11 +68,9 @@ binary formats such as **PLINK `.bed` files**.
 
 ## References
 
-**Sørensen P, Rohde PD.**  *A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.*  
-**medRxiv** (2025). [https://doi.org/10.1101/2025.10.01.25337099](https://doi.org/10.1101/2025.10.01.25337099)
+**Sørensen P, Rohde PD.**  *A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.10.01.25337099](https://doi.org/10.1101/2025.10.01.25337099)
 
-**Sørensen IF, Sørensen P.**  *Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.*  
-**medRxiv** (2025). [https://doi.org/10.1101/2025.07.30.25332448](https://doi.org/10.1101/2025.07.30.25332448)
+**Sørensen IF, Sørensen P.**  *Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.07.30.25332448](https://doi.org/10.1101/2025.07.30.25332448)
 
 **Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.**  *Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.06.13.25329590](https://doi.org/10.1101/2025.06.13.25329590)
 
