@@ -37,3 +37,55 @@ Further details on the theory and computation behind Bayesian linear regression,
 **[Sorensen, D. (2025). *Statistical Learning in Genetics: An Introduction Using R*. Springer.](https://link.springer.com/book/10.1007/978-3-031-86274-8)**  
 
 This book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in **quantitative genetics and genomics**.
+
+
+## The *qgg* R Package
+
+[**qgg**](https://github.com/psoerensen/qgg) provides tools for statistical modeling and analysis of large-scale genomic data, including:
+
+- Fine-mapping of genomic regions using **Bayesian Linear Regression (BLR) models**  
+- Polygenic scoring using **Bayesian Linear Regression (BLR) models**  
+- Gene set enrichment analysis using **Bayesian Linear Regression (BLR) models**  
+
+*qgg* handles large-scale genomic data through **efficient algorithms** and **sparse matrix techniques**, combined with **multi-core processing** using **OpenMP**, **multithreaded matrix operations** via **BLAS** libraries (e.g., OpenBLAS, ATLAS, or MKL), and **fast, memory-efficient batch processing** of genotype data stored in  
+binary formats such as **PLINK `.bed` files**.
+
+
+## The *gact* R Package
+
+[**gact**](https://github.com/psoerensen/gact) provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:
+
+- Establishing and populating a database of genomic associations  
+- Downloading and processing biological databases  
+- Handling and processing GWAS summary statistics  
+- Linking genetic markers to genes, proteins, metabolites, and biological pathways  
+- Integrates with statistical machine learning tools in the [**qgg**](https://github.com/psoerensen/qgg) R package  
+
+[**gact**](https://github.com/psoerensen/gact) is intended to serve as **a practical implementation of integrative genomics**, bridging **statistical modeling** and **biological interpretation**, and supporting **reproducible** and **extensible** workflows.
+
+
+
+## References
+
+**Sørensen P, Rohde PD.**  *A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.*  
+**medRxiv** (2025). [https://doi.org/10.1101/2025.10.01.25337099](https://doi.org/10.1101/2025.10.01.25337099)
+
+**Sørensen IF, Sørensen P.**  *Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.*  
+**medRxiv** (2025). [https://doi.org/10.1101/2025.07.30.25332448](https://doi.org/10.1101/2025.07.30.25332448)
+
+**Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.**  *Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.06.13.25329590](https://doi.org/10.1101/2025.06.13.25329590)
+
+**Gholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases.*  **PLOS Genetics** 20(11): e1011463 (2025). [https://doi.org/10.1371/journal.pgen.1011463](https://doi.org/10.1371/journal.pgen.1011463)
+
+**Bai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.** *Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods.*  **BMC Genomics** 25(1): 1236 (2024). [https://doi.org/10.1186/s12864-024-11026-2](https://doi.org/10.1186/s12864-024-11026-2)
+
+**Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures.*  **PLOS Genetics** 21(7): e1011783 (2025). [https://doi.org/10.1371/journal.pgen.1011783](https://doi.org/10.1371/journal.pgen.1011783)
+
+**Kunkel D, Sørensen P, Shankar V, Morgante F.**  *Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes.*  **PLOS Genetics** 21(1): e1011519 (2025). [https://doi.org/10.1371/journal.pgen.1011519](https://doi.org/10.1371/journal.pgen.1011519)
+
+**Rohde P, Sørensen IF, Sørensen P.**  *Expanded Utility of the R Package qgg with Applications within Genomic Medicine.*  **Bioinformatics** 39:11 (2023). [https://doi.org/10.1093/bioinformatics/btad656](https://doi.org/10.1093/bioinformatics/btad656)
+
+**Rohde P, Sørensen IF, Sørensen P.**  *qgg: An R Package for Large-Scale Quantitative Genetic Analyses.*  **Bioinformatics** 36(8): 2614–2615 (2020). [https://doi.org/10.1093/bioinformatics/btz955](https://doi.org/10.1093/bioinformatics/btz955)
+
+
+
