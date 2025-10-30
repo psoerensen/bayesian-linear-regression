@@ -17,7 +17,7 @@ Explore the sections below to find the corresponding materials.
 
 | **Section** | **Description** |
 |--------------|----------------|
-| [**BLR Notes**](notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
+| [**BLR notes**](notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
 | [**BLR slides**](bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations in Bayesian Linear Regression Analyses. |
 | [**GSEA slides**](bayesian_gene_set_slides.html) | Lecture slides introducing Gene Set Analyses using Bayesian Linear Regression Models. |
 | [**Classical Regression tutorial**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
