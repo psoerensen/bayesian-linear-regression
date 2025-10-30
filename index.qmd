@@ -61,8 +61,9 @@ binary formats such as **PLINK `.bed` files**.
 - Linking genetic markers to genes, proteins, metabolites, and biological pathways  
 - Integrates with statistical machine learning tools in the [**qgg**](https://github.com/psoerensen/qgg) R package  
 
-[**gact**](https://github.com/psoerensen/gact) is intended to serve as **a practical implementation of integrative genomics**, bridging **statistical modeling** and **biological interpretation**, and supporting **reproducible** and **extensible** workflows.
+*gact* is intended to serve as **a practical implementation of integrative genomics**, bridging **statistical modeling** and **biological interpretation**, and supporting **reproducible** and **extensible** workflows.
 
+[**Tutorials using the *qgg* and *gact* R packages**](https://psoerensen.github.io/gact/)
 
 
 ## References

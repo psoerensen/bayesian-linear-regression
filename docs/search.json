@@ -1250,7 +1250,7 @@
     "href": "index.html#the-gact-r-package",
     "title": "Bayesian Linear Regression",
     "section": "The gact R Package",
-    "text": "The gact R Package\ngact provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:\n\nEstablishing and populating a database of genomic associations\n\nDownloading and processing biological databases\n\nHandling and processing GWAS summary statistics\n\nLinking genetic markers to genes, proteins, metabolites, and biological pathways\n\nIntegrates with statistical machine learning tools in the qgg R package\n\ngact is intended to serve as a practical implementation of integrative genomics, bridging statistical modeling and biological interpretation, and supporting reproducible and extensible workflows."
+    "text": "The gact R Package\ngact provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:\n\nEstablishing and populating a database of genomic associations\n\nDownloading and processing biological databases\n\nHandling and processing GWAS summary statistics\n\nLinking genetic markers to genes, proteins, metabolites, and biological pathways\n\nIntegrates with statistical machine learning tools in the qgg R package\n\ngact is intended to serve as a practical implementation of integrative genomics, bridging statistical modeling and biological interpretation, and supporting reproducible and extensible workflows.\nTutorials using the qgg and gact R packages"
   },
   {
     "objectID": "index.html#references",
