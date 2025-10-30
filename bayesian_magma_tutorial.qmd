@@ -1,5 +1,5 @@
 ---
-title: "Pathway Prioritization Using a Bayesian MAGMA Model and Gene-Level Statistics from VEGAS"
+title: "Pathway Prioritization Using a Bayesian MAGMA Model"
 format:
   html:
     toc: true
