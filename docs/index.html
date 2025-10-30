@@ -215,9 +215,52 @@ ul.task-list li input[type="checkbox"] {
 <p>Further details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in<br>
 <strong><a href="https://link.springer.com/book/10.1007/978-3-031-86274-8">Sorensen, D. (2025). <em>Statistical Learning in Genetics: An Introduction Using R</em>. Springer.</a></strong></p>
 <p>This book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in <strong>quantitative genetics and genomics</strong>.</p>
-
-
 </section>
+</section>
+<section id="the-qgg-r-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-qgg-r-package">The <em>qgg</em> R Package</h2>
+<p><a href="https://github.com/psoerensen/qgg"><strong>qgg</strong></a> provides tools for statistical modeling and analysis of large-scale genomic data, including:</p>
+<ul>
+<li>Fine-mapping of genomic regions using <strong>Bayesian Linear Regression (BLR) models</strong><br>
+</li>
+<li>Polygenic scoring using <strong>Bayesian Linear Regression (BLR) models</strong><br>
+</li>
+<li>Gene set enrichment analysis using <strong>Bayesian Linear Regression (BLR) models</strong></li>
+</ul>
+<p><em>qgg</em> handles large-scale genomic data through <strong>efficient algorithms</strong> and <strong>sparse matrix techniques</strong>, combined with <strong>multi-core processing</strong> using <strong>OpenMP</strong>, <strong>multithreaded matrix operations</strong> via <strong>BLAS</strong> libraries (e.g., OpenBLAS, ATLAS, or MKL), and <strong>fast, memory-efficient batch processing</strong> of genotype data stored in<br>
+binary formats such as <strong>PLINK <code>.bed</code> files</strong>.</p>
+</section>
+<section id="the-gact-r-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-gact-r-package">The <em>gact</em> R Package</h2>
+<p><a href="https://github.com/psoerensen/gact"><strong>gact</strong></a> provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:</p>
+<ul>
+<li>Establishing and populating a database of genomic associations<br>
+</li>
+<li>Downloading and processing biological databases<br>
+</li>
+<li>Handling and processing GWAS summary statistics<br>
+</li>
+<li>Linking genetic markers to genes, proteins, metabolites, and biological pathways<br>
+</li>
+<li>Integrates with statistical machine learning tools in the <a href="https://github.com/psoerensen/qgg"><strong>qgg</strong></a> R package</li>
+</ul>
+<p><a href="https://github.com/psoerensen/gact"><strong>gact</strong></a> is intended to serve as <strong>a practical implementation of integrative genomics</strong>, bridging <strong>statistical modeling</strong> and <strong>biological interpretation</strong>, and supporting <strong>reproducible</strong> and <strong>extensible</strong> workflows.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p><strong>Sørensen P, Rohde PD.</strong> <em>A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.</em><br>
+<strong>medRxiv</strong> (2025). <a href="https://doi.org/10.1101/2025.10.01.25337099">https://doi.org/10.1101/2025.10.01.25337099</a></p>
+<p><strong>Sørensen IF, Sørensen P.</strong> <em>Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.</em><br>
+<strong>medRxiv</strong> (2025). <a href="https://doi.org/10.1101/2025.07.30.25332448">https://doi.org/10.1101/2025.07.30.25332448</a></p>
+<p><strong>Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.</strong> <em>Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.</em> <strong>medRxiv</strong> (2025). <a href="https://doi.org/10.1101/2025.06.13.25329590">https://doi.org/10.1101/2025.06.13.25329590</a></p>
+<p><strong>Gholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.</strong> <em>Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases.</em> <strong>PLOS Genetics</strong> 20(11): e1011463 (2025). <a href="https://doi.org/10.1371/journal.pgen.1011463">https://doi.org/10.1371/journal.pgen.1011463</a></p>
+<p><strong>Bai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.</strong> <em>Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods.</em> <strong>BMC Genomics</strong> 25(1): 1236 (2024). <a href="https://doi.org/10.1186/s12864-024-11026-2">https://doi.org/10.1186/s12864-024-11026-2</a></p>
+<p><strong>Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.</strong> <em>Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures.</em> <strong>PLOS Genetics</strong> 21(7): e1011783 (2025). <a href="https://doi.org/10.1371/journal.pgen.1011783">https://doi.org/10.1371/journal.pgen.1011783</a></p>
+<p><strong>Kunkel D, Sørensen P, Shankar V, Morgante F.</strong> <em>Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes.</em> <strong>PLOS Genetics</strong> 21(1): e1011519 (2025). <a href="https://doi.org/10.1371/journal.pgen.1011519">https://doi.org/10.1371/journal.pgen.1011519</a></p>
+<p><strong>Rohde P, Sørensen IF, Sørensen P.</strong> <em>Expanded Utility of the R Package qgg with Applications within Genomic Medicine.</em> <strong>Bioinformatics</strong> 39:11 (2023). <a href="https://doi.org/10.1093/bioinformatics/btad656">https://doi.org/10.1093/bioinformatics/btad656</a></p>
+<p><strong>Rohde P, Sørensen IF, Sørensen P.</strong> <em>qgg: An R Package for Large-Scale Quantitative Genetic Analyses.</em> <strong>Bioinformatics</strong> 36(8): 2614–2615 (2020). <a href="https://doi.org/10.1093/bioinformatics/btz955">https://doi.org/10.1093/bioinformatics/btz955</a></p>
+
+
 </section>
 
 </main> <!-- /main -->
