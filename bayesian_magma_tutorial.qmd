@@ -165,7 +165,7 @@ for (i in seq_len(n_pathways)) {
 
 ---
 
-## Step 5: Enrich Selected Pathways
+## Step 5: Create Causal Pathways
 
 We enrich 1–2 pathways with truly associated genes to simulate signal.
 
@@ -179,8 +179,8 @@ for (p in enriched_paths) {
   pathway_list[[p]] <- unique(c(pathway_list[[p]], enriched_genes))
 }
 
-cat("✅ Created", n_pathways, "pathways (15–500 genes each)\n")
-cat("⭐ Enriched pathways:", paste(enriched_paths, collapse = ", "), "\n")
+cat("Created", n_pathways, "pathways (15–500 genes each)\n")
+cat("Causal pathways:", paste(enriched_paths, collapse = ", "), "\n")
 ```
 
 ---

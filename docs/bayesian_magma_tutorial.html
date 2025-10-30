@@ -179,7 +179,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#step-2-simulate-gene-level-association-statistics" id="toc-step-2-simulate-gene-level-association-statistics" class="nav-link" data-scroll-target="#step-2-simulate-gene-level-association-statistics">Step 2: Simulate Gene-Level Association Statistics</a></li>
   <li><a href="#step-3-draw-realistic-gene-set-sizes" id="toc-step-3-draw-realistic-gene-set-sizes" class="nav-link" data-scroll-target="#step-3-draw-realistic-gene-set-sizes">Step 3: Draw Realistic Gene Set Sizes</a></li>
   <li><a href="#step-4-create-overlapping-pathways" id="toc-step-4-create-overlapping-pathways" class="nav-link" data-scroll-target="#step-4-create-overlapping-pathways">Step 4: Create Overlapping Pathways</a></li>
-  <li><a href="#step-5-enrich-selected-pathways" id="toc-step-5-enrich-selected-pathways" class="nav-link" data-scroll-target="#step-5-enrich-selected-pathways">Step 5: Enrich Selected Pathways</a></li>
+  <li><a href="#step-5-create-causal-pathways" id="toc-step-5-create-causal-pathways" class="nav-link" data-scroll-target="#step-5-create-causal-pathways">Step 5: Create Causal Pathways</a></li>
   <li><a href="#step-6-visualize-pathway-size-distribution" id="toc-step-6-visualize-pathway-size-distribution" class="nav-link" data-scroll-target="#step-6-visualize-pathway-size-distribution">Step 6: Visualize Pathway Size Distribution</a></li>
   <li><a href="#step-7-visualize-pathway-overlap" id="toc-step-7-visualize-pathway-overlap" class="nav-link" data-scroll-target="#step-7-visualize-pathway-overlap">Step 7: Visualize Pathway Overlap</a></li>
   <li><a href="#step-8-run-and-compare-magma-style-gene-set-analyses" id="toc-step-8-run-and-compare-magma-style-gene-set-analyses" class="nav-link" data-scroll-target="#step-8-run-and-compare-magma-style-gene-set-analyses">Step 8: Run and Compare MAGMA-Style Gene Set Analyses</a>
@@ -359,7 +359,7 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  19.00   48.00   83.50   92.35  109.00  361.00 </code></pre>
+  17.00   50.75   87.50   99.38  129.00  408.00 </code></pre>
 </div>
 </div>
 <hr>
@@ -394,8 +394,8 @@ causal genes (red) from null genes (grey).</p>
 </div>
 <hr>
 </section>
-<section id="step-5-enrich-selected-pathways" class="level2">
-<h2 class="anchored" data-anchor-id="step-5-enrich-selected-pathways">Step 5: Enrich Selected Pathways</h2>
+<section id="step-5-create-causal-pathways" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-create-causal-pathways">Step 5: Create Causal Pathways</h2>
 <p>We enrich 1–2 pathways with truly associated genes to simulate signal.</p>
 <div class="cell">
 <details class="code-fold">
@@ -409,17 +409,17 @@ causal genes (red) from null genes (grey).</p>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  pathway_list[[p]] <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(pathway_list[[p]], enriched_genes))</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"✅ Created"</span>, n_pathways, <span class="st">"pathways (15–500 genes each)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Created"</span>, n_pathways, <span class="st">"pathways (15–500 genes each)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>✅ Created 100 pathways (15–500 genes each)</code></pre>
+<pre><code>Created 100 pathways (15–500 genes each)</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"⭐ Enriched pathways:"</span>, <span class="fu">paste</span>(enriched_paths, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Causal pathways:"</span>, <span class="fu">paste</span>(enriched_paths, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>⭐ Enriched pathways: Pathway_22, Pathway_79 </code></pre>
+<pre><code>Causal pathways: Pathway_88, Pathway_56 </code></pre>
 </div>
 </div>
 <hr>
@@ -537,13 +537,13 @@ causal genes (red) from null genes (grey).</p>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fitM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>           ID   m      b    seb       z            p
-22 Pathway_22  62 0.0812 0.0072 11.3420 4.061958e-30
-79 Pathway_79 264 0.0427 0.0080  5.3569 4.233153e-08
-45 Pathway_45 186 0.0213 0.0085  2.5008 6.194900e-03
-90 Pathway_90 110 0.0145 0.0078  1.8733 3.051296e-02
-67 Pathway_67  76 0.0126 0.0074  1.7064 4.396675e-02
-75 Pathway_75 108 0.0118 0.0072  1.6451 4.997362e-02</code></pre>
+<pre><code>           ID   m      b    seb      z            p
+88 Pathway_88 145 0.0603 0.0082 7.3885 7.422892e-14
+56 Pathway_56 159 0.0483 0.0087 5.5499 1.429512e-08
+55 Pathway_55  33 0.0205 0.0081 2.5160 5.935522e-03
+23 Pathway_23  74 0.0176 0.0077 2.2893 1.103196e-02
+30 Pathway_30  69 0.0184 0.0082 2.2288 1.291521e-02
+39 Pathway_39  40 0.0159 0.0073 2.1930 1.415481e-02</code></pre>
 </div>
 </div>
 </section>
@@ -557,12 +557,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m       b    PIP
-22 Pathway_22  62  0.0824 1.0000
-79 Pathway_79 264  0.0093 0.3113
-53 Pathway_53 106 -0.0009 0.0322
-70 Pathway_70  45 -0.0004 0.0192
-33 Pathway_33  92  0.0000 0.0022
-45 Pathway_45 186  0.0000 0.0016</code></pre>
+88 Pathway_88 145  0.0582 1.0000
+56 Pathway_56 159  0.0315 0.9256
+47 Pathway_47  86 -0.0274 0.7602
+5   Pathway_5  53 -0.0003 0.0124
+74 Pathway_74 189 -0.0001 0.0062
+73 Pathway_73  35 -0.0001 0.0052</code></pre>
 </div>
 </div>
 </section>
@@ -576,12 +576,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m       b    PIP
-22 Pathway_22  62  0.0803 1.0000
-79 Pathway_79 264  0.0337 0.9302
-53 Pathway_53 106 -0.0149 0.5277
-70 Pathway_70  45 -0.0063 0.2787
-21 Pathway_21 152 -0.0006 0.0352
-94 Pathway_94  55 -0.0004 0.0306</code></pre>
+88 Pathway_88 145  0.0611 1.0000
+56 Pathway_56 159  0.0351 0.9944
+47 Pathway_47  86 -0.0344 0.9738
+5   Pathway_5  53 -0.0030 0.1290
+74 Pathway_74 189 -0.0011 0.0620
+39 Pathway_39  40  0.0010 0.0596</code></pre>
 </div>
 </div>
 </section>
@@ -606,19 +606,19 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR
-16 Pathway_22  0.0812 4.061958e-30   0.0824     1.0000   0.0803     1.0000
-78 Pathway_79  0.0427 4.233153e-08   0.0093     0.3113   0.0337     0.9302
-50 Pathway_53 -0.0233 9.898457e-01  -0.0009     0.0322  -0.0149     0.5277
-69 Pathway_70 -0.0228 9.985700e-01  -0.0004     0.0192  -0.0063     0.2787
-28 Pathway_33 -0.0081 7.822008e-01   0.0000     0.0022  -0.0003     0.0176
-41 Pathway_45  0.0213 6.194900e-03   0.0000     0.0016   0.0002     0.0158
+88 Pathway_88  0.0603 7.422892e-14   0.0582     1.0000   0.0611     1.0000
+53 Pathway_56  0.0483 1.429512e-08   0.0315     0.9256   0.0351     0.9944
+43 Pathway_47 -0.0317 9.998914e-01  -0.0274     0.7602  -0.0344     0.9738
+46  Pathway_5 -0.0228 9.934863e-01  -0.0003     0.0124  -0.0030     0.1290
+73 Pathway_74 -0.0166 9.741054e-01  -0.0001     0.0062  -0.0011     0.0620
+72 Pathway_73 -0.0125 9.112027e-01  -0.0001     0.0052  -0.0009     0.0490
    is_enriched
-16        TRUE
-78        TRUE
-50       FALSE
-69       FALSE
-28       FALSE
-41       FALSE</code></pre>
+88        TRUE
+53        TRUE
+43       FALSE
+46       FALSE
+73       FALSE
+72       FALSE</code></pre>
 </div>
 </div>
 </section>

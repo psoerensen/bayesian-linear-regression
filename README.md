@@ -32,7 +32,7 @@ The full rendered website is available here:
 ## Further Reading
 
 For a deeper treatment of Bayesian inference, hierarchical modeling, and applications in genetics, see:  
-**[S?rensen, D. (2025). *Statistical Learning in Genetics: An Introduction Using R*. Springer.](https://link.springer.com/book/10.1007/978-3-031-86274-8)**  
+**[Sorensen, D. (2025). *Statistical Learning in Genetics: An Introduction Using R*. Springer.](https://link.springer.com/book/10.1007/978-3-031-86274-8)**  
 
 This book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in **quantitative genetics and genomics**.
 
