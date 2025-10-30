@@ -22,7 +22,7 @@ The full rendered website is available here:
 | [**Classical Regression**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
 | [**Bayesian (Gaussian Prior)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R. |
 | [**Bayesian (Spike & Slab)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity in R. |
-| [**Bayesian MAGMA**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_magma_tutorial.html) | Bayesian gene set analysisin R. |
+| [**Bayesian MAGMA**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_magma_tutorial.html) | Bayesian gene set analysis in R. |
 
 [Download Notes (PDF)](https://psoerensen.github.io/bayesian-linear-regression/notes.pdf)  
 [Download Slides (PDF)](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_slides.pdf)

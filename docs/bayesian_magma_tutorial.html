@@ -232,8 +232,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>This tutorial introduces <strong>Bayesian MAGMA</strong> — a gene set prioritization approach utilizing <strong>Bayesian Linear Regression (BLR)</strong> models within the MAGMA gene set analysis framework.</p>
 <p>The figure below shows a schematic overview of the workflow.<br>
-In the initial step, <strong>GWAS summary data</strong> for the traits of interest are used to compute <strong>gene-level Z-scores</strong> using the <strong>VEGAS (Versatile Gene-Based Association Study)</strong> approach<br>
-(<a href="Gene_analysis_vegas.html">see VEGAS gene analysis</a>).</p>
+In the initial step, <strong>GWAS summary data</strong> for the traits of interest are used to compute <strong>gene-level Z-scores</strong> using the <strong>VEGAS (Versatile Gene-Based Association Study)</strong> approach.</p>
 <p>Next, a <strong>design matrix</strong> linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).<br>
 The Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.<br>
 This results in <strong>posterior inclusion probabilities (PIPs)</strong> for each gene set, representing the probability that the set is included in the model.</p>
@@ -356,7 +355,7 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  15.00   51.00   88.00   96.71  126.50  287.00 </code></pre>
+  20.00   58.00   75.50   91.83  107.50  330.00 </code></pre>
 </div>
 </div>
 <hr>
@@ -416,7 +415,7 @@ causal genes (red) from null genes (grey).</p>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"⭐ Enriched pathways:"</span>, <span class="fu">paste</span>(enriched_paths, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>⭐ Enriched pathways: Pathway_27, Pathway_19 </code></pre>
+<pre><code>⭐ Enriched pathways: Pathway_79, Pathway_43 </code></pre>
 </div>
 </div>
 <hr>
@@ -535,12 +534,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m      b    seb      z            p
-27 Pathway_27 154 0.0675 0.0081 8.2866 5.826617e-17
-19 Pathway_19 158 0.0636 0.0082 7.7837 3.522665e-15
-91 Pathway_91 182 0.0215 0.0091 2.3602 9.131565e-03
-25 Pathway_25  79 0.0166 0.0078 2.1131 1.729718e-02
-16 Pathway_16  87 0.0170 0.0093 1.8225 3.419139e-02
-28 Pathway_28 100 0.0175 0.0100 1.7609 3.913028e-02</code></pre>
+43 Pathway_43 117 0.0690 0.0077 8.9516 1.752292e-19
+79 Pathway_79  82 0.0594 0.0075 7.9181 1.205604e-15
+74 Pathway_74  85 0.0122 0.0075 1.6143 5.323215e-02
+87 Pathway_87 160 0.0148 0.0093 1.5975 5.507620e-02
+30 Pathway_30  66 0.0109 0.0073 1.4975 6.713759e-02
+25 Pathway_25 107 0.0107 0.0074 1.4507 7.343817e-02</code></pre>
 </div>
 </div>
 </section>
@@ -554,12 +553,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m       b    PIP
-19 Pathway_19 158  0.0521 1.0000
-27 Pathway_27 154  0.0520 1.0000
-30 Pathway_30  91 -0.0062 0.2196
-6   Pathway_6  39 -0.0023 0.0824
-15 Pathway_15 121 -0.0018 0.0740
-9   Pathway_9 225 -0.0006 0.0256</code></pre>
+43 Pathway_43 117  0.0647 1.0000
+79 Pathway_79  82  0.0531 1.0000
+35 Pathway_35  33 -0.0190 0.5881
+52 Pathway_52  53 -0.0081 0.2829
+58 Pathway_58  75 -0.0002 0.0074
+84 Pathway_84 171 -0.0001 0.0038</code></pre>
 </div>
 </div>
 </section>
@@ -573,12 +572,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m       b    PIP
-19 Pathway_19 158  0.0577 1.0000
-27 Pathway_27 154  0.0581 1.0000
-30 Pathway_30  91 -0.0224 0.8076
-15 Pathway_15 121 -0.0139 0.5733
-6   Pathway_6  39 -0.0151 0.5581
-9   Pathway_9 225 -0.0064 0.2879</code></pre>
+43 Pathway_43 117  0.0682 1.0000
+79 Pathway_79  82  0.0573 1.0000
+35 Pathway_35  33 -0.0292 0.9244
+52 Pathway_52  53 -0.0224 0.7936
+58 Pathway_58  75 -0.0007 0.0408
+94 Pathway_94 111 -0.0006 0.0388</code></pre>
 </div>
 </div>
 </section>
@@ -603,19 +602,19 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR
-12 Pathway_19  0.0636 3.522665e-15   0.0521     1.0000   0.0577     1.0000
-21 Pathway_27  0.0675 5.826617e-17   0.0520     1.0000   0.0581     1.0000
-25 Pathway_30 -0.0264 9.996551e-01  -0.0062     0.2196  -0.0224     0.8076
-57  Pathway_6 -0.0302 9.991399e-01  -0.0023     0.0824  -0.0151     0.5581
-8  Pathway_15 -0.0244 9.985072e-01  -0.0018     0.0740  -0.0139     0.5733
-90  Pathway_9 -0.0181 9.877381e-01  -0.0006     0.0256  -0.0064     0.2879
+39 Pathway_43  0.0690 1.752292e-19   0.0647     1.0000   0.0682     1.0000
+78 Pathway_79  0.0594 1.205604e-15   0.0531     1.0000   0.0573     1.0000
+30 Pathway_35 -0.0305 9.999526e-01  -0.0190     0.5881  -0.0292     0.9244
+49 Pathway_52 -0.0262 9.992671e-01  -0.0081     0.2829  -0.0224     0.7936
+55 Pathway_58 -0.0172 9.791288e-01  -0.0002     0.0074  -0.0007     0.0408
+84 Pathway_84 -0.0199 9.908913e-01  -0.0001     0.0038  -0.0004     0.0244
    is_enriched
-12        TRUE
-21        TRUE
-25       FALSE
-57       FALSE
-8        FALSE
-90       FALSE</code></pre>
+39        TRUE
+78        TRUE
+30       FALSE
+49       FALSE
+55       FALSE
+84       FALSE</code></pre>
 </div>
 </div>
 </section>
