@@ -13,17 +13,17 @@ website:
         href: index.html
       - text: "Notes"
         href: notes.html
-      - text: "Slides BLR"
+      - text: "BLR slides"
         href: bayesian_linear_regression_slides.html
-      - text: "Slides Gene Set"
+      - text: "GSEA slides"
         href: bayesian_gene_set_slides.html
-      - text: "Classical Regression"
+      - text: "Classical Regression tutorial"
         href: classical_linear_regression_simulation.html
-      - text: "Bayesian (Gaussian Prior)"
+      - text: "Bayesian (Gaussian Prior) tutorial"
         href: bayesian_linear_regression_conjugate.html
-      - text: "Bayesian (Spike & Slab)"
+      - text: "Bayesian (Spike & Slab) tutorial"
         href: bayesian_spike_and_slab.html
-      - text: "Bayesian MAGMA"
+      - text: "Bayesian MAGMA tutorial"
         href: bayesian_magma_tutorial.html
 
 format:
