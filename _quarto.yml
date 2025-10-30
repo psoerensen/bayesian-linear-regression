@@ -15,8 +15,6 @@ website:
         href: notes.html
       - text: "Slides"
         href: bayesian_linear_regression_slides.html
-      - text: "Narrated Slides"
-        href: bayesian_linear_regression_slides_with_narration.html
       - text: "Classical Regression"
         href: classical_linear_regression_simulation.html
       - text: "Bayesian (Gaussian Prior)"
