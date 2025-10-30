@@ -1,0 +1,304 @@
+---
+title: "Pathway Prioritization Using a Bayesian MAGMA Model and Gene-Level Statistics from VEGAS"
+format:
+  html:
+    toc: true
+    code-fold: true
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Introduction
+
+This tutorial introduces **Bayesian MAGMA** — a gene set prioritization approach utilizing **Bayesian Linear Regression (BLR)** models within the MAGMA gene set analysis framework.
+
+The figure below shows a schematic overview of the workflow.  
+In the initial step, **GWAS summary data** for the traits of interest are used to compute **gene-level Z-scores** using the **VEGAS (Versatile Gene-Based Association Study)** approach.
+
+Next, a **design matrix** linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).  
+The Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.  
+This results in **posterior inclusion probabilities (PIPs)** for each gene set, representing the probability that the set is included in the model.
+
+Gene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.  
+The approach can also be extended to **multi-trait analyses**, enabling cross-trait exploration of pathway relevance.
+
+See full details in *Gholipourshahraki et al., 2024*.
+
+<br>
+
+::: {.center}
+![](Images/Bayesian_MAGMA.png){width=75%}
+Figure 1. Schematic overview of the Bayesian MAGMA workflow.
+:::
+
+<br>
+
+## Simulation set up
+
+This tutorial demonstrates how to simulate **gene-level association statistics** and **overlapping gene sets (pathways)** for gene set enrichment analysis using **MAGMA-style** or **Bayesian methods**.  
+You will learn to:
+
+1. Simulate gene-level Z-scores with causal genes.  
+2. Create overlapping pathways with realistic size distributions.  
+3. Enrich specific pathways with causal genes.  
+4. Visualize pathway sizes and overlaps.  
+5. Perform gene set analysis using `magma()`-style models (linear and Bayesian).
+
+---
+
+## Step 0: Load libraries  
+
+```{r}
+library(qgg)
+library(ggplot2)
+```
+
+
+
+## Step 1: Basic Parameters
+
+```{r}
+n_genes <- 20000
+n_assoc <-
+n_pathways <- 100
+effect_mean <- 3
+sd = effect_sd <- 1
+
+```
+
+---
+
+## Step 2: Simulate Gene-Level Association Statistics
+
+In this step, we simulate gene-level Z-scores for 20,000 genes,  
+where a subset of 100 are truly associated (causal).  
+We then visualize the results using a QQ plot that distinguishes  
+causal genes (red) from null genes (grey).
+
+```{r simulate_genelevel, fig.cap="QQ plot of simulated gene-level associations showing causal (red) and null (grey) genes."}
+
+
+genes <- paste0("Gene", seq_len(n_genes))
+
+# --- Step 1: Null genes centered around 0 ---
+z_scores <- rnorm(n_genes, mean = 0, sd = 1)
+names(z_scores) <- genes
+
+# --- Step 2: Define causal genes (stronger, possibly positive or negative) ---
+associated_genes <- sample(genes, n_assoc)
+z_scores[associated_genes] <- rnorm(n_assoc, mean = effect_mean, sd = effect_sd)
+
+# --- Step 3: Compute two-tailed p-values (VEGAS-style) ---
+p_values <- 2 * pnorm(-abs(z_scores))
+
+# --- Step 4: QQ plot ---
+df <- data.frame(
+  Gene = genes,
+  P = p_values,
+  causal = genes %in% associated_genes
+)
+df <- df[order(df$P), ]
+df$expected <- -log10(ppoints(n_genes))
+df$observed <- -log10(df$P)
+
+col_map <- c("FALSE" = "grey60", "TRUE" = "firebrick")
+
+plot(df$expected, df$observed,
+     pch = 19, cex = 0.6,
+     col = col_map[as.character(df$causal)],
+     xlab = expression(Expected~~-log[10](italic(p))),
+     ylab = expression(Observed~~-log[10](italic(p))),
+     main = "QQ Plot of Simulated VEGAS-Style Gene Z-scores")
+
+abline(0, 1, col = "black", lwd = 2)
+legend("topleft",
+       legend = c("Null genes", "Causal genes"),
+       col = c("grey60", "firebrick"), pch = 19, bty = "n")
+
+
+```
+
+---
+
+## Step 3: Draw Realistic Gene Set Sizes
+
+We use a **log-normal distribution** to simulate pathway sizes, resulting in a right-skewed distribution (many small pathways, few large ones).
+
+```{r}
+sizes_raw <- round(rlnorm(n_pathways, meanlog = log(80), sdlog = 0.6))
+sizes <- pmin(pmax(sizes_raw, 15), 500)  # truncate to 15–500
+summary(sizes)
+```
+
+---
+
+## Step 4: Create Overlapping Pathways
+
+Here, we simulate overlapping pathways. Each pathway shares some genes with previous ones, mimicking realistic biological redundancy.
+
+```{r}
+pathway_list <- vector("list", n_pathways)
+names(pathway_list) <- paste0("Pathway_", seq_len(n_pathways))
+
+for (i in seq_len(n_pathways)) {
+  size <- sizes[i]
+  
+  if (i > 1 && runif(1) < 0.9) {  # 90% chance to overlap
+    j <- sample(seq_len(i - 1), 1)  # pick existing pathway
+    target_overlap <- round(size * runif(1, 0.20, 0.50))  # 20–50% overlap
+    overlap_pool <- pathway_list[[j]]
+    k <- min(target_overlap, length(overlap_pool), size)
+    overlap_genes <- if (k > 0) sample(overlap_pool, k) else character(0)
+    remaining_pool <- setdiff(genes, overlap_genes)
+    n_remaining <- size - length(overlap_genes)
+    new_genes <- if (n_remaining > 0) sample(remaining_pool, n_remaining) else character(0)
+    pathway_list[[i]] <- unique(c(overlap_genes, new_genes))
+  } else {
+    pathway_list[[i]] <- sample(genes, size)
+  }
+}
+```
+
+---
+
+## Step 5: Create Causal Pathways
+
+We enrich 1–2 pathways with truly associated genes to simulate signal.
+
+```{r}
+n_enriched_paths <- 2
+enriched_paths <- sample(names(pathway_list), n_enriched_paths)
+
+for (p in enriched_paths) {
+  n_enriched_genes <- 30
+  enriched_genes <- sample(associated_genes, n_enriched_genes)
+  pathway_list[[p]] <- unique(c(pathway_list[[p]], enriched_genes))
+}
+
+cat("Created", n_pathways, "pathways (15–500 genes each)\n")
+cat("Causal pathways:", paste(enriched_paths, collapse = ", "), "\n")
+```
+
+---
+
+## Step 6: Visualize Pathway Size Distribution
+
+```{r}
+sizes_df <- data.frame(Pathway = names(pathway_list), Size = sizes)
+
+ggplot(sizes_df, aes(x = Size)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  theme_minimal(base_size = 13) +
+  labs(
+    title = "Distribution of Simulated Pathway Sizes",
+    x = "Number of genes per pathway",
+    y = "Count"
+  )
+```
+
+---
+
+## Step 7: Visualize Pathway Overlap
+
+We calculate the **Jaccard index** (|A∩B| / |A∪B|) between pathways and visualize it with a heatmap.
+
+```{r}
+n_show <- 30  # display subset
+overlap_matrix <- matrix(NA, n_show, n_show,
+                         dimnames = list(names(pathway_list)[1:n_show],
+                                         names(pathway_list)[1:n_show]))
+
+for (i in seq_len(n_show)) {
+  for (j in seq_len(n_show)) {
+    g1 <- pathway_list[[i]]
+    g2 <- pathway_list[[j]]
+    overlap_matrix[i, j] <- length(intersect(g1, g2)) / length(union(g1, g2))
+  }
+}
+
+if (requireNamespace("pheatmap", quietly = TRUE)) {
+  library(pheatmap)
+  pheatmap(
+    overlap_matrix,
+    main = "Pathway Overlap (Jaccard Index)",
+    color = colorRampPalette(c("white", "red"))(50),
+    border_color = NA
+  )
+}
+```
+
+---
+
+## Step 8: Run and Compare MAGMA-Style Gene Set Analyses
+
+Here we compare three approaches implemented in `qgg::magma()`:
+
+| Method | Model Type | Concept | Output |
+|:--------|:------------|:--------|:--------|
+| **Joint (fitM)** | Linear regression | Tests all pathways simultaneously | β-coefficients, SEs, *p*-values |
+| **BayesC (fitC)** | Bayesian spike-and-slab | Selects relevant pathways by posterior inclusion probability (PIP) | Posterior means, PIPs |
+| **BayesR (fitR)** | Bayesian mixture prior | Allows pathways to have small, moderate, or large effects | Posterior means, PIPs |
+
+### Classical joint model (standard MAGMA-style regression)
+```{r}
+fitM <- magma(stat = z_scores, sets = pathway_list, type = "joint")
+head(fitM)
+```
+
+### Bayesian sparse model (BayesC)
+```{r}
+fitC <- magma(stat = z_scores, sets = pathway_list, method = "bayesC")
+head(fitC)
+```
+
+### Bayesian mixture model (BayesR)
+```{r}
+fitR <- magma(stat = z_scores, sets = pathway_list, method = "bayesR")
+head(fitR)
+```
+
+### Summarize and Compare Outputs
+
+```{r}
+# Extract comparable metrics
+results <- list(
+  Joint = fitM[, c("ID", "b", "p")],
+  BayesC = fitC[, c("ID", "b", "PIP")],
+  BayesR = fitR[, c("ID", "b", "PIP")]
+)
+
+# Merge results by Pathway ID
+merged_results <- Reduce(function(x, y) merge(x, y, by = "ID", all = TRUE), results)
+colnames(merged_results) <- c("Pathway", "b_joint", "p_joint", "b_bayesC", "PIP_bayesC", "b_bayesR", "PIP_bayesR")
+merged_results$is_enriched <- merged_results$Pathway %in% enriched_paths
+
+head(merged_results[order(-merged_results$PIP_bayesC), ])
+```
+
+### Visualize Comparison of Evidence
+
+```{r}
+library(ggplot2)
+
+ggplot(merged_results, aes(x = -log10(p_joint), y = PIP_bayesC, color = is_enriched)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_text(data = subset(merged_results, is_enriched), aes(label = Pathway),
+            vjust = -1, size = 3.2) +
+  scale_color_manual(values = c("FALSE" = "grey60", "TRUE" = "firebrick")) +
+  labs(
+    x = expression(-log[10](italic(p))~~"(Joint model)"),
+    y = "Posterior Inclusion Probability (BayesC)",
+    title = "Comparison of Classical and Bayesian MAGMA Results"
+  ) +
+  theme_minimal(base_size = 13)
+```
+
+### Interpretation
+
+The joint linear model detects a broad set of pathways with small effects but cannot quantify inclusion evidence. BayesC and BayesR provide posterior probabilities reflecting uncertainty and sparsity. In this simulation, truly enriched pathways (in red) show both low *p*-values and high PIPs (>0.9), illustrating consistency between classical and Bayesian inference while offering a probabilistic measure of pathway relevance.
+
+
