@@ -137,10 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Slides</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./bayesian_linear_regression_slides_with_narration.html"> 
-<span class="menu-text">Narrated Slides</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./classical_linear_regression_simulation.html"> 
 <span class="menu-text">Classical Regression</span></a>
   </li>  
@@ -359,7 +355,7 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  17.00   50.75   87.50   99.38  129.00  408.00 </code></pre>
+  15.00   49.75   75.50   94.64  129.50  247.00 </code></pre>
 </div>
 </div>
 <hr>
@@ -419,7 +415,7 @@ causal genes (red) from null genes (grey).</p>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Causal pathways:"</span>, <span class="fu">paste</span>(enriched_paths, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Causal pathways: Pathway_88, Pathway_56 </code></pre>
+<pre><code>Causal pathways: Pathway_52, Pathway_56 </code></pre>
 </div>
 </div>
 <hr>
@@ -538,12 +534,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m      b    seb      z            p
-88 Pathway_88 145 0.0603 0.0082 7.3885 7.422892e-14
-56 Pathway_56 159 0.0483 0.0087 5.5499 1.429512e-08
-55 Pathway_55  33 0.0205 0.0081 2.5160 5.935522e-03
-23 Pathway_23  74 0.0176 0.0077 2.2893 1.103196e-02
-30 Pathway_30  69 0.0184 0.0082 2.2288 1.291521e-02
-39 Pathway_39  40 0.0159 0.0073 2.1930 1.415481e-02</code></pre>
+56 Pathway_56 161 0.0591 0.0078 7.5512 2.155680e-14
+52 Pathway_52 105 0.0523 0.0072 7.2661 1.849448e-13
+90 Pathway_90 129 0.0193 0.0079 2.4497 7.149301e-03
+13 Pathway_13  99 0.0169 0.0086 1.9651 2.470172e-02
+12 Pathway_12  38 0.0160 0.0090 1.7724 3.816627e-02
+1   Pathway_1 144 0.0138 0.0079 1.7439 4.059025e-02</code></pre>
 </div>
 </div>
 </section>
@@ -557,12 +553,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m       b    PIP
-88 Pathway_88 145  0.0582 1.0000
-56 Pathway_56 159  0.0315 0.9256
-47 Pathway_47  86 -0.0274 0.7602
-5   Pathway_5  53 -0.0003 0.0124
-74 Pathway_74 189 -0.0001 0.0062
-73 Pathway_73  35 -0.0001 0.0052</code></pre>
+52 Pathway_52 105  0.0513 1.0000
+56 Pathway_56 161  0.0488 1.0000
+90 Pathway_90 129  0.0004 0.0170
+76 Pathway_76 244 -0.0003 0.0124
+87 Pathway_87  33 -0.0001 0.0076
+8   Pathway_8  30 -0.0001 0.0046</code></pre>
 </div>
 </div>
 </section>
@@ -576,12 +572,12 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>           ID   m       b    PIP
-88 Pathway_88 145  0.0611 1.0000
-56 Pathway_56 159  0.0351 0.9944
-47 Pathway_47  86 -0.0344 0.9738
-5   Pathway_5  53 -0.0030 0.1290
-74 Pathway_74 189 -0.0011 0.0620
-39 Pathway_39  40  0.0010 0.0596</code></pre>
+52 Pathway_52 105  0.0514 1.0000
+56 Pathway_56 161  0.0493 1.0000
+90 Pathway_90 129  0.0037 0.1718
+76 Pathway_76 244 -0.0024 0.1140
+87 Pathway_87  33 -0.0014 0.0726
+8   Pathway_8  30 -0.0011 0.0594</code></pre>
 </div>
 </div>
 </section>
@@ -606,19 +602,19 @@ causal genes (red) from null genes (grey).</p>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR
-88 Pathway_88  0.0603 7.422892e-14   0.0582     1.0000   0.0611     1.0000
-53 Pathway_56  0.0483 1.429512e-08   0.0315     0.9256   0.0351     0.9944
-43 Pathway_47 -0.0317 9.998914e-01  -0.0274     0.7602  -0.0344     0.9738
-46  Pathway_5 -0.0228 9.934863e-01  -0.0003     0.0124  -0.0030     0.1290
-73 Pathway_74 -0.0166 9.741054e-01  -0.0001     0.0062  -0.0011     0.0620
-72 Pathway_73 -0.0125 9.112027e-01  -0.0001     0.0052  -0.0009     0.0490
+49 Pathway_52  0.0523 1.849448e-13   0.0513     1.0000   0.0514     1.0000
+53 Pathway_56  0.0591 2.155680e-14   0.0488     1.0000   0.0493     1.0000
+91 Pathway_90  0.0193 7.149301e-03   0.0004     0.0170   0.0037     0.1718
+75 Pathway_76 -0.0208 9.974181e-01  -0.0003     0.0124  -0.0024     0.1140
+87 Pathway_87 -0.0182 9.933587e-01  -0.0001     0.0076  -0.0014     0.0726
+79  Pathway_8 -0.0202 9.919358e-01  -0.0001     0.0046  -0.0011     0.0594
    is_enriched
-88        TRUE
+49        TRUE
 53        TRUE
-43       FALSE
-46       FALSE
-73       FALSE
-72       FALSE</code></pre>
+91       FALSE
+75       FALSE
+87       FALSE
+79       FALSE</code></pre>
 </div>
 </div>
 </section>
