@@ -23,6 +23,8 @@ website:
         href: bayesian_linear_regression_conjugate.html
       - text: "Bayesian (Spike & Slab)"
         href: bayesian_spike_and_slab.html
+      - text: "Bayesian MAGMA"
+        href: bayesian_magma_tutorial.html
 
 format:
   html:
