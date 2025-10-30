@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Palle Duun Rohde">
+<meta name="author" content="Peter Sørensen">
+
+<title>Bayesian Gene Set Analyses – Bayesian Linear Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-234273d1456647dabc34a594ac50e507.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-3f1ceb0eb11a066e0501c9e2d1de2658.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Bayesian Linear Regression</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_linear_regression_slides.html"> 
+<span class="menu-text">Slides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_linear_regression_slides_with_narration.html"> 
+<span class="menu-text">Narrated Slides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./classical_linear_regression_simulation.html"> 
+<span class="menu-text">Classical Regression</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_linear_regression_conjugate.html"> 
+<span class="menu-text">Bayesian (Gaussian Prior)</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_spike_and_slab.html"> 
+<span class="menu-text">Bayesian (Spike &amp; Slab)</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="bayesian_gene_set_slides.html"><i class="bi bi-file-slides"></i>RevealJS</a></li><li><a href="bayesian_gene_set_slides.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Bayesian Gene Set Analyses</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Authors</div>
+  <div class="quarto-title-meta-heading">Affiliations</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Palle Duun Rohde </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Genomic Medicine, Department of Health Science and Technology, Aalborg University, Denmark
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">Peter Sørensen </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Center for Quantitative Genetics and Genomics, Aarhus University, Denmark
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="introduction-to-integrative-genomics-gact" class="level1 center-title">
+<h1 class="center-title">Introduction to Integrative Genomics (<em>gact</em>)</h1>
+<hr>
+<section id="why-integrate-diverse-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="why-integrate-diverse-data-sources">Why Integrate Diverse Data Sources?</h2>
+<ul>
+<li>Complex traits arise from <strong>interacting molecular layers</strong> — genetic, transcriptomic, proteomic, and metabolic.<br>
+</li>
+<li>Single data types provide only <strong>partial insights</strong> complex biological systems (<strong>GWAS: DNA → disease phenotype</strong>)<br>
+</li>
+<li>Integration connects <strong>variants → genes → pathways → phenotypes</strong> may help reveal molecular mechanisms that drive traits and diseases.</li>
+<li>Enables <strong>functional interpretation</strong>, <strong>better prediction</strong>, and <strong>new discoveries</strong> across molecular systems.</li>
+</ul>
+<hr>
+</section>
+<section id="from-data-integration-to-discovery" class="level2">
+<h2 class="anchored" data-anchor-id="from-data-integration-to-discovery">From Data Integration to Discovery</h2>
+<div class="center">
+<p><img src="Images/Concept.png" class="img-fluid" style="width:80.0%"></p>
+</div>
+<hr>
+</section>
+<section id="the-gact-r-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-gact-r-package">The <em>gact</em> R Package</h2>
+<p><a href="https://github.com/psoerensen/gact"><strong>gact</strong></a> provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:</p>
+<ul>
+<li>Establishing and populating a database of genomic associations<br>
+</li>
+<li>Downloading and processing biological databases<br>
+</li>
+<li>Handling and processing GWAS summary statistics<br>
+</li>
+<li>Linking genetic markers to genes, proteins, metabolites, and biological pathways<br>
+</li>
+<li>Integrates with statistical machine learning tools in the <a href="https://github.com/psoerensen/qgg"><strong>qgg</strong></a> R package</li>
+</ul>
+<p><a href="https://github.com/psoerensen/gact"><strong>gact</strong></a> is intended to serve as <strong>a practical implementation of integrative genomics</strong>, bridging <strong>statistical modeling</strong> and <strong>biological interpretation</strong>, and supporting <strong>reproducible</strong> and <strong>extensible</strong> workflows.</p>
+<hr>
+</section>
+<section id="integrating-data-with-gact" class="level2">
+<h2 class="anchored" data-anchor-id="integrating-data-with-gact">Integrating Data with <em>gact</em></h2>
+<p>The <strong><code>gact()</code></strong> function is a single R command that creates and populates the <em>Genomic Association of Complex Traits (GACT)</em> database.</p>
+<p><br></p>
+<p>It automates three main tasks:</p>
+<ul>
+<li><strong>Infrastructure creation</strong> – sets up a structured folder-based database<br>
+(<code>glist</code>, <code>gstat</code>, <code>gsets</code>, <code>marker</code>, <code>gtex</code>, <code>download</code>, etc.)</li>
+<li><strong>Data acquisition</strong> – downloads and organizes multiple biological data sources<br>
+(e.g., GWAS Catalog, Ensembl, GTEx, Reactome, STRING, STITCH, DGIdb)</li>
+<li><strong>Marker and feature set generation</strong> - integrates data across sources to create curated genomic feature sets that form the basis for the integrative genomic analyses.</li>
+</ul>
+<!---
+Each run creates a versioned database directory (e.g. `./gactdb/`)  and returns a list object `GAlist` that tracks the database structure and files.
+--->
+<hr>
+</section>
+<section id="biological-databases-used-by-gact" class="level2">
+<h2 class="anchored" data-anchor-id="biological-databases-used-by-gact">Biological Databases Used by <em>gact</em></h2>
+<p><em>gact</em> constructs gene and marker sets from a wide range of curated biological databases:</p>
+<div class="smaller">
+<ul>
+<li><strong>Ensembl</strong> — genes, transcripts, and proteins<br>
+</li>
+<li><strong>Ensembl Regulation</strong> — regulatory genomic features<br>
+</li>
+<li><strong>GO</strong>, <strong>Reactome</strong>, <strong>KEGG</strong> — ontology and pathway sets<br>
+</li>
+<li><strong>STRING</strong>, <strong>STITCH</strong> — protein and chemical complexes<br>
+</li>
+<li><strong>DrugBank</strong>, <strong>ATC</strong> — drug–gene and drug-class associations<br>
+</li>
+<li><strong>DISEASE</strong> — disease–gene associations<br>
+</li>
+<li><strong>GTEx</strong> — eQTL-based gene sets<br>
+</li>
+<li><strong>GWAS Catalog</strong> — trait-associated variants and genes<br>
+</li>
+<li><strong>VEP</strong> — functional variant annotations</li>
+</ul>
+<p><em>We plan to add additional biological resources in</em> <strong>gact</strong>.</p>
+</div>
+<hr>
+</section>
+<section id="from-database-to-model-inputs" class="level2">
+<h2 class="anchored" data-anchor-id="from-database-to-model-inputs">From Database to Model Inputs</h2>
+<p>The <em>gact</em> R package includes utility functions to extract and structure data from the GACT database into analysis-ready inputs — <strong><span class="math inline">\(\mathbf{Y}\)</span></strong> (e.g., summary statistic outcomes) and <strong><span class="math inline">\(\mathbf{X}\)</span></strong> (genomic or biological features).</p>
+<ul>
+<li><code>getMarkerStat()</code> — retrieve GWAS summary statistics (<strong>Y’s</strong>)<br>
+</li>
+<li><code>getFeatureStat()</code> — extract gene-, protein-, or pathway-level results (<strong>Y’s</strong>)<br>
+</li>
+<li><code>getMarkerSets()</code> — define biological groupings (basis for <strong>X’s</strong>)<br>
+</li>
+<li><code>designMatrix()</code> — build feature matrices (<strong>X</strong>) linking variants or genes to biological feature sets</li>
+</ul>
+<p>Together, these functions form a <strong>reproducible workflow</strong> for generating <strong>standardized input data</strong> for <strong>Bayesian Hierarchical Models</strong> and other <strong>machine learning</strong> approaches.</p>
+<hr>
+</section>
+</section>
+<section id="introduction-to-bayesian-hierarchical-models-qgg" class="level1 center-title">
+<h1 class="center-title">Introduction to Bayesian Hierarchical Models (<em>qgg</em>)</h1>
+<hr>
+<section id="bayesian-hierarchical-models" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-hierarchical-models">Bayesian Hierarchical Models</h2>
+<p><strong>Bayesian Hierarchical Models</strong> provide a flexible statistical framework for modeling complex biological and healthcare data.</p>
+<p>They support key applications such as:</p>
+<ul>
+<li><strong>Genome-wide association studies (GWAS)</strong> and <strong>fine-mapping</strong> of causal variants<br>
+</li>
+<li><strong>Polygenic risk scoring (PRS)</strong> for predicting complex traits and disease risk<br>
+</li>
+<li><strong>Gene and pathway enrichment analyses</strong> to test biological hypotheses<br>
+</li>
+<li><strong>Integrative multi-omics modeling</strong> across the genome, transcriptome, epigenome, and proteome</li>
+</ul>
+<p>These models build directly on the <strong>Y’s</strong> and <strong>X’s</strong> generated by <em>gact</em>, providing a unified framework for integrative genomic analysis.</p>
+<!---
+
+
+## The Response Matrix (or Vector) $\mathbf{Y}$
+
+$\mathbf{Y}$ represents the **observed outcomes** or **association measures** corresponding to the features in $\mathbf{X}$.
+
+Each **element** (or row) can represent:
+
+- A **phenotypic value** (e.g., trait measurement, case/control status)  
+- A **summary statistic** (e.g., $z$-score, $p$-value, or $\hat{\beta}$ estimate)  
+- A **molecular-level signal** for a marker, gene, or protein  
+
+In multi-trait or multi-omics contexts, $\mathbf{Y}$ can be **multivariate**, containing parallel outcomes across traits or biological layers.
+
+
+---
+
+## The Feature Matrix $\mathbf{X}$
+
+$\mathbf{X}$ represents **molecular or genomic predictors** (e.g., genotypes, gene scores, annotations, pathway indicators).  
+
+- Each **row** corresponds to an observation or association in $\mathbf{Y}$  
+- Each **column** corresponds to a feature (e.g., SNP, gene, or pathway indicator)  
+
+Entries may be:
+
+- **Binary (0/1):** presence or absence  
+- **Categorical (0/1/2):** genotype dosage or discrete state  
+- **Continuous:** quantitative molecular values (e.g., expression, methylation)
+
+
+---
+
+## Linking $\mathbf{Y}$ and $\mathbf{X}$
+
+Having defined our data structures (**Y** and **X**), we now link them through a linear model:
+
+$$
+\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, \qquad
+\boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})
+$$
+
+- $\mathbf{Y}$ — observed **outcomes** such as phenotypes or molecular traits  
+- $\mathbf{X}$ — **features** representing genetic, transcriptomic, or other biological layers  
+- $\boldsymbol{\beta}$ — **effect sizes** quantifying how features in $\mathbf{X}$ explain variation in $\mathbf{Y}$  
+- $\boldsymbol{\varepsilon}$ — **residual noise** capturing unexplained variation  
+
+This linear relationship forms the foundation for jointly modeling how genetic and molecular variation drives complex traits.
+
+---
+--->
+</section>
+<section id="the-bayesian-linear-regression-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-bayesian-linear-regression-model">The Bayesian Linear Regression Model</h2>
+<p>The <strong>Bayesian Linear Regression (BLR)</strong> model builds:</p>
+<p><span class="math display">\[
+\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, \qquad
+\boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\mathbf{Y}\)</span> represents the <strong>observed outcomes</strong> or <strong>association measures</strong> corresponding to the features in <span class="math inline">\(\mathbf{X}\)</span>.</li>
+<li><span class="math inline">\(\mathbf{X}\)</span> represents <strong>molecular or genomic predictors</strong> (e.g., genotypes, gene scores, annotations, pathway indicators).<br>
+</li>
+<li><span class="math inline">\(\boldsymbol{\beta}\)</span> — <strong>effect sizes</strong> quantifying how features in <span class="math inline">\(\mathbf{X}\)</span> explain variation in <span class="math inline">\(\mathbf{Y}\)</span><br>
+</li>
+<li><span class="math inline">\(\boldsymbol{\varepsilon}\)</span> — <strong>residual noise</strong> capturing unexplained variation</li>
+</ul>
+<p>In the <strong>Bayesian</strong> formulation, each <span class="math inline">\(\beta_j\)</span> is assigned a <strong>prior distribution</strong> reflecting beliefs about <strong>effect size magnitude or sparsity</strong> and determine how <strong>information is shared</strong> across features or biological layers.</p>
+<hr>
+</section>
+<section id="why-bayesian-hierarchical-models" class="level2">
+<h2 class="anchored" data-anchor-id="why-bayesian-hierarchical-models">Why Bayesian Hierarchical Models?</h2>
+<p>Regression effects can be estimated in many ways, but we focus on a <strong>Bayesian hierarchical framework</strong> because it:</p>
+<ul>
+<li><strong>Combines data and prior knowledge</strong> to improve inference<br>
+</li>
+<li>Provides a <strong>natural way to regularize</strong> and handle noisy or high-dimensional data<br>
+</li>
+<li>Enables <strong>flexible modeling</strong> of diverse effect patterns:
+<ul>
+<li>Many small vs.&nbsp;few large effects<br>
+</li>
+<li>Structured effects (e.g., by pathway, gene set, or omic layer)<br>
+</li>
+</ul></li>
+<li>Returns <strong>uncertainty estimates</strong> for all parameters → improving interpretability and model comparison</li>
+</ul>
+<p>Through their <strong>hierarchical structure</strong>, BLR models naturally <strong>integrate multiple biological layers</strong> — linking genomic, transcriptomic, and other molecular data</p>
+<!---
+- Performs well even when the number of features (**p**) is large  
+--->
+<!---
+
+## Hyperpriors in Bayesian Modeling
+
+The BLR model extends the linear framework by introducing **hierarchical priors** on parameters. Suppose we model regression coefficients $b_j$ with a normal prior:
+
+$$
+b_j \sim \mathcal{N}(0, \sigma_b^2)
+$$
+
+Here, $\sigma_b^2$ (the variance of the prior) controls how large the effects $b_j$ are expected to be. 
+
+Instead of fixing $\sigma_b^2$ we treat it as unknown and assign it its own prior — the **hyperprior**:
+
+$$
+\sigma_b^2 \sim \text{Inv-}\chi^2(\nu, S^2)
+$$
+
+In practice, this parameter is **learned from the data** during estimation rather than fixed in advance.
+
+--->
+</section>
+<section id="hierarchical-structure" class="level2">
+<h2 class="anchored" data-anchor-id="hierarchical-structure">Hierarchical Structure</h2>
+<p>The three levels in the model:</p>
+<div style="font-size: 0.95em">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 45%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Level</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>1</strong></td>
+<td style="text-align: left;">Describes how data are generated given parameters</td>
+<td style="text-align: left;"><span class="math inline">\(y \sim \mathcal{N}(Xb, \sigma^2 I)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>2</strong></td>
+<td style="text-align: left;">Describes our beliefs about the parameters before seeing data</td>
+<td style="text-align: left;"><span class="math inline">\(b_i \sim \mathcal{N}(0, \sigma_b^2)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>3</strong></td>
+<td style="text-align: left;">Describes uncertainty about the prior’s parameters</td>
+<td style="text-align: left;"><span class="math inline">\(\sigma_b^2 \sim \text{Inv-}\chi^2(\nu, S^2)\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br></p>
+<p>This hierarchical structure allows the model to learn how strongly to shrink effect estimates from the data, while accounting for uncertainty in prior parameters and automatically regularizing effect sizes.</p>
+<p>Simple and robust, but may not capture diverse effect-size distributions.</p>
+<hr>
+</section>
+<section id="adapting-to-complex-biological-architectures" class="level2">
+<h2 class="anchored" data-anchor-id="adapting-to-complex-biological-architectures">Adapting to Complex Biological Architectures</h2>
+<p>Complex traits arise from <strong>heterogeneous effect-size distributions</strong> — some features have large effects, many have small, and others are likely null. To capture this diversity, the BLR framework can be extended in two ways:</p>
+<ul>
+<li><p><strong>Data-driven grouping</strong> of molecular features:<br>
+The model <em>learns effect-size classes</em> from the data using a <strong>mixture of variances</strong> <span class="math inline">\(\{\tau_k^2\}\)</span> with probabilities <span class="math inline">\(\{\pi_k\}\)</span>.</p></li>
+<li><p><strong>Biologically informed grouping</strong> of molecular features:<br>
+The model uses <em>prior biological knowledge</em> to assign features to groups <em>a priori</em>, each with its own variance <span class="math inline">\(\tau_g^2\)</span> capturing within-group variability.</p></li>
+</ul>
+<p>Both approaches enable the model to <strong>adapt to complex genetic and molecular architectures</strong> and <strong>share information</strong> across related features or omic layers</p>
+<!---
+
+---
+
+## Multiple-Component BLR
+
+A more flexible formulation assumes that effects come from a **mixture of normal distributions**:
+
+$$
+\beta_j \mid d_j = k \sim \mathcal{N}(0, \tau_k^2), \qquad
+P(d_j = k) = \pi_k
+$$
+
+- $d_j$ is a **latent indicator variable** assigning effect $j$ to component $k$.  
+- Each component $k$ has its own variance $\tau_k^2$, controlling expected effect size.  
+- $\pi_k$ represents the **probability of membership** in each component.  
+
+This structure allows the model to **capture both large and small effects**, including potential nulls.  
+In practice, both $\pi_k$ and $\tau_k^2$ are **learned from the data**, making the model **data-driven and adaptive**, though not necessarily **biologically informed**.
+
+---
+
+## Hierarchical (Group-Structured) BLR
+
+In this **biologically informed extension**, we assign features to predefined **groups** (e.g., genes, pathways, or protein complexes) *a priori* and model group-specific variances:
+
+$$
+\beta_j \sim \mathcal{N}\!\big(0, \tau_{g(j)}^2\big), \qquad
+\tau_g^2 \sim p(\tau_g^2)
+$$
+
+- Each feature $j$ belongs to a group $g(j)$ defined before analysis.  
+- Each group $g$ has its own variance $\tau_g^2$, controlling effect size variability within that group.  
+
+This approach allows the model to **share information among related features** and **test enrichment across biological groups**.  
+In practice, the group-level variances $\tau_g^2$ are **learned from the data**, enabling the model to **adapt shrinkage across biological structures**.
+
+---
+
+--->
+</section>
+<section id="indicator-variables-and-posterior-inclusion-probabilities" class="level2">
+<h2 class="anchored" data-anchor-id="indicator-variables-and-posterior-inclusion-probabilities">Indicator Variables and Posterior Inclusion Probabilities</h2>
+<p>In Bayesian variable selection, each feature <span class="math inline">\(j\)</span> is assigned an <strong>indicator variable</strong>:</p>
+<p><span class="math display">\[
+\delta_j =
+\begin{cases}
+1, &amp; \text{if feature $j$ has a non-zero effect} \\
+0, &amp; \text{if feature $j$ has no effect.}
+\end{cases}
+\]</span></p>
+<!---
+The model can be written as:
+$$
+\beta_j = \alpha_j \, \delta_j, \qquad 
+\alpha_j \sim \mathcal{N}(0, \tau^2), \quad
+\delta_j \sim \text{Bernoulli}(\pi)
+$$
+
+where $\pi$ is the prior inclusion probability.  
+--->
+<p>After inference, we estimate <span class="math inline">\(\text{PIP}_j = P(\delta_j = 1 \mid \text{data})\)</span> — the <strong>posterior inclusion probability</strong> for feature <em>j</em>.</p>
+<hr>
+</section>
+<section id="summary-of-blr-model-structures" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-blr-model-structures">Summary of BLR Model Structures</h2>
+<div style="font-size: 0.85em">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 30%">
+<col style="width: 45%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Model Type</strong></th>
+<th style="text-align: left;"><strong>Prior Structure</strong></th>
+<th style="text-align: left;"><strong>Biological Interpretation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Single-component BLR</strong></td>
+<td style="text-align: left;">One global variance <span class="math inline">\(\tau^2\)</span></td>
+<td style="text-align: left;">All features (across layers) share the same level of shrinkage — equal contribution assumption</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Multiple-component BLR</strong></td>
+<td style="text-align: left;">Mixture of variances <span class="math inline">\(\{\tau_k^2\}\)</span></td>
+<td style="text-align: left;">Features belong to different effect-size classes (e.g., large, small, null); grouping learned from data</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Hierarchical (Biologically informed) BLR</strong></td>
+<td style="text-align: left;">Group-specific <strong>mixtures of variances</strong> <span class="math inline">\(\{\tau_{gk}^2\}\)</span></td>
+<td style="text-align: left;">Features grouped <em>a priori</em> (e.g., by genes, pathways, or omic layers); within each group, effects can vary in size and sparsity</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>These models form a hierarchy of increasing flexibility and biological realism —<br>
+from <strong>global shrinkage</strong> → to <strong>data-driven heterogeneity</strong> → to <strong>biologically structured mixtures</strong> that model variation <em>within and between</em> feature sets.</p>
+<hr>
+</section>
+<section id="motivation-for-multivariate-blr" class="level2">
+<h2 class="anchored" data-anchor-id="motivation-for-multivariate-blr">Motivation for Multivariate BLR</h2>
+<p>Many traits and molecular layers are <strong>correlated</strong> — they share genetic architecture and biological pathways.</p>
+<p><br></p>
+<p>To model these dependencies, we extend BLR to the <strong>multivariate</strong> setting:</p>
+<ul>
+<li><strong>Jointly models multiple traits or omic layers</strong><br>
+→ captures shared genetic or molecular effects<br>
+</li>
+<li><strong>Borrows strength across correlated traits</strong><br>
+→ improves fine-mapping resolution and prediction accuracy<br>
+</li>
+<li><strong>Estimates cross-trait effect patterns</strong><br>
+→ helps identify pleiotropic genes and shared biological pathways</li>
+</ul>
+<hr>
+</section>
+<section id="the-multivariate-bayesian-linear-regression-mv-blr-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-multivariate-bayesian-linear-regression-mv-blr-model">The Multivariate Bayesian Linear Regression (MV-BLR) Model</h2>
+<p>In the <strong>multivariate BLR</strong> model, we model <strong>multiple correlated outcomes</strong> jointly:</p>
+<p><span class="math display">\[
+\mathbf{Y} = \mathbf{X}\mathbf{B} + \mathbf{E}
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\mathbf{Y}\)</span>: <span class="math inline">\((n \times T)\)</span> matrix of outcomes<br>
+(e.g., association measures for <span class="math inline">\(T\)</span> traits or omic layers)<br>
+</li>
+<li><span class="math inline">\(\mathbf{X}\)</span>: <span class="math inline">\((n \times p)\)</span> feature matrix<br>
+</li>
+<li><span class="math inline">\(\mathbf{B}\)</span>: <span class="math inline">\((p \times T)\)</span> matrix of effect sizes<br>
+</li>
+<li><span class="math inline">\(\mathbf{E}\)</span>: <span class="math inline">\((n \times T)\)</span> residual matrix</li>
+</ul>
+<p>Each row of <span class="math inline">\(\mathbf{Y}\)</span> corresponds to an observation or gene, and each column to a trait, phenotype, or molecular layer.</p>
+<hr>
+</section>
+<section id="multivariate-error-and-effect-priors" class="level2">
+<h2 class="anchored" data-anchor-id="multivariate-error-and-effect-priors">Multivariate Error and Effect Priors</h2>
+<p>We extend the univariate priors to the multivariate setting:</p>
+<p><span class="math display">\[
+\mathbf{e}_{i\cdot} \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_e)
+\]</span> <span class="math display">\[
+\mathbf{b}_j \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_b)
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\boldsymbol{\Sigma}_e\)</span>: residual covariance among traits<br>
+</li>
+<li><span class="math inline">\(\boldsymbol{\Sigma}_b\)</span>: covariance of effect sizes across traits<br>
+</li>
+<li>When <span class="math inline">\(\boldsymbol{\Sigma}_e\)</span> and <span class="math inline">\(\boldsymbol{\Sigma}_b\)</span> are diagonal, the model reduces to <span class="math inline">\(T\)</span> independent univariate BLR models.</li>
+</ul>
+<p>Allows <strong>information sharing across correlated traits or omic layers</strong> and can be used to identify <strong>pleiotropic effects</strong> and <strong>cross-trait genetic architectures</strong>.</p>
+<hr>
+</section>
+<section id="multivariate-blr-structured-mv-blr" class="level2">
+<h2 class="anchored" data-anchor-id="multivariate-blr-structured-mv-blr">Multivariate BLR (Structured MV-BLR)</h2>
+<p>The hierarchical structure can be extended to model <strong>multiple traits</strong><br>
+while preserving <strong>biological grouping</strong> of features:</p>
+<p><span class="math display">\[
+\mathbf{b}_j \sim \mathcal{N}_T\!\big(\mathbf{0}, \boldsymbol{\Sigma}_{b, g(j)}\big), \qquad
+\boldsymbol{\Sigma}_{b, g} \sim p(\boldsymbol{\Sigma}_{b, g})
+\]</span></p>
+<ul>
+<li>Each biological group <span class="math inline">\(g\)</span> has its own <strong>trait-level covariance matrix</strong> <span class="math inline">\(\boldsymbol{\Sigma}_{b,g}\)</span><br>
+</li>
+<li><span class="math inline">\(\boldsymbol{\Sigma}_{b,g}\)</span> captures <strong>correlations and scale of effects</strong> across traits within that group</li>
+</ul>
+<p>Enables information sharing both <strong>within biological sets</strong> and <strong>across correlated traits</strong>.</p>
+<hr>
+</section>
+<section id="indicator-variables-and-pips-multivariate-blr" class="level2">
+<h2 class="anchored" data-anchor-id="indicator-variables-and-pips-multivariate-blr">Indicator Variables and PIPs (Multivariate BLR)</h2>
+<p>In the <strong>multivariate BLR</strong>, each feature <span class="math inline">\(j\)</span> may affect multiple outcomes (traits).<br>
+We extend the indicator variable to capture <strong>cross-trait activity patterns</strong>:</p>
+<p><span class="math display">\[
+\boldsymbol{\delta}_j =
+\begin{bmatrix}
+\delta_{j1} \\ \delta_{j2} \\ \vdots \\ \delta_{jT}
+\end{bmatrix},
+\qquad
+\delta_{jt} =
+\begin{cases}
+1, &amp; \text{if feature $j$ affects trait $t$} \\
+0, &amp; \text{otherwise.}
+\end{cases}
+\]</span></p>
+<p>After inference, we estimate <span class="math inline">\(\text{PIP}_{jt} = P(\delta_{jt} = 1 \mid \text{data})\)</span> — the <strong>posterior inclusion probability</strong> that feature <em>j</em> affects trait <em>t</em>.</p>
+<hr>
+</section>
+<section id="interpreting-posterior-inclusion-probabilities-pips" class="level2">
+<h2 class="anchored" data-anchor-id="interpreting-posterior-inclusion-probabilities-pips">Interpreting Posterior Inclusion Probabilities (PIPs)</h2>
+<ul>
+<li>PIPs quantify the <strong>probability that a feature is truly associated</strong> with one or more outcomes.<br>
+</li>
+<li>High PIPs (e.g., &gt; 0.9) indicate strong evidence for inclusion.</li>
+<li>A probabilistic view of how molecular variation drives outcomes</li>
+<li>Patterns in <span class="math inline">\(\boldsymbol{\delta}_j\)</span> reveal <strong>shared vs.&nbsp;trait-specific effects</strong> — all zeros (no effect), few ones (trait-specific), many ones (shared or pleiotropic).</li>
+</ul>
+<hr>
+</section>
+<section id="blr-models-in-integrative-genomics" class="level2">
+<h2 class="anchored" data-anchor-id="blr-models-in-integrative-genomics">BLR Models in Integrative Genomics</h2>
+<div style="font-size: 0.75em">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 23%">
+<col style="width: 19%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Model Type</strong></th>
+<th style="text-align: left;"><strong>Feature Integration</strong></th>
+<th style="text-align: left;"><strong>Grouping Basis</strong></th>
+<th style="text-align: left;"><strong>Prior Structure</strong></th>
+<th style="text-align: left;"><strong>What It Captures</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Single-component BLR</strong></td>
+<td style="text-align: left;">Combines all biological features in one model</td>
+<td style="text-align: left;">None</td>
+<td style="text-align: left;">One global variance (<span class="math inline">\(\tau^2\)</span>)</td>
+<td style="text-align: left;">All features contribute equally; uniform shrinkage</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Multiple-component BLR</strong></td>
+<td style="text-align: left;">Integrates all layers but allows heterogeneous contributions</td>
+<td style="text-align: left;">Learned from data</td>
+<td style="text-align: left;">Mixture of variances (<span class="math inline">\(\{\tau_k^2\}\)</span>)</td>
+<td style="text-align: left;">Large, small, and null effect classes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Hierarchical BLR</strong></td>
+<td style="text-align: left;">Groups features by biological structure (e.g., genes, pathways)</td>
+<td style="text-align: left;">Defined <em>a priori</em></td>
+<td style="text-align: left;">Group-specific <strong>mixture of variances</strong> (<span class="math inline">\(\{\tau_{gk}^2\}\)</span>)</td>
+<td style="text-align: left;">Within-group heterogeneity; enrichment and structured shrinkage</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Multivariate BLR</strong></td>
+<td style="text-align: left;">Jointly models multiple correlated traits or outcomes</td>
+<td style="text-align: left;">None or by trait</td>
+<td style="text-align: left;">Shared covariance (<span class="math inline">\(\boldsymbol{\Sigma}_b\)</span>) across traits</td>
+<td style="text-align: left;">Genetic/molecular correlations; pleiotropy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Hierarchical MV-BLR</strong></td>
+<td style="text-align: left;">Combines biological grouping and multiple outcomes</td>
+<td style="text-align: left;">Defined <em>a priori</em></td>
+<td style="text-align: left;">Group- and trait-specific covariance mixtures (<span class="math inline">\(\{\boldsymbol{\Sigma}_{b,gk}\}\)</span>)</td>
+<td style="text-align: left;">Shared biological mechanisms across traits and layers</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</section>
+<section id="learning-at-different-levels" class="level2">
+<h2 class="anchored" data-anchor-id="learning-at-different-levels">Learning at Different Levels</h2>
+<div style="font-size: 0.7em">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 21%">
+<col style="width: 19%">
+<col style="width: 20%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Model Level</strong></th>
+<th style="text-align: left;"><strong>Key Parameters Learned</strong></th>
+<th style="text-align: left;"><strong>What They Represent</strong></th>
+<th style="text-align: left;"><strong>How They Are Learned</strong></th>
+<th style="text-align: left;"><strong>What We Learn Biologically</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Effect sizes</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\boldsymbol{\beta}\)</span></td>
+<td style="text-align: left;">Strength and direction of association for each feature</td>
+<td style="text-align: left;">Posterior mean/median given priors and data</td>
+<td style="text-align: left;">Which features drive the outcome</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Indicator variables</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\delta_j\)</span> (single trait), <span class="math inline">\(\boldsymbol{\delta}_j\)</span> (multi-trait)</td>
+<td style="text-align: left;">Whether feature <span class="math inline">\(j\)</span> is active (and for which traits)</td>
+<td style="text-align: left;">Estimated as posterior inclusion probabilities (PIPs)</td>
+<td style="text-align: left;">Which features are relevant, and whether effects are shared or trait-specific</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Variance components</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\tau^2\)</span>, <span class="math inline">\(\{\tau_k^2\}\)</span>, <span class="math inline">\(\{\tau_{gk}^2\}\)</span></td>
+<td style="text-align: left;">Magnitude of expected effect sizes; heterogeneity across layers or groups</td>
+<td style="text-align: left;">Inferred hierarchically from the data (via MCMC or EM)</td>
+<td style="text-align: left;">How strongly different groups or omic layers contribute</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Covariance components</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\boldsymbol{\Sigma}_b\)</span>, <span class="math inline">\(\{\boldsymbol{\Sigma}_{b,g}\}\)</span></td>
+<td style="text-align: left;">Correlation of effects across traits or molecular layers</td>
+<td style="text-align: left;">Estimated from joint posterior</td>
+<td style="text-align: left;">Shared pathways, pleiotropy, and cross-layer architecture</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="bayesian-linear-regression-for-polygenic-risk-scoring" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression-for-polygenic-risk-scoring">Bayesian Linear Regression for Polygenic Risk Scoring</h2>
+<p>Bayesian Linear Regression (BLR) provides a <strong>probabilistic framework</strong> for estimating genome-wide effects used in <strong>polygenic risk scores (PRS)</strong>.</p>
+<p><span class="math display">\[
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon},
+\qquad
+\boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2 \mathbf{I})
+\]</span></p>
+<p>After fitting the BLR model:</p>
+<ul>
+<li>Posterior means <span class="math inline">\(\hat{\boldsymbol{\beta}} = E(\boldsymbol{\beta} \mid \text{data})\)</span> represent <strong>regularized SNP effect estimates</strong>.<br>
+</li>
+<li>Individual-level PRS values are computed as:</li>
+</ul>
+<p><span class="math display">\[
+\text{PRS}_i = \sum_j X_{ij} \, \hat{\beta}_j
+\]</span></p>
+<hr>
+</section>
+<section id="the-qgg-r-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-qgg-r-package">The <em>qgg</em> R Package</h2>
+<p><a href="https://github.com/psoerensen/qgg"><strong>qgg</strong></a> provides tools for statistical modeling and analysis of large-scale genomic data, including:</p>
+<ul>
+<li>Fine-mapping of genomic regions using <strong>Bayesian Linear Regression (BLR) models</strong><br>
+</li>
+<li>Polygenic scoring using <strong>Bayesian Linear Regression (BLR) models</strong><br>
+</li>
+<li>Gene set enrichment analysis using <strong>Bayesian Linear Regression (BLR) models</strong></li>
+</ul>
+<p><em>qgg</em> handles large-scale genomic data through <strong>efficient algorithms</strong> and <strong>sparse matrix techniques</strong>, combined with <strong>multi-core processing</strong> using <strong>OpenMP</strong>, <strong>multithreaded matrix operations</strong> via <strong>BLAS</strong> libraries (e.g., OpenBLAS, ATLAS, or MKL), and <strong>fast, memory-efficient batch processing</strong> of genotype data stored in<br>
+binary formats such as <strong>PLINK <code>.bed</code> files</strong>.</p>
+<hr>
+</section>
+<section id="tutorials-using-the-qgg-and-gact-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="tutorials-using-the-qgg-and-gact-r-packages">Tutorials using the <em>qgg</em> and <em>gact</em> R packages</h2>
+<div style="font-size: 0.75em">
+<ul>
+<li><p><a href="Document/Gene_analysis_vegas.html">Gene analysis using VEGAS</a>: Gene analysis using the VEGAS (Versatile Gene-based Association Study) approach using the 1000G LD reference data processed above,</p></li>
+<li><p><a href="Document/Gene_set_analysis_bayesian_magma.html">Gene set analysis using Bayesian MAGMA</a>: Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).</p></li>
+<li><p><a href="Document/Gene_ranking_bayesian_pops.html">Gene ranking using PoPS</a>: Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level statistics derived from VEGAS (work in progress).</p></li>
+<li><p><a href="Document/Finemapping_bayesian_linear_regression_real_data.html">Finemapping using BLR models</a>: Finemapping of gene and LD regions using single trait Bayesian Linear Regression models (Shrestha et al.2025).</p></li>
+<li><p><a href="Document/Polygenic_scoring_bayesian_linear_regression.html">Polygenic scoring using BLR models</a>: Polygenic scoring (PGS) using Bayesian Linear Regression models and biological pathway information (work in progress).</p></li>
+<li><p><a href="Document/Polygenic_scoring_pgscatalog.html">Polygenic scoring using PGS Catalog</a>: Polygenic scoring (PGS) using summary statistics from PGS catalog and biological pathway information.</p></li>
+<li><p><a href="Document/LD_score_regression.html">LD score regression</a>: LD score regression for estimating genomic heritability and correlations.</p></li>
+</ul>
+</div>
+<!---
+
+---
+
+# Posterior Summaries in Bayesian Hierarchical Models {.center-title}
+
+---
+
+
+## Understanding the Outputs of Bayesian Linear Regression (BLR)
+
+The BLR model produces **posterior summaries** that describe  the evidence, magnitude, and uncertainty of feature effects.
+
+Key outputs:
+
+1. **Posterior means of $\boldsymbol{\beta}$** (effect sizes)  
+2. **Posterior inclusion probabilities (PIPs)**  
+3. **Variance component estimates** ($\sigma^2$, $\tau^2$, …)
+
+Each plays a distinct and complementary role in interpretation.
+
+---
+
+##  Posterior Means of Effect Sizes ($\boldsymbol{\beta}$)
+
+- Represent the **estimated effect** of each feature (gene, SNP, or set)  
+- Computed as posterior averages:  
+  $$
+  \hat{\beta}_j = \mathbb{E}[\beta_j \mid \mathbf{Y}, \mathbf{X}]
+  $$
+- Interpretation:
+  - Magnitude → **direction and strength** of association  
+  - Sign → **positive or negative effect**  
+  - Shrinkage → smaller estimates for weak or uncertain effects  
+
+- These are directly analogous to regression coefficients,  but account for prior information and uncertainty.
+
+---
+
+##  Posterior Inclusion Probabilities (PIPs)
+
+- Represent the **probability** that feature $j$ has a nonzero effect:
+  $$
+  \text{PIP}_j = \Pr(\beta_j \neq 0 \mid \mathbf{Y}, \mathbf{X})
+  $$
+
+- Quantifies **evidence of inclusion** in the model:
+  - High PIP → strong support for inclusion  
+  - Low PIP → likely irrelevant or redundant feature  
+
+- Interpretation:
+  - PIPs act as **Bayesian significance measures**  
+  - Useful for **ranking**, **fine-mapping**, and **feature prioritization**
+
+In pathway analyses (e.g., Bayesian MAGMA), PIPs correspond to **gene- or set-level importance scores**.
+
+---
+
+## Variance Component Estimates ($\tau^2$, $\sigma^2$)
+
+Variance components describe **uncertainty** and **heterogeneity** in effect sizes:
+
+$$
+\beta_j \sim \mathcal{N}(0, \tau^2)
+\qquad \text{and} \qquad
+\varepsilon_i \sim \mathcal{N}(0, \sigma^2)
+$$
+
+**$\tau^2$** is the variance component for the effect sizes  
+- Small $\tau^2$: most effects are close to zero  
+- Large $\tau^2$: more large-effect features expected  
+
+**$\sigma^2$** is the variance component for the residuals  
+- Captures unexplained variation after accounting for $\mathbf{X}$  
+
+Together, these components describe the **genetic architecture**, enabling **heritability estimation**, **uncertainty quantification**, and **enrichment analysis** across sets or traits.
+
+---
+
+##  Interpreting the Outputs Together
+
+| Quantity | Interpretation | Typical use |
+|-----------|----------------|--------------|
+| $\hat{\beta}_j$ | Direction and magnitude of effect | Effect estimation, prediction |
+| $\text{PIP}_j$ | Probability feature is truly associated | Fine-mapping, feature ranking |
+| $\tau^2$, $\sigma^2$ | Variance in effect sizes and residuals | Genetic architecture, model fit |
+
+These summaries are **synergistic**:  
+
+ - $\boldsymbol{\beta}$ tells *how much*  
+ - PIP tells *how confident*  
+ - Variance components tell *how complex*  
+
+---
+
+## Multivariate BLR Outputs
+
+In the multivariate setting, we generalize each posterior quantity:
+
+| Parameter | Interpretation |
+|------------|----------------|
+| $\mathbf{B} = [\beta_{jt}]$ | Effect matrix across traits ($j$: feature, $t$: trait) |
+| $\text{PIP}_j$ | Probability that feature $j$ affects ≥1 trait |
+| $\boldsymbol{\Sigma}_b$ | Covariance of effects across traits |
+| $\boldsymbol{\Sigma}_e$ | Residual covariance among traits |
+
+These allow us to identify:
+
+ - **Shared genetic effects** (pleiotropy)  
+ - **Trait-specific vs. shared signals**  
+ - **Cross-trait enrichment** of biological sets
+
+---
+
+# Estimating Variance Components in Bayesian Hierarchical Models {.center-title}
+
+---
+
+## Estimating Variance Components During Model Fitting
+
+In Bayesian Linear Regression, the **variance components** are *not fixed* —  they are **estimated jointly** with the effect sizes $\boldsymbol{\beta}$.
+
+- The model defines hierarchical priors:
+  $$
+  \beta_j \sim \mathcal{N}(0, \tau^2)
+  \qquad \text{and} \qquad
+  \varepsilon_i \sim \mathcal{N}(0, \sigma^2)
+  $$
+  where $\tau^2$ and $\sigma^2$ are **unknown parameters**.
+
+- These variances are updated iteratively during MCMC or EM optimization:
+  - **$\tau^2$** reflects the inferred spread of true effects  
+  - **$\sigma^2$** reflects residual noise or unexplained variability  
+
+Inference alternates between sampling (or updating) $\boldsymbol{\beta}$  and re-estimating the variance components given the data and current effects.
+
+---
+
+## Hierarchical Structure: Full Bayesian Estimation
+
+Each variance component has its own prior, enabling uncertainty propagation:
+
+$$
+\begin{aligned}
+\mathbf{Y} &= \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}, & \boldsymbol{\varepsilon} \sim \mathcal{N}(0, \sigma^2\mathbf{I}) \\
+\beta_j &\sim \mathcal{N}(0, \tau^2) & \tau^2 \sim \text{Inv-}\chi^2(\nu_\tau, S_\tau^2) \\
+\sigma^2 &\sim \text{Inv-}\chi^2(\nu_\sigma, S_\sigma^2)
+\end{aligned}
+$$
+
+- The model integrates over the **uncertainty in $\tau^2$ and $\sigma^2$**,  
+  not just point estimates  
+- Posterior samples of these parameters describe:
+  - The **degree of polygenicity** (via $\tau^2$)  
+  - The **signal-to-noise ratio** (via $\tau^2 / \sigma^2$)
+
+This full hierarchical treatment improves stability and interpretability  compared to fixing variance components a priori.
+
+---
+
+## In Grouped or Multi-Component BLR Models
+
+Variance components can be **set-specific** or **mixture-specific**,  
+and are all estimated from the data:
+
+$$
+\beta_j \sim \mathcal{N}\!\big(0, \tau_{g(j)}^2\big), \qquad
+\tau_g^2 \sim p(\tau_g^2)
+$$
+
+or
+
+$$
+\beta_j \sim \sum_{k=1}^{K} \pi_k\,\mathcal{N}(0, \tau_k^2), \qquad
+\tau_k^2 \sim p(\tau_k^2)
+$$
+
+- Each $\tau_g^2$ (or $\tau_k^2$) is **estimated adaptively**  
+- Groups or components with strong evidence receive **larger $\tau^2$**  
+  (less shrinkage, more signal)  
+- Noisy or irrelevant groups shrink toward **smaller $\tau^2$**  
+
+Variance components act as *adaptive shrinkage parameters*, controlling model complexity based on the data.
+
+---
+
+## In the Multivariate BLR Model
+
+Variance components generalize to covariance matrices:
+
+$$
+\mathbf{b}_j \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_b), \qquad
+\mathbf{E}_{i\cdot} \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_e)
+$$
+
+- $\boldsymbol{\Sigma}_b$: covariance of effects across traits  
+  → estimated from shared signal among outcomes  
+- $\boldsymbol{\Sigma}_e$: residual covariance among traits  
+  → estimated from correlated noise or shared environment
+
+Estimating $\boldsymbol{\Sigma}_b$ and $\boldsymbol{\Sigma}_e$  enables discovery of **pleiotropy** and **cross-trait genetic structure**.
+
+---
+
+## Why Variance Component Estimation Matters
+
+<div style="font-size: 0.8em">
+
+| Parameter | Role | Interpretation |
+|------------|------|----------------|
+| $\tau^2$ | Effect-size variance | How much true genetic signal exists |
+| $\sigma^2$ | Residual variance | How much variation remains unexplained |
+| $\tau_g^2$ / $\tau_k^2$ | Group or component variance | Which sets/components are enriched |
+| $\boldsymbol{\Sigma}_b$ | Cross-trait covariance | Pleiotropy or shared mechanisms |
+
+</div>
+
+These variance components are not tuning parameters —  they are **learned quantities** that describe the underlying biology. Their estimation is central to the interpretability of BLR and *gact* analyses.
+
+---
+
+
+---
+
+
+## Summary: Variance Components as Model-Driven Insights
+
+- Estimated **jointly** with effect sizes and inclusion probabilities  
+- Control the **degree of shrinkage and complexity** in the model  
+- Reveal **biological structure** (e.g., gene-set enrichments, trait correlations)  
+- Provide **model-based evidence** for:
+  - Polygenicity  
+  - Pleiotropy  
+  - Biological pathway relevance  
+
+In short, variance components are *learned descriptors of architecture*,  not just technical parameters — and are a cornerstone of *gact*’s BLR framework.
+
+
+--->
+<hr>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p><strong>From Data Integration to Modeling</strong></p>
+<ul>
+<li><p>Bridges data integration, statistical modeling and biological interpretation, enabling reproducible and extensible workflows.</p></li>
+<li><p><strong>Integrates biological information</strong> across molecular layers — from <strong>genome</strong> to <strong>pathways</strong>, <strong>complexes</strong>, and <strong>drug–gene interactions</strong><br>
+</p></li>
+<li><p><strong>Uses structured priors and hierarchical modeling</strong> to share information, regularize effect estimates, and quantify uncertainty<br>
+</p></li>
+<li><p><strong>Enables data-driven discovery and prediction</strong></p></li>
+</ul>
+<p><strong>Next Steps</strong></p>
+<ul>
+<li>Apply the framework to new and relevant use cases<br>
+</li>
+<li>Expand integration with more biological data resources<br>
+</li>
+<li>Incorporate additional statistical and machine learning methods</li>
+</ul>
+</section>
+<section id="further-reading-and-collaboration" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading-and-collaboration">Further Reading and Collaboration</h2>
+<p>💡 <strong>We are open to collaboration!</strong></p>
+<p>If you’re interested in applying <strong>BLR methods</strong> or contributing to the <strong>gact</strong> framework, please reach out.</p>
+<p><br></p>
+<p><strong>Further Reading</strong></p>
+<ul>
+<li><a href="https://psoerensen.github.io/bayesian-linear-regression/"><strong>Bayesian Linear Regression</strong> – teaching materials</a><br>
+</li>
+<li><a href="https://psoerensen.github.io/gact/"><strong>gact</strong> – R package documentation</a><br>
+</li>
+<li><a href="https://psoerensen.github.io/qgg/"><strong>qgg</strong> – R package documentation</a></li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div style="font-size: 0.6em; line-height: 1.5;">
+<p><strong>Sørensen P, Rohde PD.</strong> <em>A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.</em><br>
+<strong>medRxiv</strong> (2025). <a href="https://doi.org/10.1101/2025.10.01.25337099">https://doi.org/10.1101/2025.10.01.25337099</a></p>
+<p><strong>Sørensen IF, Sørensen P.</strong> <em>Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.</em><br>
+<strong>medRxiv</strong> (2025). <a href="https://doi.org/10.1101/2025.07.30.25332448">https://doi.org/10.1101/2025.07.30.25332448</a></p>
+<p><strong>Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.</strong> <em>Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.</em> <strong>medRxiv</strong> (2025). <a href="https://doi.org/10.1101/2025.06.13.25329590">https://doi.org/10.1101/2025.06.13.25329590</a></p>
+<p><strong>Gholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.</strong> <em>Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases.</em> <strong>PLOS Genetics</strong> 20(11): e1011463 (2025). <a href="https://doi.org/10.1371/journal.pgen.1011463">https://doi.org/10.1371/journal.pgen.1011463</a></p>
+<p><strong>Bai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.</strong> <em>Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods.</em> <strong>BMC Genomics</strong> 25(1): 1236 (2024). <a href="https://doi.org/10.1186/s12864-024-11026-2">https://doi.org/10.1186/s12864-024-11026-2</a></p>
+<p><strong>Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.</strong> <em>Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures.</em> <strong>PLOS Genetics</strong> 21(7): e1011783 (2025). <a href="https://doi.org/10.1371/journal.pgen.1011783">https://doi.org/10.1371/journal.pgen.1011783</a></p>
+<p><strong>Kunkel D, Sørensen P, Shankar V, Morgante F.</strong> <em>Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes.</em> <strong>PLOS Genetics</strong> 21(1): e1011519 (2025). <a href="https://doi.org/10.1371/journal.pgen.1011519">https://doi.org/10.1371/journal.pgen.1011519</a></p>
+<p><strong>Rohde P, Sørensen IF, Sørensen P.</strong> <em>Expanded Utility of the R Package qgg with Applications within Genomic Medicine.</em> <strong>Bioinformatics</strong> 39:11 (2023). <a href="https://doi.org/10.1093/bioinformatics/btad656">https://doi.org/10.1093/bioinformatics/btad656</a></p>
+<p><strong>Rohde P, Sørensen IF, Sørensen P.</strong> <em>qgg: An R Package for Large-Scale Quantitative Genetic Analyses.</em> <strong>Bioinformatics</strong> 36(8): 2614–2615 (2020). <a href="https://doi.org/10.1093/bioinformatics/btz955">https://doi.org/10.1093/bioinformatics/btz955</a></p>
+</div>
+<hr>
+</section>
+</section>
+<section id="gene-set-analyses-using-bayesian-linear-regression-models" class="level1 center-title">
+<h1 class="center-title">Gene Set Analyses using Bayesian Linear Regression Models</h1>
+<hr>
+<section id="gene-set-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="gene-set-analyses">Gene Set Analyses</h2>
+<p>Gene and biological pathway prioritization can provide valuable insights into the underlying biology of diseases and potential drug targets.</p>
+<p><br></p>
+<p><strong>MAGMA</strong>: Multi-marker Analysis of GenoMic Annotation (Leuww et al 2015) generalized gene set analysis of GWAS data</p>
+<ul>
+<li>Compute gene-level association statistics (<strong><span class="math inline">\(y\)</span></strong>)</li>
+<li>Create a design matrix based on annotation (<strong><span class="math inline">\(X\)</span></strong>)</li>
+<li>Fits single or multiple regression models (<strong><span class="math inline">\(y=Xb\)</span></strong>)<br>
+</li>
+<li>Identifies associated features using standard procedures (e.g., <em>t</em>-tests)</li>
+</ul>
+<hr>
+</section>
+<section id="gene-level-association-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="gene-level-association-statistics">Gene-level Association Statistics</h2>
+<div class="center">
+<p><img src="Images/gene_level_statistics.png" class="img-fluid" style="width:80.0%"></p>
+</div>
+<p>Compute gene-level (or other feature-level) association statistics:</p>
+<ul>
+<li>Account for correlation among marker statistics (i.e., linkage disequilibrium, LD)</li>
+<li>Different LD-adjustment methods (e.g., SVD, clumping and thresholding, BLR)</li>
+<li>The choice of method depends on the quality of the available GWAS summary statistics and LD reference panel</li>
+</ul>
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+<p>Bai et al., 2025</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-magma" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-magma">Bayesian MAGMA</h2>
+<div class="center">
+<p><img src="Images/Bayesian_MAGMA.png" class="img-fluid" style="width:70.0%"></p>
+</div>
+<ul>
+<li>Fits a Bayesian regression model that allows <strong>regularization</strong> and <strong>variable selection</strong><br>
+</li>
+<li>Supports <strong>single- or multi-trait</strong> analyses<br>
+</li>
+<li>Identifies associated features based on <strong>posterior inclusion probabilities</strong> (PIPs) for the regression effects</li>
+</ul>
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+<p>Gholipourshahraki et al., 2024</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-magma-kegg-pathway" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-magma-kegg-pathway">Bayesian MAGMA – KEGG Pathway</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>GWAS summary statistics from nine studies (<strong>T2D</strong>, <strong>CAD</strong>, <strong>CKD</strong>, <strong>HTN</strong>, <strong>BMI</strong>, <strong>WHR</strong>, <strong>Hb1Ac</strong>, <strong>TG</strong>, <strong>SBP</strong>)</li>
+<li><strong>Gene sets</strong> are defined by genes linked to <strong>KEGG pathways</strong>.<br>
+</li>
+<li><strong>Posterior inclusion probabilities (PIPs)</strong> quantify the degree of association between gene set and diseases<br>
+</li>
+<li>Pathways relevant to <strong>diabetes</strong> are associated with <strong>Type 2 Diabetes (T2D)</strong> and correlated traits<br>
+</li>
+<li>Enables identification of <strong>cross-disease patterns</strong> to better understand <strong>comorbidities</strong></li>
+</ul>
+</div><div class="column vcenter" style="width:50%;">
+<div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+<p><img src="Images/bayesian_magma_kegg.png" alt="KEGG Pathway Associations" style="max-width: 100%; max-height: 90%;"></p>
+</div>
+</div>
+</div>
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+<p>Gholipourshahraki et al., 2024</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-magma-dgidb" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-magma-dgidb">Bayesian MAGMA – DGIdb</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><strong>Gene sets</strong> are defined by genes linked to the <strong>Anatomical Therapeutic Chemical (ATC)</strong> classification system using the <strong>Drug–Gene Interaction Database (DGIdb)</strong><br>
+</li>
+<li><strong>Drug gene sets relevant to diabetes</strong> show associations with <strong>Type 2 Diabetes (T2D)</strong> and related traits<br>
+</li>
+<li><strong>Novel drug–gene set associations</strong> may reveal opportunities for <strong>drug repurposing</strong></li>
+</ul>
+</div><div class="column vcenter" style="width:50%;">
+<div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+<p><img src="Images/bayesian_magma_dgidb.png" alt="Drug Gene Set Associations (DGIdb)" style="max-width: 80%; max-height: 70%;"></p>
+</div>
+</div>
+</div>
+<div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
+<p>Hjelholt et al., 2025</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-magma-across-ancestries" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-magma-across-ancestries">Bayesian MAGMA – Across Ancestries</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><strong>Gene sets</strong> are defined by genes linked to <strong>KEGG pathways</strong>.<br>
+</li>
+<li>Joint analysis of <strong>T2D</strong> across three ancestries (<strong>EUR</strong>, <strong>EAS</strong>, <strong>SAS</strong>).<br>
+</li>
+<li>Pathways relevant to <strong>diabetes</strong> show associations with <strong>Type 2 Diabetes (T2D)</strong> across two of the ancestries (<strong>EUR</strong> and <strong>EAS</strong>).<br>
+</li>
+<li>Comparing these associations helps reveal <strong>ancestry-specific biological mechanisms</strong>.</li>
+</ul>
+</div><div class="column vcenter" style="width:50%;">
+<div style="display: flex; align-items: center; justify-content: center;">
+<p><img src="Images/bayesian_magma_ancestry.png" alt="Cross-Ancestry Pathway Associations" style="width: 120%; height: 100%;"></p>
+</div>
+</div>
+</div>
+<!---
+
+
+## Modeling and Machine Learning
+
+- **Creates QC’ed, standardized Y’s and X’s**  
+  Curated phenotypes and molecular features ready for statistical and ML analyses.  
+
+- **Reveals new biology**  
+  Associations between Y’s and X’s provide insight into molecular mechanisms and trait architecture.  
+
+- **Enables integrative and predictive modeling**  
+  Large, well-defined datasets support BLR, multi-omic integration, and predictive modeling (*qgg*).  
+
+- **Training and benchmarking resource**  
+  Could serve as a standardized foundation for developing and comparing ML and deep learning methods.  
+
+--->
+<!---
+
+## What the GACT Database Contains
+
+After running `gact()`, the database includes:
+
+- **Marker and feature sets** (genes, proteins, pathways, complexes)  
+- **GWAS and Bayesian summary statistics** (from pre-processed data)  
+- **Gene set and enrichment results** (from pre-processed data)  
+- **Drug–gene and protein–chemical interaction data**  
+- **Annotation and mapping files** for linking biological entities  
+
+The resulting QC’ed *marker* and *feature* sets serve as the foundation for **Bayesian Linear Regression (BLR)** models, **machine learning**,  and **integrative genomics analyses**.
+
+---
+--->
+<!---
+
+## What's Next
+
+- **What *gact* enables today**  
+  - Produces **QC’ed, standardized** $\mathbf{Y}$’s and $\mathbf{X}$’s ready for statistical and machine learning analyses  
+  - Reveals **associations between molecular features and traits**, uncovering underlying biological mechanisms  
+  - Integrates seamlessly with *qgg* for **Bayesian Linear Regression (BLR)** and predictive modeling  
+
+- **Where *gact* is heading**  
+  - Provide a **foundation for large-scale, integrative modeling** across omic layers  
+  - Serve as a **benchmarking resource** for machine learning and deep learning methods  
+  - Enable **reproducible and extensible workflows** that accelerate biological discovery  
+
+---
+
+## Current Limitations of *gact*
+
+While *gact* provides a solid infrastructure for integrative genomics, several limitations remain:
+
+- **Data dependency and versioning**  
+  - Relies on multiple external databases (e.g., Ensembl, GTEx, STRING) that are updated independently — requiring ongoing maintenance and version tracking.  
+
+- **Missingness and bias in input data**  
+  - GWAS summary statistics, biological annotations, and gene–set mappings may be incomplete, unevenly distributed across traits or populations, or biased toward well-studied genes and pathways.  
+
+- **Limited multi-omic data integration**  
+  - Primarily supports genomic and gene-level information; quantitative transcriptomic, proteomic, and metabolomic data are not yet integrated directly.  
+
+- **Scalability and performance**  
+  - The folder-based database and R-based workflow may become slow or memory-intensive for very large GWAS or fine-mapping datasets.  
+
+- **Limited parallelization and cloud support**  
+  - Most functions are optimized for local execution; distributed or cloud-based workflows (e.g., AWS, GCP, or HPC clusters) are not yet implemented.  
+
+- **Annotation bias and incompleteness**  
+  - Dependent on existing biological databases that vary in coverage and quality; missing or biased annotations can propagate into analyses and interpretations.  
+
+- **Visualization and user interface**  
+  - Lacks a graphical dashboard or web interface; currently requires R scripting for all operations and exploration.  
+
+
+---
+
+## Future Directions for *gact*
+
+To address current limitations and expand functionality, upcoming development will focus on:
+
+- **Improved data management and versioning**  
+  - Automated tracking of database versions and metadata to ensure reproducibility across analyses.  
+
+- **Handling missingness and bias**  
+  - Implement QC pipelines for GWAS and annotation data, harmonize population-specific resources, and flag incomplete mappings.  
+
+- **Expanded multi-omics integration**  
+  - Incorporate quantitative transcriptomic, proteomic, and metabolomic datasets to support integrative modeling.  
+
+- **Enhanced scalability and performance**  
+  - Optimize file I/O, adopt sparse data structures, and enable distributed computation for large-scale analyses.  
+
+- **Cloud and HPC compatibility**  
+  - Add support for parallel execution and storage on cloud or cluster environments (e.g., AWS, GCP, SLURM).  
+
+- **Richer annotation ecosystem**  
+  - Integrate additional databases and functional genomics resources to improve biological coverage and reduce bias.  
+
+- **Visualization and user accessibility**  
+  - Develop interactive dashboards and R Shiny tools for exploring associations, enrichment results, and model outputs.  
+
+---
+
+## Learning at Different Levels
+
+BLR models **learn hierarchically**:
+
+- Inclusion indicators → *Which features matter*  
+- Variance/covariance components → *How much they matter and how they relate across traits*  
+
+Together, they enable **data-driven and biologically informed inference** across multiple levels.
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const backBtn = document.createElement("a");
+  backBtn.href = "https://psoerensen.github.io/gact/";  // ✅ full URL
+  backBtn.target = "_self";  // opens in same tab
+  backBtn.textContent = "← Back to Main Page";
+  backBtn.style.cssText = `
+    position: fixed; top: 10px; right: 20px;
+    background: #fff; color: #000;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid #000;
+    font-weight: 600; font-family: sans-serif;
+    text-decoration: none; font-size: 14px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
+    z-index: 9999;
+  `;
+  backBtn.onmouseover = () => {
+    backBtn.style.background = '#000';
+    backBtn.style.color = '#fff';
+  };
+  backBtn.onmouseout = () => {
+    backBtn.style.background = '#fff';
+    backBtn.style.color = '#000';
+  };
+  document.body.appendChild(backBtn);
+});
+</script>
+
+--->
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

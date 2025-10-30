@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Peter Sørensen">
+
+<title>Pathway Prioritization Using a Bayesian MAGMA Model and Gene-Level Statistics from VEGAS – Bayesian Linear Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-234273d1456647dabc34a594ac50e507.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-3f1ceb0eb11a066e0501c9e2d1de2658.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Bayesian Linear Regression</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_linear_regression_slides.html"> 
+<span class="menu-text">Slides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_linear_regression_slides_with_narration.html"> 
+<span class="menu-text">Narrated Slides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./classical_linear_regression_simulation.html"> 
+<span class="menu-text">Classical Regression</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_linear_regression_conjugate.html"> 
+<span class="menu-text">Bayesian (Gaussian Prior)</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bayesian_spike_and_slab.html"> 
+<span class="menu-text">Bayesian (Spike &amp; Slab)</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#simulation-set-up" id="toc-simulation-set-up" class="nav-link" data-scroll-target="#simulation-set-up">Simulation set up</a></li>
+  <li><a href="#step-0-load-libraries" id="toc-step-0-load-libraries" class="nav-link" data-scroll-target="#step-0-load-libraries">Step 0: Load libraries</a></li>
+  <li><a href="#step-1-basic-parameters" id="toc-step-1-basic-parameters" class="nav-link" data-scroll-target="#step-1-basic-parameters">Step 1: Basic Parameters</a></li>
+  <li><a href="#step-2-simulate-gene-level-association-statistics" id="toc-step-2-simulate-gene-level-association-statistics" class="nav-link" data-scroll-target="#step-2-simulate-gene-level-association-statistics">Step 2: Simulate Gene-Level Association Statistics</a></li>
+  <li><a href="#step-3-draw-realistic-gene-set-sizes" id="toc-step-3-draw-realistic-gene-set-sizes" class="nav-link" data-scroll-target="#step-3-draw-realistic-gene-set-sizes">Step 3: Draw Realistic Gene Set Sizes</a></li>
+  <li><a href="#step-4-create-overlapping-pathways" id="toc-step-4-create-overlapping-pathways" class="nav-link" data-scroll-target="#step-4-create-overlapping-pathways">Step 4: Create Overlapping Pathways</a></li>
+  <li><a href="#step-5-enrich-selected-pathways" id="toc-step-5-enrich-selected-pathways" class="nav-link" data-scroll-target="#step-5-enrich-selected-pathways">Step 5: Enrich Selected Pathways</a></li>
+  <li><a href="#step-6-visualize-pathway-size-distribution" id="toc-step-6-visualize-pathway-size-distribution" class="nav-link" data-scroll-target="#step-6-visualize-pathway-size-distribution">Step 6: Visualize Pathway Size Distribution</a></li>
+  <li><a href="#step-7-visualize-pathway-overlap" id="toc-step-7-visualize-pathway-overlap" class="nav-link" data-scroll-target="#step-7-visualize-pathway-overlap">Step 7: Visualize Pathway Overlap</a></li>
+  <li><a href="#step-8-run-and-compare-magma-style-gene-set-analyses" id="toc-step-8-run-and-compare-magma-style-gene-set-analyses" class="nav-link" data-scroll-target="#step-8-run-and-compare-magma-style-gene-set-analyses">Step 8: Run and Compare MAGMA-Style Gene Set Analyses</a>
+  <ul class="collapse">
+  <li><a href="#classical-joint-model-standard-magma-style-regression" id="toc-classical-joint-model-standard-magma-style-regression" class="nav-link" data-scroll-target="#classical-joint-model-standard-magma-style-regression">Classical joint model (standard MAGMA-style regression)</a></li>
+  <li><a href="#bayesian-sparse-model-bayesc" id="toc-bayesian-sparse-model-bayesc" class="nav-link" data-scroll-target="#bayesian-sparse-model-bayesc">Bayesian sparse model (BayesC)</a></li>
+  <li><a href="#bayesian-mixture-model-bayesr" id="toc-bayesian-mixture-model-bayesr" class="nav-link" data-scroll-target="#bayesian-mixture-model-bayesr">Bayesian mixture model (BayesR)</a></li>
+  <li><a href="#summarize-and-compare-outputs" id="toc-summarize-and-compare-outputs" class="nav-link" data-scroll-target="#summarize-and-compare-outputs">Summarize and Compare Outputs</a></li>
+  <li><a href="#visualize-comparison-of-evidence" id="toc-visualize-comparison-of-evidence" class="nav-link" data-scroll-target="#visualize-comparison-of-evidence">Visualize Comparison of Evidence</a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Pathway Prioritization Using a Bayesian MAGMA Model and Gene-Level Statistics from VEGAS</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliations</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Peter Sørensen </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Center for Quantitative Genetics and Genomics
+          </p>
+        <p class="affiliation">
+            Aarhus University
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This tutorial introduces <strong>Bayesian MAGMA</strong> — a gene set prioritization approach utilizing <strong>Bayesian Linear Regression (BLR)</strong> models within the MAGMA gene set analysis framework.</p>
+<p>The figure below shows a schematic overview of the workflow.<br>
+In the initial step, <strong>GWAS summary data</strong> for the traits of interest are used to compute <strong>gene-level Z-scores</strong> using the <strong>VEGAS (Versatile Gene-Based Association Study)</strong> approach<br>
+(<a href="Gene_analysis_vegas.html">see VEGAS gene analysis</a>).</p>
+<p>Next, a <strong>design matrix</strong> linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).<br>
+The Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.<br>
+This results in <strong>posterior inclusion probabilities (PIPs)</strong> for each gene set, representing the probability that the set is included in the model.</p>
+<p>Gene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.<br>
+The approach can also be extended to <strong>multi-trait analyses</strong>, enabling cross-trait exploration of pathway relevance.</p>
+<p>See full details in <em>Gholipourshahraki et al., 2024</em>.</p>
+<p><br></p>
+<div class="center">
+<p><img src="Images/Bayesian_MAGMA.png" class="img-fluid" style="width:75.0%"> Figure 1. Schematic overview of the Bayesian MAGMA workflow.</p>
+</div>
+<p><br></p>
+</section>
+<section id="simulation-set-up" class="level2">
+<h2 class="anchored" data-anchor-id="simulation-set-up">Simulation set up</h2>
+<p>This tutorial demonstrates how to simulate <strong>gene-level association statistics</strong> and <strong>overlapping gene sets (pathways)</strong> for gene set enrichment analysis using <strong>MAGMA-style</strong> or <strong>Bayesian methods</strong>.<br>
+You will learn to:</p>
+<ol type="1">
+<li>Simulate gene-level Z-scores with causal genes.<br>
+</li>
+<li>Create overlapping pathways with realistic size distributions.<br>
+</li>
+<li>Enrich specific pathways with causal genes.<br>
+</li>
+<li>Visualize pathway sizes and overlaps.<br>
+</li>
+<li>Perform gene set analysis using <code>magma()</code>-style models (linear and Bayesian).</li>
+</ol>
+<hr>
+</section>
+<section id="step-0-load-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="step-0-load-libraries">Step 0: Load libraries</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qgg)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="step-1-basic-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-basic-parameters">Step 1: Basic Parameters</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n_genes <span class="ot">&lt;-</span> <span class="dv">20000</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n_assoc <span class="ot">&lt;-</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_pathways <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>effect_mean <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sd <span class="ot">=</span> effect_sd <span class="ot">&lt;-</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<hr>
+</section>
+<section id="step-2-simulate-gene-level-association-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-simulate-gene-level-association-statistics">Step 2: Simulate Gene-Level Association Statistics</h2>
+<p>In this step, we simulate gene-level Z-scores for 20,000 genes,<br>
+where a subset of 100 are truly associated (causal).<br>
+We then visualize the results using a QQ plot that distinguishes<br>
+causal genes (red) from null genes (grey).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>genes <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Gene"</span>, <span class="fu">seq_len</span>(n_genes))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Step 1: Null genes centered around 0 ---</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>z_scores <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_genes, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(z_scores) <span class="ot">&lt;-</span> genes</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Step 2: Define causal genes (stronger, possibly positive or negative) ---</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>associated_genes <span class="ot">&lt;-</span> <span class="fu">sample</span>(genes, n_assoc)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>z_scores[associated_genes] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_assoc, <span class="at">mean =</span> effect_mean, <span class="at">sd =</span> effect_sd)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Step 3: Compute two-tailed p-values (VEGAS-style) ---</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="sc">-</span><span class="fu">abs</span>(z_scores))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Step 4: QQ plot ---</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Gene =</span> genes,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">P =</span> p_values,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">causal =</span> genes <span class="sc">%in%</span> associated_genes</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df[<span class="fu">order</span>(df<span class="sc">$</span>P), ]</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>expected <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log10</span>(<span class="fu">ppoints</span>(n_genes))</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>observed <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log10</span>(df<span class="sc">$</span>P)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>col_map <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"grey60"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df<span class="sc">$</span>expected, df<span class="sc">$</span>observed,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">cex =</span> <span class="fl">0.6</span>,</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> col_map[<span class="fu">as.character</span>(df<span class="sc">$</span>causal)],</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="fu">expression</span>(Expected<span class="sc">~</span><span class="er">~</span><span class="sc">-</span>log[<span class="dv">10</span>](<span class="fu">italic</span>(p))),</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="fu">expression</span>(Observed<span class="sc">~</span><span class="er">~</span><span class="sc">-</span>log[<span class="dv">10</span>](<span class="fu">italic</span>(p))),</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"QQ Plot of Simulated VEGAS-Style Gene Z-scores"</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>,</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Null genes"</span>, <span class="st">"Causal genes"</span>),</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"firebrick"</span>), <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="bayesian_magma_tutorial_files/figure-html/simulate_genelevel-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>QQ plot of simulated gene-level associations showing causal (red) and null (grey) genes.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="step-3-draw-realistic-gene-set-sizes" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-draw-realistic-gene-set-sizes">Step 3: Draw Realistic Gene Set Sizes</h2>
+<p>We use a <strong>log-normal distribution</strong> to simulate pathway sizes, resulting in a right-skewed distribution (many small pathways, few large ones).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sizes_raw <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">rlnorm</span>(n_pathways, <span class="at">meanlog =</span> <span class="fu">log</span>(<span class="dv">80</span>), <span class="at">sdlog =</span> <span class="fl">0.6</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sizes <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(sizes_raw, <span class="dv">15</span>), <span class="dv">500</span>)  <span class="co"># truncate to 15–500</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sizes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  15.00   51.00   88.00   96.71  126.50  287.00 </code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="step-4-create-overlapping-pathways" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-create-overlapping-pathways">Step 4: Create Overlapping Pathways</h2>
+<p>Here, we simulate overlapping pathways. Each pathway shares some genes with previous ones, mimicking realistic biological redundancy.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pathway_list <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">"list"</span>, n_pathways)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pathway_list) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Pathway_"</span>, <span class="fu">seq_len</span>(n_pathways))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(n_pathways)) {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  size <span class="ot">&lt;-</span> sizes[i]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (i <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">&amp;&amp;</span> <span class="fu">runif</span>(<span class="dv">1</span>) <span class="sc">&lt;</span> <span class="fl">0.9</span>) {  <span class="co"># 90% chance to overlap</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    j <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_len</span>(i <span class="sc">-</span> <span class="dv">1</span>), <span class="dv">1</span>)  <span class="co"># pick existing pathway</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    target_overlap <span class="ot">&lt;-</span> <span class="fu">round</span>(size <span class="sc">*</span> <span class="fu">runif</span>(<span class="dv">1</span>, <span class="fl">0.20</span>, <span class="fl">0.50</span>))  <span class="co"># 20–50% overlap</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    overlap_pool <span class="ot">&lt;-</span> pathway_list[[j]]</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    k <span class="ot">&lt;-</span> <span class="fu">min</span>(target_overlap, <span class="fu">length</span>(overlap_pool), size)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    overlap_genes <span class="ot">&lt;-</span> <span class="cf">if</span> (k <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">sample</span>(overlap_pool, k) <span class="cf">else</span> <span class="fu">character</span>(<span class="dv">0</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    remaining_pool <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(genes, overlap_genes)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    n_remaining <span class="ot">&lt;-</span> size <span class="sc">-</span> <span class="fu">length</span>(overlap_genes)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    new_genes <span class="ot">&lt;-</span> <span class="cf">if</span> (n_remaining <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">sample</span>(remaining_pool, n_remaining) <span class="cf">else</span> <span class="fu">character</span>(<span class="dv">0</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    pathway_list[[i]] <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(overlap_genes, new_genes))</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    pathway_list[[i]] <span class="ot">&lt;-</span> <span class="fu">sample</span>(genes, size)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<hr>
+</section>
+<section id="step-5-enrich-selected-pathways" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-enrich-selected-pathways">Step 5: Enrich Selected Pathways</h2>
+<p>We enrich 1–2 pathways with truly associated genes to simulate signal.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_enriched_paths <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>enriched_paths <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">names</span>(pathway_list), n_enriched_paths)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (p <span class="cf">in</span> enriched_paths) {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  n_enriched_genes <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  enriched_genes <span class="ot">&lt;-</span> <span class="fu">sample</span>(associated_genes, n_enriched_genes)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  pathway_list[[p]] <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(pathway_list[[p]], enriched_genes))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"✅ Created"</span>, n_pathways, <span class="st">"pathways (15–500 genes each)</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>✅ Created 100 pathways (15–500 genes each)</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"⭐ Enriched pathways:"</span>, <span class="fu">paste</span>(enriched_paths, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>⭐ Enriched pathways: Pathway_27, Pathway_19 </code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="step-6-visualize-pathway-size-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="step-6-visualize-pathway-size-distribution">Step 6: Visualize Pathway Size Distribution</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sizes_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Pathway =</span> <span class="fu">names</span>(pathway_list), <span class="at">Size =</span> sizes)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sizes_df, <span class="fu">aes</span>(<span class="at">x =</span> Size)) <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Simulated Pathway Sizes"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Number of genes per pathway"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Count"</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="bayesian_magma_tutorial_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="step-7-visualize-pathway-overlap" class="level2">
+<h2 class="anchored" data-anchor-id="step-7-visualize-pathway-overlap">Step 7: Visualize Pathway Overlap</h2>
+<p>We calculate the <strong>Jaccard index</strong> (|A∩B| / |A∪B|) between pathways and visualize it with a heatmap.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>n_show <span class="ot">&lt;-</span> <span class="dv">30</span>  <span class="co"># display subset</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>overlap_matrix <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, n_show, n_show,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">names</span>(pathway_list)[<span class="dv">1</span><span class="sc">:</span>n_show],</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">names</span>(pathway_list)[<span class="dv">1</span><span class="sc">:</span>n_show]))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(n_show)) {</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_len</span>(n_show)) {</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    g1 <span class="ot">&lt;-</span> pathway_list[[i]]</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    g2 <span class="ot">&lt;-</span> pathway_list[[j]]</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    overlap_matrix[i, j] <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">intersect</span>(g1, g2)) <span class="sc">/</span> <span class="fu">length</span>(<span class="fu">union</span>(g1, g2))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">"pheatmap"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(pheatmap)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pheatmap</span>(</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    overlap_matrix,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="st">"Pathway Overlap (Jaccard Index)"</span>,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"red"</span>))(<span class="dv">50</span>),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">border_color =</span> <span class="cn">NA</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="bayesian_magma_tutorial_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="step-8-run-and-compare-magma-style-gene-set-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="step-8-run-and-compare-magma-style-gene-set-analyses">Step 8: Run and Compare MAGMA-Style Gene Set Analyses</h2>
+<p>Here we compare three approaches implemented in <code>qgg::magma()</code>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 32%">
+<col style="width: 22%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Model Type</th>
+<th style="text-align: left;">Concept</th>
+<th style="text-align: left;">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Joint (fitM)</strong></td>
+<td style="text-align: left;">Linear regression</td>
+<td style="text-align: left;">Tests all pathways simultaneously</td>
+<td style="text-align: left;">β-coefficients, SEs, <em>p</em>-values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>BayesC (fitC)</strong></td>
+<td style="text-align: left;">Bayesian spike-and-slab</td>
+<td style="text-align: left;">Selects relevant pathways by posterior inclusion probability (PIP)</td>
+<td style="text-align: left;">Posterior means, PIPs</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>BayesR (fitR)</strong></td>
+<td style="text-align: left;">Bayesian mixture prior</td>
+<td style="text-align: left;">Allows pathways to have small, moderate, or large effects</td>
+<td style="text-align: left;">Posterior means, PIPs</td>
+</tr>
+</tbody>
+</table>
+<section id="classical-joint-model-standard-magma-style-regression" class="level3">
+<h3 class="anchored" data-anchor-id="classical-joint-model-standard-magma-style-regression">Classical joint model (standard MAGMA-style regression)</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fitM <span class="ot">&lt;-</span> <span class="fu">magma</span>(<span class="at">stat =</span> z_scores, <span class="at">sets =</span> pathway_list, <span class="at">type =</span> <span class="st">"joint"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fitM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           ID   m      b    seb      z            p
+27 Pathway_27 154 0.0675 0.0081 8.2866 5.826617e-17
+19 Pathway_19 158 0.0636 0.0082 7.7837 3.522665e-15
+91 Pathway_91 182 0.0215 0.0091 2.3602 9.131565e-03
+25 Pathway_25  79 0.0166 0.0078 2.1131 1.729718e-02
+16 Pathway_16  87 0.0170 0.0093 1.8225 3.419139e-02
+28 Pathway_28 100 0.0175 0.0100 1.7609 3.913028e-02</code></pre>
+</div>
+</div>
+</section>
+<section id="bayesian-sparse-model-bayesc" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-sparse-model-bayesc">Bayesian sparse model (BayesC)</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fitC <span class="ot">&lt;-</span> <span class="fu">magma</span>(<span class="at">stat =</span> z_scores, <span class="at">sets =</span> pathway_list, <span class="at">method =</span> <span class="st">"bayesC"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fitC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           ID   m       b    PIP
+19 Pathway_19 158  0.0521 1.0000
+27 Pathway_27 154  0.0520 1.0000
+30 Pathway_30  91 -0.0062 0.2196
+6   Pathway_6  39 -0.0023 0.0824
+15 Pathway_15 121 -0.0018 0.0740
+9   Pathway_9 225 -0.0006 0.0256</code></pre>
+</div>
+</div>
+</section>
+<section id="bayesian-mixture-model-bayesr" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-mixture-model-bayesr">Bayesian mixture model (BayesR)</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fitR <span class="ot">&lt;-</span> <span class="fu">magma</span>(<span class="at">stat =</span> z_scores, <span class="at">sets =</span> pathway_list, <span class="at">method =</span> <span class="st">"bayesR"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fitR)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           ID   m       b    PIP
+19 Pathway_19 158  0.0577 1.0000
+27 Pathway_27 154  0.0581 1.0000
+30 Pathway_30  91 -0.0224 0.8076
+15 Pathway_15 121 -0.0139 0.5733
+6   Pathway_6  39 -0.0151 0.5581
+9   Pathway_9 225 -0.0064 0.2879</code></pre>
+</div>
+</div>
+</section>
+<section id="summarize-and-compare-outputs" class="level3">
+<h3 class="anchored" data-anchor-id="summarize-and-compare-outputs">Summarize and Compare Outputs</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract comparable metrics</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Joint =</span> fitM[, <span class="fu">c</span>(<span class="st">"ID"</span>, <span class="st">"b"</span>, <span class="st">"p"</span>)],</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">BayesC =</span> fitC[, <span class="fu">c</span>(<span class="st">"ID"</span>, <span class="st">"b"</span>, <span class="st">"PIP"</span>)],</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">BayesR =</span> fitR[, <span class="fu">c</span>(<span class="st">"ID"</span>, <span class="st">"b"</span>, <span class="st">"PIP"</span>)]</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge results by Pathway ID</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>merged_results <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(<span class="cf">function</span>(x, y) <span class="fu">merge</span>(x, y, <span class="at">by =</span> <span class="st">"ID"</span>, <span class="at">all =</span> <span class="cn">TRUE</span>), results)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(merged_results) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Pathway"</span>, <span class="st">"b_joint"</span>, <span class="st">"p_joint"</span>, <span class="st">"b_bayesC"</span>, <span class="st">"PIP_bayesC"</span>, <span class="st">"b_bayesR"</span>, <span class="st">"PIP_bayesR"</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>merged_results<span class="sc">$</span>is_enriched <span class="ot">&lt;-</span> merged_results<span class="sc">$</span>Pathway <span class="sc">%in%</span> enriched_paths</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merged_results[<span class="fu">order</span>(<span class="sc">-</span>merged_results<span class="sc">$</span>PIP_bayesC), ])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR
+12 Pathway_19  0.0636 3.522665e-15   0.0521     1.0000   0.0577     1.0000
+21 Pathway_27  0.0675 5.826617e-17   0.0520     1.0000   0.0581     1.0000
+25 Pathway_30 -0.0264 9.996551e-01  -0.0062     0.2196  -0.0224     0.8076
+57  Pathway_6 -0.0302 9.991399e-01  -0.0023     0.0824  -0.0151     0.5581
+8  Pathway_15 -0.0244 9.985072e-01  -0.0018     0.0740  -0.0139     0.5733
+90  Pathway_9 -0.0181 9.877381e-01  -0.0006     0.0256  -0.0064     0.2879
+   is_enriched
+12        TRUE
+21        TRUE
+25       FALSE
+57       FALSE
+8        FALSE
+90       FALSE</code></pre>
+</div>
+</div>
+</section>
+<section id="visualize-comparison-of-evidence" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-comparison-of-evidence">Visualize Comparison of Evidence</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(merged_results, <span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">-</span><span class="fu">log10</span>(p_joint), <span class="at">y =</span> PIP_bayesC, <span class="at">color =</span> is_enriched)) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="fu">subset</span>(merged_results, is_enriched), <span class="fu">aes</span>(<span class="at">label =</span> Pathway),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">size =</span> <span class="fl">3.2</span>) <span class="sc">+</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"FALSE"</span> <span class="ot">=</span> <span class="st">"grey60"</span>, <span class="st">"TRUE"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>)) <span class="sc">+</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(<span class="sc">-</span>log[<span class="dv">10</span>](<span class="fu">italic</span>(p))<span class="sc">~</span><span class="er">~</span><span class="st">"(Joint model)"</span>),</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Posterior Inclusion Probability (BayesC)"</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparison of Classical and Bayesian MAGMA Results"</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="bayesian_magma_tutorial_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
+<p>The joint linear model detects a broad set of pathways with small effects but cannot quantify inclusion evidence. BayesC and BayesR provide posterior probabilities reflecting uncertainty and sparsity. In this simulation, truly enriched pathways (in red) show both low <em>p</em>-values and high PIPs (&gt;0.9), illustrating consistency between classical and Bayesian inference while offering a probabilistic measure of pathway relevance.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
