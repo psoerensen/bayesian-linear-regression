@@ -35,7 +35,9 @@ format:
     highlight-style: github
 
 author:
+  - name: "Palle Duun Rohde"
+    affiliation:
+      - "Genomic Medicine, Department of Health Science and Technology, Aalborg University, Denmark"
   - name: "Peter Sørensen"
     affiliation:
-      - "Center for Quantitative Genetics and Genomics"
-      - "Aarhus University"
+      - "Center for Quantitative Genetics and Genomics, Aarhus University, Denmark"
