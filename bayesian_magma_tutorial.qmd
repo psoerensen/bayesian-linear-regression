@@ -63,6 +63,7 @@ library(ggplot2)
 ## Step 1: Basic Parameters
 
 ```{r}
+set.seed(123)
 n_genes <- 20000
 n_assoc <-  100
 n_pathways <- 100
