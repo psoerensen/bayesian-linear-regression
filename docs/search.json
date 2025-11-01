@@ -123,7 +123,7 @@
     "href": "bayesian_magma_tutorial.html#simulation-set-up",
     "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
     "section": "Simulation set up",
-    "text": "Simulation set up\nThis tutorial demonstrates how to simulate gene-level association statistics and overlapping gene sets (pathways) for enrichment analysis using MAGMA-style approaches, implemented either as OLS joint estimation or via Bayesian inference with BayesC or BayesR priors.\nYou will learn to:\n\nSimulate gene-level Z-scores with causal genes.\n\nCreate overlapping pathways with realistic size distributions.\n\nEnrich specific pathways with causal genes.\n\nVisualize pathway sizes and overlaps.\n\nPerform gene set analysis using magma()-style models (linear and Bayesian)."
+    "text": "Simulation set up\nThis tutorial demonstrates how to simulate gene-level association statistics and overlapping gene sets (pathways) for enrichment analysis using MAGMA-style approaches, implemented either as OLS joint estimation or via Bayesian inference with BayesC or BayesR priors.\nThe tutorial included the following steps:\n\nSimulate gene-level Z-scores with causal genes.\n\nCreate overlapping pathways with realistic size distributions.\n\nEnrich specific pathways with causal genes.\n\nVisualize pathway sizes and overlaps.\n\nPerform gene set analysis using magma()-style models (linear and Bayesian)."
   },
   {
     "objectID": "bayesian_magma_tutorial.html#step-0-load-libraries",
