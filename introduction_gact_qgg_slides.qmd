@@ -1,0 +1,356 @@
+---
+title: "Integrative Genomics Analyses using the *gact* and *qgg* R packages"
+author:
+  - name: "Peter Sørensen"
+    affiliation:
+      - "Center for Quantitative Genetics and Genomics, Aarhus University, Denmark"
+format: 
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    toc: false
+    incremental: false
+    smaller: true
+    auto-scale: true
+    font-size: 85%
+    math:
+      scale: 0.9
+    css: slides.css   
+  beamer:
+    theme: default
+    slide-level: 2
+    keep-tex: true
+    pdf-engine: lualatex
+    fontsize: 11pt
+    header-includes: |
+      \setbeamertemplate{itemize item}{\textendash}
+      \setbeamertemplate{itemize subitem}{\textbullet}
+      \setbeamertemplate{itemize subsubitem}{$\cdot$}
+      \makeatletter
+      \patchcmd{\beamer@framesetup}{\centering}{}{}{}
+      \makeatother
+
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+
+
+## Why Integrate Diverse Data Sources?
+
+- Complex traits arise from **interacting molecular layers** — genetic, transcriptomic, proteomic, and metabolic.  
+- Single data types provide only **partial insights** complex biological systems (**GWAS: DNA → disease phenotype**)  
+- Integration connects **variants → genes → pathways → phenotypes** may help reveal molecular mechanisms that drive traits and diseases.
+- Enables **functional interpretation**, **better prediction**, and **new discoveries** across molecular systems.  
+
+<!---
+## Challenges Integrating Biological Data
+
+- **Fragmented data sources** — genomic, transcriptomic, proteomic, and metabolomic data stored in different databases and formats.  
+- **Inconsistent identifiers and annotations** — linking SNPs, genes, proteins, and pathways requires multiple reference systems.  
+- **Variable data quality and coverage** — heterogeneous QC, missing metadata, and species bias reduce comparability.  
+- **High technical barriers** — integration often depends on manual downloads, custom scripts, and one-off pipelines.  
+
+
+---
+
+## Toward Integrative Genomics
+
+- **Connecting molecular layers** — translating genetic variants into biological mechanisms requires structured links across omics.  
+- **Scalability and efficiency** — multi-omic integration for thousands of traits demands organized, high-performance data processing.  
+- **Reproducibility and transparency** — ad hoc analyses make it hard to reproduce or extend results.  
+- **Need for unified frameworks** — few resources combine database management, biological context, and modeling tools.  
+
+---
+--->
+
+## From Data Integration to Discovery
+
+::: {.center}
+![](Images/Concept.png){width=80%}
+:::
+
+---
+
+## The *gact* R Package
+
+[**gact**](https://github.com/psoerensen/gact) provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:
+
+- Establishing and populating a database of genomic associations  
+- Downloading and processing biological databases  
+- Handling and processing GWAS summary statistics  
+- Linking genetic markers to genes, proteins, metabolites, and biological pathways  
+- Integrates with statistical machine learning tools in the [**qgg**](https://github.com/psoerensen/qgg) R package  
+
+[**gact**](https://github.com/psoerensen/gact) is intended to serve as **a practical implementation of integrative genomics**, bridging **statistical modeling** and **biological interpretation**, and supporting **reproducible** and **extensible** workflows.
+
+---
+
+## Integrating Data with *gact*
+
+The **`gact()`** function is a single R command that creates and populates the *Genomic Association of Complex Traits (GACT)* database.  
+
+<br>
+
+It automates three main tasks:
+
+- **Infrastructure creation** – sets up a structured folder-based database  
+  (`glist`, `gstat`, `gsets`, `marker`, `gtex`, `download`, etc.)
+- **Data acquisition** – downloads and organizes multiple biological data sources  
+  (e.g., GWAS Catalog, Ensembl, GTEx, Reactome, STRING, STITCH, DGIdb)
+- **Marker and feature set generation** - integrates data across sources to create
+curated genomic feature sets that form the basis for the integrative genomic analyses.
+
+---
+
+## Biological Databases Used by *gact*
+
+*gact* constructs gene and marker sets from a wide range of curated biological databases:
+
+::: {.smaller}
+
+- **Ensembl** — genes, transcripts, and proteins  
+- **Ensembl Regulation** — regulatory genomic features  
+- **GO**, **Reactome**, **KEGG** — ontology and pathway sets  
+- **STRING**, **STITCH** — protein and chemical complexes  
+- **DrugBank**, **ATC** — drug–gene and drug-class associations  
+- **DISEASE** — disease–gene associations  
+- **GTEx** — eQTL-based gene sets  
+- **GWAS Catalog** — trait-associated variants and genes  
+- **VEP** — functional variant annotations
+
+*We plan to add additional biological resources in* **gact**.
+
+:::
+
+---
+
+## From Database to Model Inputs
+
+The *gact* R package includes utility functions to extract and structure data from the GACT database into analysis-ready inputs — **$\mathbf{Y}$** (e.g., summary statistic outcomes) and **$\mathbf{X}$** (genomic or biological features).
+
+- `getMarkerStat()` — retrieve GWAS summary statistics (**Y’s**)  
+- `getFeatureStat()` — extract gene-, protein-, or pathway-level results  (**Y’s**)  
+- `getMarkerSets()` — define biological groupings (basis for **X’s**)  
+- `designMatrix()` — build feature matrices (**X**) linking variants or genes to biological feature sets  
+
+Together, these functions form a **reproducible workflow** for generating **standardized input data** for **Bayesian Hierarchical Models** and other **machine learning** approaches.
+
+---
+
+## The *qgg* R Package
+
+[**qgg**](https://github.com/psoerensen/qgg) provides tools for statistical modeling and analysis of large-scale genomic data, including:
+
+- Fine-mapping of genomic regions using **Bayesian Linear Regression (BLR) models**  
+- Polygenic scoring using **Bayesian Linear Regression (BLR) models**  
+- Gene set enrichment analysis using **Bayesian Linear Regression (BLR) models**  
+
+*qgg* handles large-scale genomic data through **efficient algorithms** and **sparse matrix techniques**, combined with **multi-core processing** using **OpenMP**, **multithreaded matrix operations** via **BLAS** libraries (e.g., OpenBLAS, ATLAS, or MKL), and **fast, memory-efficient batch processing** of genotype data stored in  
+binary formats such as **PLINK `.bed` files**.
+
+
+---
+
+## Tutorials using the *qgg* and *gact* R packages
+
+<div style="font-size: 0.75em">
+
+- [Gene analysis using VEGAS](Document/Gene_analysis_vegas.html):
+Gene analysis using the VEGAS (Versatile Gene-based Association Study)
+approach using the 1000G LD reference data processed above,  
+
+- [Gene set analysis using Bayesian MAGMA](Document/Gene_set_analysis_bayesian_magma.html): Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).  
+
+- [Gene ranking using PoPS](Document/Gene_ranking_bayesian_pops.html): Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level
+statistics derived from VEGAS (work in progress).  
+
+- [Finemapping using BLR models](Document/Finemapping_bayesian_linear_regression_real_data.html): Finemapping of gene and LD regions using single trait Bayesian Linear
+Regression models (Shrestha et al.2025).  
+
+- [Polygenic scoring using BLR models](Document/Polygenic_scoring_bayesian_linear_regression.html): Polygenic scoring (PGS) using Bayesian Linear Regression models and
+biological pathway information (work in progress).  
+
+- [Polygenic scoring using PGS Catalog](Document/Polygenic_scoring_pgscatalog.html): Polygenic scoring (PGS) using summary statistics from PGS catalog and
+biological pathway information.  
+
+- [LD score regression](Document/LD_score_regression.html): LD score regression for estimating genomic heritability and
+correlations.  
+
+</div>
+
+---
+
+## From Data Integration to Modeling 
+
+The *gact* and *qgg* R packages bridges data integration, statistical modeling and biological interpretation, enabling reproducible and extensible workflows.
+
+- **Integrates biological information** across molecular layers — from **genome** to **pathways**, **complexes**, and **drug–gene interactions**  
+- **Uses structured priors and hierarchical modeling** to share information, regularize effect estimates, and quantify uncertainty  
+- **Enables data-driven discovery and prediction**
+
+**Next Steps**
+
+ - Apply the framework to new and relevant use cases  
+ - Expand integration with more biological data resources  
+ - Incorporate additional statistical and machine learning methods  
+
+
+## Further Reading and Collaboration
+
+💡 **We are open to collaboration!**  
+
+If you’re interested in applying **BLR methods** or contributing to the **gact** framework, please reach out.
+
+<br>
+
+**Further Reading**
+
+- [**Bayesian Linear Regression** – teaching materials](https://psoerensen.github.io/bayesian-linear-regression/)  
+- [**gact** – R package documentation](https://psoerensen.github.io/gact/)  
+- [**qgg** – R package documentation](https://psoerensen.github.io/qgg/)
+
+
+<!---
+
+
+## Modeling and Machine Learning
+
+- **Creates QC’ed, standardized Y’s and X’s**  
+  Curated phenotypes and molecular features ready for statistical and ML analyses.  
+
+- **Reveals new biology**  
+  Associations between Y’s and X’s provide insight into molecular mechanisms and trait architecture.  
+
+- **Enables integrative and predictive modeling**  
+  Large, well-defined datasets support BLR, multi-omic integration, and predictive modeling (*qgg*).  
+
+- **Training and benchmarking resource**  
+  Could serve as a standardized foundation for developing and comparing ML and deep learning methods.  
+
+--->
+
+
+<!---
+
+## What the GACT Database Contains
+
+After running `gact()`, the database includes:
+
+- **Marker and feature sets** (genes, proteins, pathways, complexes)  
+- **GWAS and Bayesian summary statistics** (from pre-processed data)  
+- **Gene set and enrichment results** (from pre-processed data)  
+- **Drug–gene and protein–chemical interaction data**  
+- **Annotation and mapping files** for linking biological entities  
+
+The resulting QC’ed *marker* and *feature* sets serve as the foundation for **Bayesian Linear Regression (BLR)** models, **machine learning**,  and **integrative genomics analyses**.
+
+---
+--->
+
+
+<!---
+
+## What's Next
+
+- **What *gact* enables today**  
+  - Produces **QC’ed, standardized** $\mathbf{Y}$’s and $\mathbf{X}$’s ready for statistical and machine learning analyses  
+  - Reveals **associations between molecular features and traits**, uncovering underlying biological mechanisms  
+  - Integrates seamlessly with *qgg* for **Bayesian Linear Regression (BLR)** and predictive modeling  
+
+- **Where *gact* is heading**  
+  - Provide a **foundation for large-scale, integrative modeling** across omic layers  
+  - Serve as a **benchmarking resource** for machine learning and deep learning methods  
+  - Enable **reproducible and extensible workflows** that accelerate biological discovery  
+
+---
+
+## Current Limitations of *gact*
+
+While *gact* provides a solid infrastructure for integrative genomics, several limitations remain:
+
+- **Data dependency and versioning**  
+  - Relies on multiple external databases (e.g., Ensembl, GTEx, STRING) that are updated independently — requiring ongoing maintenance and version tracking.  
+
+- **Missingness and bias in input data**  
+  - GWAS summary statistics, biological annotations, and gene–set mappings may be incomplete, unevenly distributed across traits or populations, or biased toward well-studied genes and pathways.  
+
+- **Limited multi-omic data integration**  
+  - Primarily supports genomic and gene-level information; quantitative transcriptomic, proteomic, and metabolomic data are not yet integrated directly.  
+
+- **Scalability and performance**  
+  - The folder-based database and R-based workflow may become slow or memory-intensive for very large GWAS or fine-mapping datasets.  
+
+- **Limited parallelization and cloud support**  
+  - Most functions are optimized for local execution; distributed or cloud-based workflows (e.g., AWS, GCP, or HPC clusters) are not yet implemented.  
+
+- **Annotation bias and incompleteness**  
+  - Dependent on existing biological databases that vary in coverage and quality; missing or biased annotations can propagate into analyses and interpretations.  
+
+- **Visualization and user interface**  
+  - Lacks a graphical dashboard or web interface; currently requires R scripting for all operations and exploration.  
+
+
+---
+
+## Future Directions for *gact*
+
+To address current limitations and expand functionality, upcoming development will focus on:
+
+- **Improved data management and versioning**  
+  - Automated tracking of database versions and metadata to ensure reproducibility across analyses.  
+
+- **Handling missingness and bias**  
+  - Implement QC pipelines for GWAS and annotation data, harmonize population-specific resources, and flag incomplete mappings.  
+
+- **Expanded multi-omics integration**  
+  - Incorporate quantitative transcriptomic, proteomic, and metabolomic datasets to support integrative modeling.  
+
+- **Enhanced scalability and performance**  
+  - Optimize file I/O, adopt sparse data structures, and enable distributed computation for large-scale analyses.  
+
+- **Cloud and HPC compatibility**  
+  - Add support for parallel execution and storage on cloud or cluster environments (e.g., AWS, GCP, SLURM).  
+
+- **Richer annotation ecosystem**  
+  - Integrate additional databases and functional genomics resources to improve biological coverage and reduce bias.  
+
+- **Visualization and user accessibility**  
+  - Develop interactive dashboards and R Shiny tools for exploring associations, enrichment results, and model outputs.  
+
+--->
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const backBtn = document.createElement("a");
+  backBtn.href = "https://psoerensen.github.io/bayesian-linear-regression/";  // ✅ full URL
+  backBtn.target = "_self";  // opens in same tab
+  backBtn.textContent = "← Back to Main Page";
+  backBtn.style.cssText = `
+    position: fixed; top: 10px; right: 20px;
+    background: #fff; color: #000;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid #000;
+    font-weight: 600; font-family: sans-serif;
+    text-decoration: none; font-size: 14px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
+    z-index: 9999;
+  `;
+  backBtn.onmouseover = () => {
+    backBtn.style.background = '#000';
+    backBtn.style.color = '#fff';
+  };
+  backBtn.onmouseout = () => {
+    backBtn.style.background = '#fff';
+    backBtn.style.color = '#000';
+  };
+  document.body.appendChild(backBtn);
+});
+</script>
+

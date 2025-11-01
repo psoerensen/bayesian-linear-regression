@@ -15,8 +15,10 @@ website:
         href: notes.html
       - text: "BLR slides"
         href: bayesian_linear_regression_slides.html
-      - text: "GSEA slides"
-        href: bayesian_gene_set_slides.html
+      - text: "BLR_GSEA slides"
+        href: advanced_bayesian_linear_regression_slides.html
+      - text: "Bayesian MAGMA slides"
+        href: bayesian_magma_slides.html
       - text: "Classical Regression tutorial"
         href: classical_linear_regression_simulation.html
       - text: "Bayesian (Gaussian Prior) tutorial"
