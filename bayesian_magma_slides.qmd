@@ -1,5 +1,5 @@
 ---
-title: "Gene Set Analyses using Bayesian Linear Regression Models"
+title: "Gene Set Analyses using Bayesian MAGMA Models"
 author:
   - name: "Peter Sørensen"
     affiliation:

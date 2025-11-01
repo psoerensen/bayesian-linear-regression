@@ -1094,168 +1094,168 @@
   {
     "objectID": "bayesian_magma_slides.html#from-gwas-to-biological-discovery",
     "href": "bayesian_magma_slides.html#from-gwas-to-biological-discovery",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "From GWAS to Biological Discovery",
     "text": "From GWAS to Biological Discovery"
   },
   {
     "objectID": "bayesian_magma_slides.html#gene-set-analysis",
     "href": "bayesian_magma_slides.html#gene-set-analysis",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Gene Set Analysis",
     "text": "Gene Set Analysis\nGene set analysis evaluates the coordinated action of genes or sets of variants within predefined biological pathways or functional groups.\nGWAS identify single genetic variants (SNPs) associated with traits or diseases.\n\nMany variants have small individual effects\n→ Use larger datasets or make better use of existing data.\nSome effects are clustered within functionally related genes or pathways\n→ Use prior information on functional marker groups to improve detection power and interpretation.\nSome effects are shared across multiple traits\n→ Leverage correlated trait information to enhance detection power and prediction accuracy."
   },
   {
     "objectID": "bayesian_magma_slides.html#gene-set-analyses",
     "href": "bayesian_magma_slides.html#gene-set-analyses",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Gene Set Analyses",
     "text": "Gene Set Analyses\nMany different gene set analysis approaches have been proposed.\n\nMAGMA: Multi-marker Analysis of GenoMic Annotation (Leuww et al 2015)\n\ngeneralized gene set analysis of GWAS data\nbased on a multiple regression model\nrank gene sets\n\nPoPS: Polygenic Prioritisation Scoring (Weeks et al 2023)\n\nleveraging polygenic enrichment of gene features (e.g. gene sets) to predict genes underlying complex diseases\nbased on a multiple regression model\nrank genes"
   },
   {
     "objectID": "bayesian_magma_slides.html#magma-linear-model-approach",
     "href": "bayesian_magma_slides.html#magma-linear-model-approach",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "MAGMA: Linear Model Approach",
     "text": "MAGMA: Linear Model Approach\nMAGMA fits a linear regression model to test associations between gene sets and traits.\n\nAggregate SNP-level GWAS statistics into gene-level statistics, accounting for LD.\n\nUse gene-level statistics as the response variable.\n\nRepresent gene sets as a predictor matrix, typically indicating gene membership, but not necessarily limited to binary values.\n\nEstimate regression coefficients to assess the strength of association between each gene set and the trait.\n\nEvaluate significance using permutation or model-based null distributions."
   },
   {
     "objectID": "bayesian_magma_slides.html#magma-limitations",
     "href": "bayesian_magma_slides.html#magma-limitations",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "MAGMA: Limitations",
     "text": "MAGMA: Limitations\nWhen analyzing thousands of gene sets, several issues arise:\n- Overfitting – the model may capture noise rather than true signals.\n- Multicollinearity – many gene sets are correlated due to biological overlap.\n- Multiple testing – increases false-positive risk.\n- Interpretation difficulty – hard to disentangle contributions of overlapping sets.\n→ Use of regularization and variable selection to improve model robustness and interpretability.\nAdditionally, many complex traits are genetically correlated, sharing overlapping biological pathways.\n→ Incorporating multi-trait information in MAGMA can increase detection power and reveal shared genetic mechanisms across traits."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-idea",
     "href": "bayesian_magma_slides.html#bayesian-magma-idea",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Idea",
     "text": "Bayesian MAGMA: Idea\nDevelop and evaluate a Bayesian gene-set prioritization approach using BLR within the MAGMA framework.\n\nAdvantages:\n\nIncorporates regularization and variable selection via spike-and-slab priors.\n\nControls false positives and handles correlated gene sets.\n\nProvides posterior inclusion probabilities (PIP) as evidence of gene set association.\n\n\nFlexible framework supporting:\n\nSingle- and multi-trait models\n\nIntegration of diverse genomic features\n\nModeling of correlated traits to uncover shared genetic factors."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-regression-model",
     "href": "bayesian_magma_slides.html#bayesian-magma-regression-model",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Regression Model",
     "text": "Bayesian MAGMA: Regression Model\nThe Bayesian MAGMA framework builds on the standard regression model:\n\\[\n\\mathbf{Y} = \\mathbf{X}\\boldsymbol{\\beta} + \\boldsymbol{\\varepsilon},\n\\qquad\n\\boldsymbol{\\varepsilon} \\sim \\mathcal{N}(0, \\sigma^2 \\mathbf{I})\n\\]\n\n\\(\\mathbf{Y}\\) — vector of observed outcomes or gene-/set-level association measures\n\n\\(\\mathbf{X}\\) — matrix of genomic predictors (e.g., gene membership, functional annotations, or pathway indicators)\n\n\\(\\boldsymbol{\\beta}\\) — vector of effect sizes describing how predictors in \\(\\mathbf{X}\\) explain variation in \\(\\mathbf{Y}\\)\n\n\\(\\boldsymbol{\\varepsilon}\\) — residual noise capturing unexplained variation\n\nIn the Bayesian formulation, each \\(\\beta_j\\) is assigned a prior distribution that encodes assumptions about effect size magnitude, sparsity, or functional grouping.\nThese priors enable regularization, variable selection, and information sharing across correlated features or biological layers."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-multivariate-motivation",
     "href": "bayesian_magma_slides.html#bayesian-magma-multivariate-motivation",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Multivariate Motivation",
     "text": "Bayesian MAGMA: Multivariate Motivation\n\nTraditional single-trait analyses may miss associations that are\nweak individually but consistent across traits.\n\nMulti-trait Bayesian MAGMA leverages these correlations by\njointly modeling multiple traits to:\n\nIncrease power for detecting gene sets and pathways,\n\nImprove accuracy of effect estimation, and\n\nReveal shared biological mechanisms underlying complex diseases."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-multivariate-regression-model",
     "href": "bayesian_magma_slides.html#bayesian-magma-multivariate-regression-model",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Multivariate Regression Model",
     "text": "Bayesian MAGMA: Multivariate Regression Model\nIn the multivariate BLR model, we model multiple correlated outcomes jointly:\n\\[\n\\mathbf{Y} = \\mathbf{X}\\mathbf{B} + \\mathbf{E}\n\\]\n\n\\(\\mathbf{Y}\\): \\((n \\times T)\\) matrix of outcomes\n(e.g., association measures for \\(T\\) traits or omic layers)\n\n\\(\\mathbf{X}\\): \\((n \\times p)\\) feature matrix\n\n\\(\\mathbf{B}\\): \\((p \\times T)\\) matrix of effect sizes\n\n\\(\\mathbf{E}\\): \\((n \\times T)\\) residual matrix\n\nEach row of \\(\\mathbf{Y}\\) corresponds to an observation or gene, and each column to a trait, phenotype, or molecular layer."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-error-and-effect-priors",
     "href": "bayesian_magma_slides.html#bayesian-magma-error-and-effect-priors",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Error and Effect Priors",
     "text": "Bayesian MAGMA: Error and Effect Priors\nWe extend the univariate priors to the multivariate setting:\n\\[\n\\mathbf{e}_{i\\cdot} \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_e)\n\\] \\[\n\\mathbf{b}_j \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_b)\n\\]\n\n\\(\\boldsymbol{\\Sigma}_e\\): residual covariance among traits\n\n\\(\\boldsymbol{\\Sigma}_b\\): covariance of effect sizes across traits\n\nWhen \\(\\boldsymbol{\\Sigma}_e\\) and \\(\\boldsymbol{\\Sigma}_b\\) are diagonal, the model reduces to \\(T\\) independent univariate BLR models.\n\nAllows information sharing across correlated traits or omic layers and can be used to identify pleiotropic effects and cross-trait genetic architectures."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-estimation-of-effects",
     "href": "bayesian_magma_slides.html#bayesian-magma-estimation-of-effects",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Estimation of Effects",
     "text": "Bayesian MAGMA: Estimation of Effects\nOrdinary multiple regression \\[\n\\mathbf{b} = (\\mathbf{X}'\\mathbf{X})^{-1}\\mathbf{X}'\\mathbf{y}\n\\]\nWith regularization \\[\n\\mathbf{b} = \\left(\\mathbf{X}'\\mathbf{X} + \\mathbf{I}\\frac{\\sigma_e^{2}}{\\sigma_b^{2}}\\right)^{-1}\\mathbf{X}'\\mathbf{y}\n\\]\nUsing information from multiple responses \\[\n\\mathbf{b} =\n\\left(\n\\mathbf{X}'\\mathbf{X} +\n\\mathbf{I} \\otimes \\boldsymbol{\\Sigma}_{B}^{-1}\\boldsymbol{\\Sigma}_{E}\n\\right)^{-1}\\mathbf{X}'\\mathbf{y}\n\\]"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-indicator-variables-and-pips",
     "href": "bayesian_magma_slides.html#bayesian-magma-indicator-variables-and-pips",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Indicator Variables and PIPs",
     "text": "Bayesian MAGMA: Indicator Variables and PIPs\nIn the multivariate BLR, each feature \\(j\\) may affect multiple outcomes (traits).\nWe extend the indicator variable to capture cross-trait activity patterns:\n\\[\n\\boldsymbol{\\delta}_j =\n\\begin{bmatrix}\n\\delta_{j1} \\\\ \\delta_{j2} \\\\ \\vdots \\\\ \\delta_{jT}\n\\end{bmatrix},\n\\qquad\n\\delta_{jt} =\n\\begin{cases}\n1, & \\text{if feature $j$ affects trait $t$} \\\\\n0, & \\text{otherwise.}\n\\end{cases}\n\\]\nAfter inference, we estimate \\(\\text{PIP}_{jt} = P(\\delta_{jt} = 1 \\mid \\text{data})\\) — the posterior inclusion probability that feature j affects trait t."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-posterior-parameters",
     "href": "bayesian_magma_slides.html#bayesian-magma-posterior-parameters",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Posterior Parameters",
     "text": "Bayesian MAGMA: Posterior Parameters\nIn the multivariate setting, we generalize each posterior quantity:\n\n\n\n\n\n\n\nParameter\nInterpretation\n\n\n\n\n\\(\\mathbf{B} = [\\beta_{jt}]\\)\nEffect matrix across traits (\\(j\\): feature, \\(t\\): trait)\n\n\n\\(\\text{PIP}_j\\)\nProbability that feature \\(j\\) affects ≥1 trait\n\n\n\\(\\boldsymbol{\\Sigma}_b\\)\nCovariance of effects across traits\n\n\n\\(\\boldsymbol{\\Sigma}_e\\)\nResidual covariance among traits\n\n\n\nThese allow us to identify:\n\nShared genetic effects (pleiotropy)\n\nTrait-specific vs. shared signals\n\nCross-trait enrichment of biological sets"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma.-study-aim-and-design",
     "href": "bayesian_magma_slides.html#bayesian-magma.-study-aim-and-design",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA. Study Aim and Design",
     "text": "Bayesian MAGMA. Study Aim and Design\nEvaluate a Bayesian gene-set prioritization approach using BLR within the MAGMA framework.\nSimulation study:\n- Assessed model performance under varying gene set characteristics and genetic architectures.\n- Used UK Biobank genetic data for realistic evaluation.\nComparative analysis:\n- Benchmarked Bayesian MAGMA against the standard MAGMA approach.\nApplications:\n- Applied to nine complex traits using publicly available GWAS data.\n- Developed a multi-trait BLR model to integrate GWAS results across traits and uncover shared genetic architecture."
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-overview",
     "href": "bayesian_magma_slides.html#bayesian-magma-overview",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Overview",
     "text": "Bayesian MAGMA: Overview\n\n\n\n\nFits a Bayesian regression model that allows regularization and variable selection\n\nSupports single- or multi-trait a nalyses\n\nIdentifies associated features based on posterior inclusion probabilities (PIPs) for the regression effects\n\n\nGholipourshahraki et al., 2024"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-gene-level-statistics",
     "href": "bayesian_magma_slides.html#bayesian-magma-gene-level-statistics",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Gene-level Statistics",
     "text": "Bayesian MAGMA: Gene-level Statistics\n\n\n\nCompute gene-level (or other feature-level) association statistics:\n\nAccount for correlation among marker statistics (i.e., linkage disequilibrium, LD)\nDifferent LD-adjustment methods (e.g., SVD, clumping and thresholding, BLR)\nThe choice of method depends on the quality of the available GWAS summary statistics and LD reference panel\n\n\nBai et al., 2025"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-kegg-pathway",
     "href": "bayesian_magma_slides.html#bayesian-magma-kegg-pathway",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA – KEGG Pathway",
     "text": "Bayesian MAGMA – KEGG Pathway\n\n\n\nGWAS summary statistics from nine studies (T2D, CAD, CKD, HTN, BMI, WHR, Hb1Ac, TG, SBP)\nGene sets are defined by genes linked to KEGG pathways.\n\nPathways relevant to diabetes are associated with Type 2 Diabetes (T2D) and correlated traits\n\nEnables identification of cross-disease patterns to better understand comorbidities\n\n\n\n\n\n\n\nGholipourshahraki et al., 2024"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-dgidb",
     "href": "bayesian_magma_slides.html#bayesian-magma-dgidb",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA – DGIdb",
     "text": "Bayesian MAGMA – DGIdb\n\n\n\nGene sets are defined by genes linked to the Anatomical Therapeutic Chemical (ATC) classification system using the Drug–Gene Interaction Database (DGIdb)\n\nDrug gene sets relevant to diabetes show associations with Type 2 Diabetes (T2D) and related traits\n\nNovel drug–gene set associations may reveal opportunities for drug repurposing\n\n\n\n\n\n\n\nHjelholt et al., 2025"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-across-ancestries",
     "href": "bayesian_magma_slides.html#bayesian-magma-across-ancestries",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA – Across Ancestries",
     "text": "Bayesian MAGMA – Across Ancestries\n\n\n\nGene sets are defined by genes linked to KEGG pathways.\n\nJoint analysis of T2D across three ancestries (EUR, EAS, SAS).\n\nPathways relevant to diabetes show associations with Type 2 Diabetes (T2D) across two of the ancestries (EUR and EAS).\n\nComparing these associations helps reveal ancestry-specific biological mechanisms."
   },
   {
     "objectID": "bayesian_magma_slides.html#overview-of-blr-models-used-in-gene-set-analyses",
     "href": "bayesian_magma_slides.html#overview-of-blr-models-used-in-gene-set-analyses",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Overview of BLR Models used in Gene Set Analyses",
     "text": "Overview of BLR Models used in Gene Set Analyses\n\n\n\n\n\n\n\n\n\n\n\nModel Type\nFeature Integration\nGrouping Basis\nPrior Structure\nWhat It Captures\n\n\n\n\nSingle-component BLR\nCombines all biological features in one model\nNone\nOne global variance (\\(\\tau^2\\))\nAll features contribute equally; uniform shrinkage\n\n\nMultiple-component BLR\nIntegrates all layers but allows heterogeneous contributions\nLearned from data\nMixture of variances (\\(\\{\\tau_k^2\\}\\))\nLarge, small, and null effect classes\n\n\nHierarchical BLR\nGroups features by biological structure (e.g., genes, pathways)\nDefined a priori\nGroup-specific mixture of variances (\\(\\{\\tau_{gk}^2\\}\\))\nWithin-group heterogeneity; enrichment and structured shrinkage\n\n\nMultivariate BLR\nJointly models multiple correlated traits or outcomes\nNone or by trait\nShared covariance (\\(\\boldsymbol{\\Sigma}_b\\)) across traits\nGenetic/molecular correlations; pleiotropy\n\n\nHierarchical MV-BLR\nCombines biological grouping and multiple outcomes\nDefined a priori\nGroup- and trait-specific covariance mixtures (\\(\\{\\boldsymbol{\\Sigma}_{b,gk}\\}\\))\nShared biological mechanisms across traits and layers"
   },
   {
     "objectID": "bayesian_magma_slides.html#learning-at-different-levels",
     "href": "bayesian_magma_slides.html#learning-at-different-levels",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Learning at Different Levels",
     "text": "Learning at Different Levels\n\n\n\n\n\n\n\n\n\n\n\nModel Level\nKey Parameters Learned\nWhat They Represent\nHow They Are Learned\nWhat We Learn Biologically\n\n\n\n\nEffect sizes\n\\(\\boldsymbol{\\beta}\\)\nStrength and direction of association for each feature\nPosterior mean/median given priors and data\nWhich features drive the outcome\n\n\nIndicator variables\n\\(\\delta_j\\) (single trait), \\(\\boldsymbol{\\delta}_j\\) (multi-trait)\nWhether feature \\(j\\) is active (and for which traits)\nEstimated as posterior inclusion probabilities (PIPs)\nWhich features are relevant, and whether effects are shared or trait-specific\n\n\nVariance components\n\\(\\tau^2\\), \\(\\{\\tau_k^2\\}\\), \\(\\{\\tau_{gk}^2\\}\\)\nMagnitude of expected effect sizes; heterogeneity across layers or groups\nInferred hierarchically from the data (via MCMC or EM)\nHow strongly different groups or omic layers contribute\n\n\nCovariance components\n\\(\\boldsymbol{\\Sigma}_b\\), \\(\\{\\boldsymbol{\\Sigma}_{b,g}\\}\\)\nCorrelation of effects across traits or molecular layers\nEstimated from joint posterior\nShared pathways, pleiotropy, and cross-layer architecture"
   },
   {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-summary",
     "href": "bayesian_magma_slides.html#bayesian-magma-summary",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Bayesian MAGMA: Summary",
     "text": "Bayesian MAGMA: Summary\nAdvantages\n\nIncorporates regularization and variable selection via spike-and-slab priors.\n\nControls false positives and handles correlated gene sets.\n\nProvides posterior inclusion probabilities (PIP) as evidence of association strength.\n\nFlexible framework supporting:\n\nSingle- and multi-trait models\n\nIntegration of diverse genomic features\n\nModeling correlated traits to uncover shared genetic architecture."
   },
   {
     "objectID": "bayesian_magma_slides.html#limitations-and-future-work",
     "href": "bayesian_magma_slides.html#limitations-and-future-work",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "Limitations and Future Work",
     "text": "Limitations and Future Work\n\nDependent on the quality and granularity of GWAS summary data and annotations.\n\nComputationally more demanding than standard MAGMA, especially for multi-trait analyses.\n\nOpportunities for hierarchical model extensions (e.g., grouping by pathways/tissues).\n\nMulti-omics integration to capture regulatory complexity across data layers.\n\nSystematic comparisons with machine learning and deep learning methods to assess performance and scalability."
   },
   {
     "objectID": "bayesian_magma_slides.html#references",
     "href": "bayesian_magma_slides.html#references",
-    "title": "Gene Set Analyses using Bayesian Linear Regression Models",
+    "title": "Gene Set Analyses using Bayesian MAGMA Models",
     "section": "References",
     "text": "References\n\nSørensen P, Rohde PD. A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.\nmedRxiv (2025). https://doi.org/10.1101/2025.10.01.25337099\nSørensen IF, Sørensen P. Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.\nmedRxiv (2025). https://doi.org/10.1101/2025.07.30.25332448\nHjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P. Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes. medRxiv (2025). https://doi.org/10.1101/2025.06.13.25329590\nGholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases. PLOS Genetics 20(11): e1011463 (2025). https://doi.org/10.1371/journal.pgen.1011463\nBai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods. BMC Genomics 25(1): 1236 (2024). https://doi.org/10.1186/s12864-024-11026-2\nShrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures. PLOS Genetics 21(7): e1011783 (2025). https://doi.org/10.1371/journal.pgen.1011783\nKunkel D, Sørensen P, Shankar V, Morgante F. Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes. PLOS Genetics 21(1): e1011519 (2025). https://doi.org/10.1371/journal.pgen.1011519\nRohde P, Sørensen IF, Sørensen P. Expanded Utility of the R Package qgg with Applications within Genomic Medicine. Bioinformatics 39:11 (2023). https://doi.org/10.1093/bioinformatics/btad656\nRohde P, Sørensen IF, Sørensen P. qgg: An R Package for Large-Scale Quantitative Genetic Analyses. Bioinformatics 36(8): 2614–2615 (2020). https://doi.org/10.1093/bioinformatics/btz955"
   },
