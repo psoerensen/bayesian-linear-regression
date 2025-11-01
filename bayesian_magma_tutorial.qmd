@@ -41,7 +41,7 @@ Figure 1. Schematic overview of the Bayesian MAGMA workflow.
 
 This tutorial demonstrates how to simulate **gene-level association statistics** and **overlapping gene sets (pathways)** for enrichment analysis using MAGMA-style approaches, implemented either as OLS joint estimation or via Bayesian inference with BayesC or BayesR priors.
 
-The tutorial included the following steps:
+The tutorial includes the following key steps:
 
 1. Simulate gene-level Z-scores with causal genes.  
 2. Create overlapping pathways with realistic size distributions.  
