@@ -4,6 +4,9 @@ author:
   - name: "Peter Sørensen"
     affiliation:
       - "Center for Quantitative Genetics and Genomics, Aarhus University, Denmark"
+  - name: "Palle Duun Rohde"
+    affiliation:
+      - "Genomic Medicine, Department of Health Science and Technology, Aalborg University, Denmark"
 format: 
   revealjs:
     theme: simple

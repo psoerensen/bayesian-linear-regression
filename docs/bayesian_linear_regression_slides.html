@@ -168,6 +168,21 @@ Peter Sørensen
 </section>
 <section id="introduction" class="slide level2">
 <h2>Introduction</h2>
+<p><strong>Bayesian Linear Regression Models</strong> provide a flexible statistical framework for modeling complex biological and healthcare data. They support key applications such as:</p>
+<ul>
+<li><strong>Genome-wide association studies (GWAS)</strong> and <strong>fine-mapping</strong> of causal variants<br>
+</li>
+<li><strong>Polygenic risk scoring (PRS)</strong> for predicting complex traits and disease risk<br>
+</li>
+<li><strong>Gene and pathway enrichment analyses</strong> to test biological hypotheses<br>
+</li>
+<li><strong>Integrative multi-omics modeling</strong> across the genome, transcriptome, epigenome, and proteome<br>
+</li>
+<li>Applications to <strong>registry-based healthcare data</strong>, enabling population-level <strong>risk prediction</strong> and <strong>disease modeling</strong></li>
+</ul>
+</section>
+<section id="introduction-1" class="slide level2">
+<h2>Introduction</h2>
 <ul>
 <li><strong>Bayesian Linear Regression (BLR)</strong> extends classical regression by incorporating <strong>prior information</strong> and producing <strong>posterior distributions</strong> over model parameters.<br>
 </li>
@@ -181,36 +196,25 @@ Peter Sørensen
 </ul></li>
 </ul>
 </section>
-<section id="applications-in-genomics" class="slide level2">
-<h2>Applications in Genomics</h2>
-<ul>
-<li><strong>Bayesian Linear Regression (BLR)</strong> is widely applied in quantitative genetics and genomics.<br>
-</li>
-<li><strong>Common use cases:</strong>
-<ul>
-<li>Genome-Wide Association Studies (<strong>GWAS</strong>) and <strong>fine-mapping</strong> of causal variants.<br>
-</li>
-<li><strong>Genetic prediction</strong> and <strong>heritability estimation</strong>.<br>
-</li>
-<li><strong>Pathway</strong> and <strong>gene-set enrichment</strong> analyses.<br>
-</li>
-<li>Integrative <strong>multi-omics</strong> modeling (genome, transcriptome, epigenome).</li>
-</ul></li>
-</ul>
-</section>
 <section id="classical-linear-regression" class="slide level2">
 <h2>Classical Linear Regression</h2>
-<h3 id="model">Model</h3>
+<p>The standard linear regression model, which assumes that the observed outcomes can be expressed as a linear combination of predictors plus random noise:</p>
 <p><span class="math display">\[
 y = X\beta + e, \quad e \sim \mathcal{N}(0, \sigma^2 I_n)
-\]</span> - <span class="math inline">\(y\)</span>: outcomes<br>
-- <span class="math inline">\(X\)</span>: design matrix<br>
-- <span class="math inline">\(\beta\)</span>: coefficients<br>
-- <span class="math inline">\(e\)</span>: are the residuals<br>
-- <span class="math inline">\(\sigma^2\)</span>: residual variance</p>
+\]</span></p>
+<ul>
+<li><span class="math inline">\(y\)</span>: <span class="math inline">\(n \times 1\)</span> vector of observed outcomes<br>
+</li>
+<li><span class="math inline">\(X\)</span>: <span class="math inline">\(n \times p\)</span> design matrix of predictors<br>
+</li>
+<li><span class="math inline">\(\beta\)</span>: <span class="math inline">\(p \times 1\)</span> vector of unknown coefficients<br>
+</li>
+<li><span class="math inline">\(e\)</span>: Gaussian noise with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma^2\)</span></li>
+</ul>
 </section>
 <section id="estimation" class="slide level2">
 <h2>Estimation</h2>
+<p>Given the linear model, we can estimate the regression coefficients and residual variance using the method of ordinary least squares (OLS), which minimizes the sum of squared residuals:</p>
 <p>Regression effects: <span class="math display">\[
 \hat{\beta} = (X^\top X)^{-1} X^\top y
 \]</span></p>
@@ -221,6 +225,7 @@ y = X\beta + e, \quad e \sim \mathcal{N}(0, \sigma^2 I_n)
 </section>
 <section id="limitations" class="slide level2">
 <h2>Limitations</h2>
+<p>While ordinary least squares estimation is simple and widely used, it has several important limitations that motivate the use of regularized or Bayesian approaches:</p>
 <ul>
 <li>No explicit control over <strong>effect size distribution</strong></li>
 <li>Sensitive when <strong>collinearity</strong> is high</li>
@@ -230,6 +235,7 @@ y = X\beta + e, \quad e \sim \mathcal{N}(0, \sigma^2 I_n)
 </section>
 <section id="why-bayesian-linear-regression" class="slide level2">
 <h2>Why Bayesian Linear Regression?</h2>
+<p>The Bayesian framework extends linear regression by incorporating prior beliefs about the model parameters and updating them with observed data through Bayes’ theorem:</p>
 <ul>
 <li>Combines <strong>likelihood</strong> and <strong>prior</strong> to form the <strong>posterior</strong>.<br>
 </li>
@@ -251,18 +257,20 @@ y = X\beta + e, \quad e \sim \mathcal{N}(0, \sigma^2 I_n)
 </li>
 <li>Provides <strong>full posterior distributions</strong> for <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma^2\)</span>.</li>
 </ul>
-</section>
-<section id="overview-bayesian-linear-regression" class="slide level2">
-<h2>Overview: Bayesian Linear Regression</h2>
-<ul>
-<li>Combines data and prior knowledge using <strong>Bayes’ rule</strong>.<br>
-</li>
-<li>Uses <strong>conjugate priors</strong> to yield closed-form full conditionals.<br>
-</li>
-<li>Employs <strong>Gibbs sampling</strong> to approximate the posterior distribution.<br>
-</li>
-<li>Estimates <strong>parameters, uncertainty, and predictions</strong> from posterior draws.</li>
-</ul>
+<!---
+
+---
+
+
+## Overview: Bayesian Linear Regression
+
+
+- Combines data and prior knowledge using **Bayes’ rule**.  
+- Uses **conjugate priors** to yield closed-form full conditionals.  
+- Employs **Gibbs sampling** to approximate the posterior distribution.  
+- Estimates **parameters, uncertainty, and predictions** from posterior draws.
+
+--->
 </section>
 <section id="bayesian-linear-regression-with-gaussian-priors" class="slide level2">
 <h2>Bayesian Linear Regression with Gaussian Priors</h2>
@@ -282,65 +290,59 @@ y = X\beta + e, \quad e \sim \mathcal{N}(0, \sigma^2 I_n)
 </section>
 <section id="likelihood-in-bayesian-linear-regression" class="slide level2">
 <h2>Likelihood in Bayesian Linear Regression</h2>
-<p>Because the residuals are Gaussian, it follows that the marginal distribution of <span class="math inline">\(y\)</span> is:</p>
+<p>Because the residuals are assumed to be Gaussian,</p>
 <p><span class="math display">\[
 e \sim \mathcal{N}(0, \sigma^2 I_n)
-\]</span> The marginal distribution of <span class="math inline">\(y\)</span> is:</p>
+\]</span></p>
+<p>it follows that the <strong>response vector</strong> <span class="math inline">\(y\)</span> follows a multivariate normal distribution:</p>
 <p><span class="math display">\[
-y \sim \mathcal{N}(X\beta, \sigma^2 I_n)
-\]</span> This defines the <strong>likelihood</strong> the probability of the observed data given parameters <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma^2\)</span>:</p>
+y = X\beta + e \quad \Rightarrow \quad y \sim \mathcal{N}(X\beta, \sigma^2 I_n)
+\]</span></p>
+<p>This defines the <strong>likelihood</strong>, i.e.&nbsp;the probability of the observed data given the model parameters <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma^2\)</span>:</p>
 <p><span class="math display">\[
-p(y \mid X, \beta, \sigma^2) = \mathcal{N}(X\beta, \sigma^2 I_n)
+p(y \mid X, \beta, \sigma^2) = \mathcal{N}(y \mid X\beta, \sigma^2 I_n)
 \]</span></p>
 </section>
 <section id="introducing-priors" class="slide level2">
 <h2>Introducing Priors</h2>
-<p>In Bayesian linear regression, we specify <strong>prior distributions</strong> that express our beliefs about parameters before seeing the data.</p>
-<p>A common <strong>conjugate prior</strong> for the regression coefficients is:</p>
+<p>In Bayesian linear regression, we specify <strong>prior distributions</strong> to express our beliefs about the model parameters before observing the data.</p>
+<p>A common <strong>conjugate prior</strong> for the regression coefficients is</p>
 <p><span class="math display">\[
 \beta \mid \sigma_b^2 \sim \mathcal{N}(0, \sigma_b^2 I_p)
 \]</span></p>
-<p>This reflects the belief that most effect sizes are small and centered near zero — consistent with the <strong>polygenic assumption</strong> in genetics.</p>
+<p>This expresses the belief that most effect sizes are small and centered around zero — consistent with the <strong>polygenic assumption</strong> often used in genetics.</p>
+<p>Using <strong>conjugate priors</strong> ensures that the <strong>posterior distributions</strong> remain in the same family as the priors (e.g., scaled inverse-chi-squared for variance parameters), enabling <strong>closed-form Gibbs sampling updates</strong>.</p>
 </section>
 <section id="role-of-the-prior-variance-sigma_b2" class="slide level2">
 <h2>Role of the Prior Variance <span class="math inline">\(\sigma_b^2\)</span></h2>
-<p>The parameter <span class="math inline">\(\sigma_b^2\)</span> acts as a <strong>shrinkage (regularization) parameter</strong>:</p>
+<p>The parameter <span class="math inline">\(\sigma_b^2\)</span> acts as a <strong>shrinkage</strong> (or <strong>regularization</strong>) parameter:</p>
 <ul>
-<li>Small <span class="math inline">\(\sigma_b^2\)</span> → stronger shrinkage toward zero.<br>
+<li>Small <span class="math inline">\(\sigma_b^2\)</span> → stronger shrinkage toward zero<br>
 </li>
-<li>Large <span class="math inline">\(\sigma_b^2\)</span> → weaker shrinkage, allowing larger effects.</li>
+<li>Large <span class="math inline">\(\sigma_b^2\)</span> → weaker shrinkage, allowing larger effects</li>
 </ul>
-<p>It controls the <strong>strength of regularization</strong> and is often treated as an <strong>unknown hyperparameter</strong> estimated from the data.</p>
+<p>It determines the <strong>strength of regularization</strong> and is often treated as an <strong>unknown hyperparameter</strong> to be estimated from the data.</p>
 </section>
 <section id="priors-on-variance-components" class="slide level2">
 <h2>Priors on Variance Components</h2>
-<p>We also place priors on the variance components to complete the hierarchical model.</p>
+<p>We also place priors on the variance components to complete the hierarchical model:</p>
 <p><span class="math display">\[
 \sigma_b^2 \mid S_b, v_b \sim S_b \, \chi^{-2}(v_b), \quad
 \sigma^2 \mid S, v \sim S \, \chi^{-2}(v)
 \]</span></p>
-<p>Here:</p>
 <ul>
-<li><span class="math inline">\(S_b\)</span> and <span class="math inline">\(v_b\)</span> are user-defined hyperparameters that control the prior distribution on the <strong>variance of regression coefficients</strong>.<br>
+<li><span class="math inline">\(S_b\)</span> and <span class="math inline">\(v_b\)</span> are hyperparameters that control the prior distribution for the <strong>effect size variance</strong> <span class="math inline">\(\sigma_b^2\)</span>.<br>
 </li>
 <li><span class="math inline">\(S\)</span> and <span class="math inline">\(v\)</span> are hyperparameters for the <strong>residual variance</strong> <span class="math inline">\(\sigma^2\)</span>.</li>
 </ul>
-</section>
-<section id="conjugate-priors-and-regularization" class="slide level2">
-<h2>Conjugate Priors and Regularization</h2>
-<p>Conjugate priors keep posteriors in the same family<br>
-(e.g., scaled inverse-chi-squared), allowing <strong>closed-form Gibbs updates</strong>.</p>
-<p>They also serve as <strong>regularizers</strong>:</p>
-<ul>
-<li>The prior on <span class="math inline">\(\beta\)</span> shrinks small or noisy effects toward zero.<br>
-</li>
-<li>Priors on variance components prevent overfitting, especially when <span class="math inline">\(p &gt; n\)</span>.</li>
-</ul>
-<p>Thus, conjugate priors make Bayesian linear regression <strong>efficient</strong> and <strong>stable</strong>.</p>
+<p>These scaled inverse-chi-squared priors ensure conjugacy, enabling <strong>closed-form updates</strong> for the variance parameters in Gibbs sampling.</p>
+<p><strong>Typical choices:</strong><br>
+- Small degrees of freedom (e.g., <span class="math inline">\(v_b = v = 4\)</span>) give weakly informative, heavy-tailed priors.<br>
+- Scale parameters <span class="math inline">\(S_b\)</span> and <span class="math inline">\(S\)</span> are often set based on expected variance magnitudes (e.g., empirical estimates).</p>
 </section>
 <section id="posterior-distribution" class="slide level2">
 <h2>Posterior Distribution</h2>
-<p>In Bayesian analysis, we combine the <strong>likelihood</strong> and <strong>priors</strong> using Bayes’ rule to obtain the <strong>joint posterior</strong>:</p>
+<p>In Bayesian linear regression, we combine the <strong>likelihood</strong> and <strong>prior distributions</strong> using <strong>Bayes’ rule</strong> to obtain the <strong>joint posterior</strong>:</p>
 <p><span class="math display">\[
 p(\beta, \sigma_b^2, \sigma^2 \mid y) \propto
 p(y \mid \beta, \sigma^2)\;
@@ -348,8 +350,9 @@ p(\beta \mid \sigma_b^2)\;
 p(\sigma_b^2)\;
 p(\sigma^2)
 \]</span></p>
-<p>This posterior captures all <strong>updated knowledge</strong> about the unknown parameters after observing the data.<br>
-It forms the basis for computing <strong>posterior means</strong>, <strong>credible intervals</strong>, and <strong>predictions</strong>.</p>
+<p>The posterior distribution represents all <strong>updated knowledge</strong> about the unknown parameters after observing the data.<br>
+It serves as the foundation for computing <strong>posterior means</strong>, <strong>credible intervals</strong>, and <strong>predictions</strong>.</p>
+<p>In practice, the posterior is often too complex to evaluate directly, so we use <strong>sampling-based methods</strong> such as Gibbs sampling to approximate it.</p>
 </section>
 <section id="conjugacy-and-gibbs-sampling" class="slide level2">
 <h2>Conjugacy and Gibbs Sampling</h2>
@@ -376,30 +379,26 @@ This makes <strong>Gibbs sampling</strong> a natural and efficient inference met
 \quad
 \mu_\beta = \Sigma_\beta \frac{X^\top y}{\sigma^2}
 \]</span></p>
-<p>This distribution represents our <strong>updated belief</strong> about <span class="math inline">\(\beta\)</span><br>
-after observing the data, while holding <span class="math inline">\(\sigma_b^2\)</span> and <span class="math inline">\(\sigma^2\)</span> fixed.</p>
+<p>This distribution represents our <strong>updated belief</strong> about <span class="math inline">\(\beta\)</span> after observing the data, while holding <span class="math inline">\(\sigma_b^2\)</span> and <span class="math inline">\(\sigma^2\)</span> fixed.</p>
 </section>
 <section id="comparison-to-classical-ols" class="slide level2">
 <h2>Comparison to Classical OLS</h2>
 <p>In classical regression, the OLS estimator is</p>
 <p><span class="math display">\[
-\hat\beta_{\text{OLS}} = (X^\top X)^{-1} X^\top y,
-\quad y \sim \mathcal{N}(X\beta, \sigma^2 I)
+\hat\beta_{\text{OLS}} = (X^\top X)^{-1} X^\top y
 \]</span></p>
-<p>The estimate of <span class="math inline">\(\beta\)</span> is <strong>independent of <span class="math inline">\(\sigma^2\)</span></strong>,<br>
-since <span class="math inline">\(\sigma^2\)</span> only scales the likelihood, not its maximum.</p>
+<p>The estimate of <span class="math inline">\(\beta\)</span> is <strong>independent of <span class="math inline">\(\sigma^2\)</span></strong>, since <span class="math inline">\(\sigma^2\)</span> only scales the likelihood, not its maximum.</p>
 <p>In Bayesian regression, <span class="math inline">\(\sigma^2\)</span> appears explicitly in the posterior:</p>
 <p><span class="math display">\[
 \Sigma_\beta = \left( \frac{X^\top X}{\sigma^2} + \frac{I}{\sigma_b^2} \right)^{-1},
 \quad
 \mu_\beta = \Sigma_\beta \frac{X^\top y}{\sigma^2}
 \]</span></p>
-<p>The term <span class="math inline">\(\frac{I}{\sigma_b^2}\)</span> introduces <strong>shrinkage</strong>, regularizing estimates and stabilizing inference especially when <span class="math inline">\(p &gt; n\)</span> or predictors are highly correlated.</p>
-<p>Thus, the Bayesian posterior mean is a <strong>regularized, uncertainty-aware generalization</strong> of OLS.</p>
+<p>The term <span class="math inline">\(\frac{I}{\sigma_b^2}\)</span> introduces <strong>shrinkage</strong>, regularizing estimates and stabilizing inference especially when <span class="math inline">\(p &gt; n\)</span> or predictors are highly correlated. Thus, the Bayesian posterior mean is a <strong>regularized, uncertainty-aware generalization</strong> of OLS.</p>
 </section>
 <section id="full-conditional-for-beta_j" class="slide level2">
 <h2>Full Conditional for <span class="math inline">\(\beta_j\)</span></h2>
-<p>Instead of sampling <span class="math inline">\(\beta\)</span> jointly, we can update each coefficient <span class="math inline">\(\beta_j\)</span> <strong>one at a time</strong>, holding all others fixed efficient for large <span class="math inline">\(p\)</span> or spike-and-slab models.</p>
+<p>Instead of sampling <span class="math inline">\(\beta\)</span> jointly, we can update each coefficient <span class="math inline">\(\beta_j\)</span> <strong>one at a time</strong>, holding all others fixed efficient.</p>
 <p>Let <span class="math inline">\(X_j\)</span> be the <span class="math inline">\(j\)</span>th column of <span class="math inline">\(X\)</span> and define the <strong>partial residual</strong>:</p>
 <p><span class="math display">\[
 r_j = y - X_{-j} \beta_{-j}
@@ -475,21 +474,17 @@ p(y \mid \beta, \sigma^2)\; p(\beta \mid \sigma_b^2)\; p(\sigma_b^2)\; p(\sigma^
 </section>
 <section id="posterior-summaries" class="slide level2">
 <h2>Posterior Summaries</h2>
-<p>After running the Gibbs sampler, we obtain posterior draws <span class="math inline">\(\{\theta^{(t)}\}_{t=1}^T\)</span> for parameters such as <span class="math inline">\(\beta_j\)</span>, <span class="math inline">\(\sigma^2\)</span>, or <span class="math inline">\(\sigma_b^2\)</span>.</p>
-<p>We summarize the posterior distribution via:</p>
+<p>After running the Gibbs sampler, we obtain a sequence of posterior draws <span class="math inline">\(\{\theta^{(t)}\}_{t=1}^T\)</span> for parameters such as <span class="math inline">\(\beta_j\)</span>, <span class="math inline">\(\sigma^2\)</span>, or <span class="math inline">\(\sigma_b^2\)</span>, where <span class="math inline">\(T\)</span> denotes the total number of MCMC iterations (after burn-in).<br>
+We can summarize the posterior distribution using:</p>
 <ul>
-<li><strong>Posterior mean</strong><br>
+<li><p><strong>Posterior mean</strong><br>
 <span class="math display">\[
 \mathbb{E}[\theta \mid y] \approx \frac{1}{T} \sum_{t=1}^{T} \theta^{(t)}
-\]</span></li>
-<li><strong>Posterior median</strong>: the median of <span class="math inline">\(\theta^{(t)}\)</span></li>
-<li><strong>Credible interval (95%)</strong><br>
-<span class="math display">\[
-[\theta]_{0.025}, [\theta]_{0.975}
-\]</span></li>
+\]</span></p></li>
+<li><p><strong>Posterior median</strong>: the median of <span class="math inline">\(\{\theta^{(t)}\}\)</span></p></li>
+<li><p><strong>95% credible interval</strong>: the interval between the 2.5th and 97.5th percentiles of <span class="math inline">\(\{\theta^{(t)}\}\)</span></p></li>
 </ul>
-<p>These summaries describe the most probable values of <span class="math inline">\(\theta\)</span><br>
-and their uncertainty after combining data and prior beliefs.</p>
+<p>These summaries describe the most probable values of <span class="math inline">\(\theta\)</span> and their associated uncertainty after combining data with prior beliefs.</p>
 </section>
 <section id="estimating-uncertainty" class="slide level2">
 <h2>Estimating Uncertainty</h2>
@@ -571,13 +566,12 @@ The <strong>autocorrelation function (ACF)</strong> quantifies dependence across
 </li>
 <li>Low <span class="math inline">\(\hat{\rho}_k\)</span> → better mixing and faster convergence</li>
 </ul>
-<p>Reducing autocorrelation may require <strong>more iterations</strong>,<br>
-<strong>reparameterization</strong>, or <strong>thinning</strong> the chain.</p>
+<p>Reducing autocorrelation may require <strong>more iterations</strong>, <strong>reparameterization</strong>, or <strong>thinning</strong> the chain.</p>
 </section>
 <section id="effective-sample-size-ess" class="slide level2">
 <h2>Effective Sample Size (ESS)</h2>
-<p>Autocorrelation reduces the number of <em>independent</em> samples obtained.<br>
-The <strong>effective sample size (ESS)</strong> adjusts for this:</p>
+<p>Autocorrelation reduces the number of <em>independent</em> samples obtained.</p>
+<p>The <strong>effective sample size (ESS)</strong> adjusts for this:</p>
 <p><span class="math display">\[
 \text{ESS}(\theta) =
 \frac{T}{1 + 2 \sum_{k=1}^{K} \hat{\rho}_k}
@@ -587,12 +581,11 @@ The <strong>effective sample size (ESS)</strong> adjusts for this:</p>
 </li>
 <li>Rule of thumb: <span class="math inline">\(\text{ESS} &gt; 100\)</span> per parameter for stable inference</li>
 </ul>
-<p>ESS provides a quantitative measure of <strong>sampling efficiency</strong><br>
-and helps determine whether more iterations are needed.</p>
+<p>ESS provides a quantitative measure of <strong>sampling efficiency</strong> and helps determine whether more iterations are needed.</p>
 </section>
 <section id="gelmanrubin-diagnostic-hatr" class="slide level2">
 <h2>Gelman–Rubin Diagnostic (<span class="math inline">\(\hat{R}\)</span>)</h2>
-<p>When running multiple chains, the <strong>Gelman–Rubin statistic</strong> compares between-chain and within-chain variability.</p>
+<p>When running multiple chains, the <strong>Gelman–Rubin statistic</strong> compares <strong>between-chain</strong> and <strong>within-chain</strong> variability.</p>
 <p>For <span class="math inline">\(m\)</span> chains with <span class="math inline">\(T\)</span> iterations each:</p>
 <p><span class="math display">\[
 W = \frac{1}{m} \sum_{i=1}^{m} s_i^2, \quad
@@ -603,11 +596,7 @@ B = \frac{T}{m-1} \sum_{i=1}^{m} (\bar{\theta}_i - \bar{\theta})^2
 \hat{R} = \sqrt{ \frac{\hat{V}}{W} }, \quad
 \hat{V} = \frac{T-1}{T} W + \frac{1}{T} B
 \]</span></p>
-<ul>
-<li><span class="math inline">\(\hat{R} \approx 1\)</span> → convergence achieved<br>
-</li>
-<li><span class="math inline">\(\hat{R} &gt; 1.1\)</span> → chains have <strong>not converged</strong></li>
-</ul>
+<p>Values of <span class="math inline">\(\hat{R}\)</span> close to 1 indicate convergence, whereas <span class="math inline">\(\hat{R} &gt; 1.1\)</span> suggests that the chains have not yet converged.</p>
 </section>
 <section id="geweke-diagnostic" class="slide level2">
 <h2>Geweke Diagnostic</h2>
@@ -631,108 +620,103 @@ Z =
 </ul>
 <p>These diagnostics ensure that posterior summaries reflect the <strong>true target distribution</strong>.</p>
 </section>
+<section id="motivation-for-the-spike-and-slab-prior" class="slide level2">
+<h2>Motivation for the Spike-and-Slab Prior</h2>
+<p>In standard Bayesian linear regression,</p>
+<p><span class="math display">\[
+\beta_j \sim \mathcal{N}(0, \sigma_b^2)
+\]</span></p>
+<p>This <strong>Gaussian (shrinkage) prior</strong> assumes that all predictors have small effects but does <strong>not allow exact zeros</strong>, limiting its ability to perform variable selection.</p>
+<p>The <strong>spike-and-slab prior</strong> addresses this by mixing two components:</p>
+<ul>
+<li>A <strong>spike</strong> at zero → represents excluded predictors<br>
+</li>
+<li>A <strong>slab</strong> (wide normal) → represents active predictors</li>
+</ul>
+<p>This formulation produces <strong>sparse</strong>, interpretable models that automatically select the most relevant variables.</p>
+</section>
 <section id="spike-and-slab-bayesian-linear-regression" class="slide level2">
 <h2>Spike-and-Slab Bayesian Linear Regression</h2>
-<p>As in classical BLR, the outcome is modeled as:</p>
+<p>As in classical Bayesian linear regression, the outcome is modeled as</p>
 <p><span class="math display">\[
 y = Xb + e, \quad e \sim \mathcal{N}(0, \sigma^2 I_n)
 \]</span></p>
-<p>where <span class="math inline">\(y\)</span> is the <span class="math inline">\(n \times 1\)</span> response, <span class="math inline">\(X\)</span> the design matrix, <span class="math inline">\(b\)</span> the regression coefficients, and <span class="math inline">\(\sigma^2\)</span> the residual variance.</p>
+<p>where <span class="math inline">\(y\)</span> is the <span class="math inline">\(n \times 1\)</span> response vector, <span class="math inline">\(X\)</span> is the <span class="math inline">\(n \times p\)</span> design matrix of predictors, <span class="math inline">\(b\)</span> is the <span class="math inline">\(p \times 1\)</span> vector of regression coefficients, and <span class="math inline">\(\sigma^2\)</span> is the residual variance.</p>
 <p>This defines the <strong>likelihood</strong>:</p>
 <p><span class="math display">\[
 y \mid b, \sigma^2 \sim \mathcal{N}(Xb, \sigma^2 I_n)
 \]</span></p>
-<p>The goal is to estimate <span class="math inline">\(b\)</span> and identify which predictors truly contribute to <span class="math inline">\(y\)</span>.</p>
-</section>
-<section id="motivation-for-the-spike-and-slab-prior" class="slide level2">
-<h2>Motivation for the Spike-and-Slab Prior</h2>
-<p>In standard Bayesian linear regression:</p>
-<p><span class="math display">\[
-\beta_j \sim \mathcal{N}(0, \sigma_b^2)
-\]</span></p>
-<p>This <strong>Gaussian (shrinkage) prior</strong> assumes all predictors have small effects, but it does <strong>not allow exact zeros</strong> — limiting variable selection.</p>
-<p>The <strong>spike-and-slab prior</strong> addresses this by mixing two components:</p>
-<ul>
-<li>A <strong>spike</strong> at zero → excluded predictors<br>
-</li>
-<li>A <strong>slab</strong> (wide normal) → active predictors</li>
-</ul>
-<p>This yields <strong>sparse</strong>, interpretable models that select relevant variables.</p>
+<p>The goal is to estimate <span class="math inline">\(b\)</span> and determine which predictors truly contribute to explaining variation in <span class="math inline">\(y\)</span>.</p>
 </section>
 <section id="the-spike-and-slab-mixture-prior" class="slide level2">
 <h2>The Spike-and-Slab Mixture Prior</h2>
-<p>Each regression effect is drawn from a two-component mixture:</p>
+<p>Each regression coefficient <span class="math inline">\(b_i\)</span> is drawn from a <strong>two-component mixture prior</strong>:</p>
 <p><span class="math display">\[
 p(b_i \mid \sigma_b^2, \pi)
-= \pi\, \mathcal{N}(0, \sigma_b^2) + (1-\pi)\, \delta_0
+= \pi\, \mathcal{N}(0, \sigma_b^2) + (1 - \pi)\, \delta_0
 \]</span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\(\pi\)</span> = prior probability that <span class="math inline">\(b_i\)</span> is non-zero<br>
+<li><span class="math inline">\(\pi\)</span> is the <strong>prior probability</strong> that <span class="math inline">\(b_i\)</span> is nonzero (active predictor)<br>
 </li>
-<li><span class="math inline">\(\delta_0\)</span> = point mass at zero</li>
+<li><span class="math inline">\(\delta_0\)</span> is a <strong>point mass at zero</strong> (excluded predictor)</li>
 </ul>
-<p>Thus, with probability <span class="math inline">\(\pi\)</span> a predictor is active (slab), and with probability <span class="math inline">\(1-\pi\)</span> it is excluded (spike).</p>
+<p>Thus, with probability <span class="math inline">\(\pi\)</span> a predictor belongs to the <strong>slab</strong> (included), and with probability <span class="math inline">\(1 - \pi\)</span> it belongs to the <strong>spike</strong> (excluded).</p>
+<p>This prior induces <strong>sparsity</strong>, allowing the model to automatically select relevant predictors while shrinking others exactly to zero.</p>
 </section>
-<section id="advantages-of-spike-and-slab-priors" class="slide level2">
-<h2>Advantages of Spike-and-Slab Priors</h2>
-<p>This hierarchical mixture prior provides several benefits:</p>
-<ul>
-<li><strong>Sparsity</strong> — allows exact zeros for irrelevant predictors<br>
-</li>
-<li><strong>Interpretability</strong> — binary indicators give posterior inclusion probabilities (PIPs)<br>
-</li>
-<li><strong>Adaptivity</strong> — the inclusion probability <span class="math inline">\(\pi\)</span> is learned from the data<br>
-</li>
-<li><strong>Balance</strong> — captures both strong signals (detection) and small effects (prediction)</li>
-</ul>
-<p>Hence, spike-and-slab models combine <strong>variable selection</strong> with <strong>Bayesian uncertainty quantification</strong>.</p>
-</section>
-<section id="hierarchical-representation" class="slide level2">
-<h2>Hierarchical Representation</h2>
-<p>We express each effect as:</p>
+<section id="hierarchical-indicator-representation" class="slide level2">
+<h2>Hierarchical (Indicator) Representation</h2>
+<p>The spike-and-slab prior can be expressed hierarchically by introducing a <strong>binary inclusion indicator</strong> <span class="math inline">\(\delta_i\)</span>:</p>
 <p><span class="math display">\[
 b_i = \alpha_i \, \delta_i
 \]</span></p>
-<p>where:</p>
+<p>where</p>
 <p><span class="math display">\[
-\alpha_i \mid \sigma_b^2 \sim \mathcal{N}(0, \sigma_b^2), \quad
+\alpha_i \mid \sigma_b^2 \sim \mathcal{N}(0, \sigma_b^2),
+\quad
 \delta_i \mid \pi \sim \text{Bernoulli}(\pi)
 \]</span></p>
 <ul>
-<li><span class="math inline">\(\alpha_i\)</span>: effect size when predictor is included<br>
+<li><span class="math inline">\(\alpha_i\)</span>: effect size when the predictor is <strong>included</strong><br>
 </li>
-<li><span class="math inline">\(\delta_i\)</span>: binary inclusion indicator (0 or 1)</li>
+<li><span class="math inline">\(\delta_i\)</span>: binary variable indicating <strong>inclusion (1)</strong> or <strong>exclusion (0)</strong></li>
 </ul>
-<p>Marginalizing over <span class="math inline">\(\delta_i\)</span> yields the spike-and-slab mixture prior above.</p>
+<p>This representation separates <strong>effect size</strong> (<span class="math inline">\(\alpha_i\)</span>) from <strong>inclusion</strong> (<span class="math inline">\(\delta_i\)</span>), making inference straightforward via Gibbs sampling. Marginalizing over <span class="math inline">\(\delta_i\)</span> recovers the <strong>spike-and-slab mixture prior</strong> defined earlier.</p>
 </section>
 <section id="prior-for-the-inclusion-probability-pi" class="slide level2">
 <h2>Prior for the Inclusion Probability <span class="math inline">\(\pi\)</span></h2>
-<p>The overall sparsity level is controlled by <span class="math inline">\(\pi\)</span>, assigned a <strong>Beta prior</strong>:</p>
+<p>The overall <strong>sparsity level</strong> of the model is controlled by <span class="math inline">\(\pi\)</span>, which represents the prior probability that a predictor is included.<br>
+We assign <span class="math inline">\(\pi\)</span> a <strong>Beta prior</strong>:</p>
 <p><span class="math display">\[
 \pi \sim \text{Beta}(\alpha, \beta)
 \]</span></p>
 <ul>
-<li>Small <span class="math inline">\(\alpha\)</span>, large <span class="math inline">\(\beta\)</span> → favor sparser models<br>
+<li>Small <span class="math inline">\(\alpha\)</span> and large <span class="math inline">\(\beta\)</span> → favor <strong>sparser models</strong><br>
 </li>
-<li><span class="math inline">\(\alpha = \beta = 1\)</span> → uniform prior<br>
+<li><span class="math inline">\(\alpha = \beta = 1\)</span> → <strong>uniform prior</strong> (no preference)<br>
 </li>
-<li>Larger <span class="math inline">\(\alpha\)</span> → denser models</li>
+<li>Larger <span class="math inline">\(\alpha\)</span> → favor <strong>denser models</strong></li>
 </ul>
-<p>This prior lets the <strong>data determine the degree of sparsity</strong>.</p>
+<p>This prior allows the <strong>data to inform the degree of sparsity</strong> through posterior updating of <span class="math inline">\(\pi\)</span>.</p>
 </section>
 <section id="priors-for-variance-components" class="slide level2">
 <h2>Priors for Variance Components</h2>
-<p>Variance parameters use <strong>scaled inverse-chi-squared</strong> priors:</p>
+<p>Variance parameters are typically assigned <strong>scaled inverse-chi-squared</strong> priors:</p>
 <p><span class="math display">\[
 \sigma_b^2 \sim S_b \chi^{-2}(v_b), \quad
 \sigma^2 \sim S \chi^{-2}(v)
 \]</span></p>
-<p>These are conjugate, providing closed-form conditional updates. Hyperparameters <span class="math inline">\((S_b, v_b)\)</span> and <span class="math inline">\((S, v)\)</span> encode prior beliefs about effect size variability and residual noise.</p>
+<p>These priors are <strong>conjugate</strong>, yielding <strong>closed-form conditional updates</strong> for both variance components.<br>
+The hyperparameters <span class="math inline">\((S_b, v_b)\)</span> and <span class="math inline">\((S, v)\)</span> encode prior beliefs about the variability of <strong>effect sizes</strong> and <strong>residual noise</strong>, respectively.</p>
+<p>In the spike-and-slab model, the <strong>sum of squares</strong> for updating <span class="math inline">\(\sigma_b^2\)</span> is computed only over the <strong>included effects</strong>, i.e.,</p>
+<p><span class="math display">\[
+\sum_{i:\delta_i=1} \alpha_i^2,
+\]</span></p>
+<p>ensuring that the variance of inactive predictors (where <span class="math inline">\(\delta_i = 0\)</span>) does not influence the estimate of <span class="math inline">\(\sigma_b^2\)</span>.</p>
 </section>
 <section id="joint-posterior-structure" class="slide level2">
 <h2>Joint Posterior Structure</h2>
-<p>Combining the likelihood and priors, the joint posterior is:</p>
+<p>As in Bayesian linear regression with normal priors, we combine the <strong>likelihood</strong> and <strong>priors</strong> to obtain the <strong>joint posterior</strong> over all model parameters:</p>
 <p><span class="math display">\[
 p(\mu, \alpha, \delta, \pi, \sigma_b^2, \sigma^2 \mid y)
 \propto
@@ -743,65 +727,80 @@ p(\pi)\,
 p(\sigma_b^2)\,
 p(\sigma^2)
 \]</span></p>
-<p>This captures our <strong>updated beliefs</strong> about effects, inclusion indicators, and variance components.</p>
+<p>This captures our <strong>updated beliefs</strong> about effect sizes, inclusion indicators, and variance components after observing the data.</p>
+<p>The inference procedure follows the same principle as for standard BLR — we use <strong>Gibbs sampling</strong> to draw from each parameter’s full conditional distribution.<br>
+Next, we derive these <strong>full conditional distributions</strong> from the joint posterior.</p>
 </section>
-<section id="gibbs-sampling-for-spike-and-slab-blr" class="slide level2">
-<h2>Gibbs Sampling for Spike-and-Slab BLR</h2>
-<p>Inference proceeds via <strong>Gibbs sampling</strong>, cycling through these conditional updates:</p>
+<section id="gibbs-sampling-the-algorithm-spike-and-slab-blr" class="slide level2">
+<h2>Gibbs Sampling: The Algorithm (Spike-and-Slab BLR)</h2>
+<p>We iteratively draw from the following <strong>full conditionals</strong>:</p>
+<div style="font-size:1em; line-height:1em">
 <ol type="1">
-<li><span class="math inline">\(\alpha \mid D\)</span><br>
+<li>Sample <span class="math inline">\(\alpha \mid \delta, \sigma_b^2, \sigma^2, y\)</span><br>
 </li>
-<li><span class="math inline">\(\delta \mid D\)</span><br>
+<li>Sample <span class="math inline">\(\delta \mid \alpha, \pi, y\)</span><br>
 </li>
-<li><span class="math inline">\(\pi \mid D\)</span><br>
+<li>Sample <span class="math inline">\(\pi \mid \delta\)</span><br>
 </li>
-<li><span class="math inline">\(\sigma_b^2 \mid D\)</span><br>
+<li>Sample <span class="math inline">\(\sigma_b^2 \mid \alpha, \delta\)</span><br>
 </li>
-<li><span class="math inline">\(\sigma^2 \mid D\)</span></li>
+<li>Sample <span class="math inline">\(\sigma^2 \mid \alpha, \delta, y\)</span></li>
 </ol>
-<p>Here, <strong><span class="math inline">\(D\)</span></strong> denotes the data and all other current parameter values.<br>
-Each conditional follows a <strong>standard distribution</strong> (Normal, Bernoulli, Beta, scaled-<span class="math inline">\(\chi^{-2}\)</span>).<br>
-Iterating these updates generates samples from the joint posterior.</p>
+</div>
+<p>Each step updates one parameter block given the others, and iterating the sequence yields samples from the joint posterior. Since all conditionals have <strong>standard forms</strong> (Normal, Bernoulli, Beta, scaled inverse-<span class="math inline">\(\chi^2\)</span>), Gibbs sampling is <strong>straightforward and efficient</strong>.</p>
 </section>
 <section id="posterior-inclusion-probabilities" class="slide level2">
 <h2>Posterior Inclusion Probabilities</h2>
-<p>The <strong>posterior inclusion probability (PIP)</strong> measures how likely each predictor is truly associated with <span class="math inline">\(y\)</span>:</p>
+<p>The <strong>posterior inclusion probability (PIP)</strong> quantifies how likely each predictor is to be <strong>included in the model</strong> (i.e., truly associated with <span class="math inline">\(y\)</span>):</p>
 <p><span class="math display">\[
 \widehat{\Pr}(\delta_i = 1 \mid y)
 = \frac{1}{T} \sum_{t=1}^{T} \delta_i^{(t)}
 \]</span></p>
 <ul>
-<li>High PIP → predictor is likely important<br>
+<li><strong>High PIP</strong> → predictor is likely important<br>
 </li>
-<li>Low PIP → predictor likely irrelevant</li>
+<li><strong>Low PIP</strong> → predictor is likely irrelevant</li>
 </ul>
-<p>PIPs summarize <strong>variable relevance</strong> and drive <strong>Bayesian feature selection</strong>.</p>
+<p>PIPs provide a direct measure of <strong>variable relevance</strong> and form the basis for <strong>Bayesian feature selection</strong>.</p>
+</section>
+<section id="advantages-of-spike-and-slab-priors" class="slide level2">
+<h2>Advantages of Spike-and-Slab Priors</h2>
+<p>This hierarchical mixture prior offers several key benefits:</p>
+<ul>
+<li><strong>Sparsity</strong> — allows exact zeros for irrelevant predictors<br>
+</li>
+<li><strong>Interpretability</strong> — binary indicators yield posterior inclusion probabilities (PIPs)<br>
+</li>
+<li><strong>Adaptivity</strong> — the inclusion probability <span class="math inline">\(\pi\)</span> is inferred from the data<br>
+</li>
+<li><strong>Balance</strong> — captures both strong signals (for detection) and small effects (for prediction)</li>
+</ul>
+<p>Thus, spike-and-slab models naturally combine <strong>variable selection</strong> with <strong>Bayesian uncertainty quantification</strong>.</p>
 </section>
 <section id="summary-of-bayesian-linear-regression" class="slide level2">
 <h2>Summary of Bayesian Linear Regression</h2>
-<p><strong>Bayesian Linear Regression</strong> combines <strong>likelihood</strong> and <strong>prior</strong> to form the <strong>posterior</strong>, enabling principled modeling, regularization, and uncertainty quantification.</p>
+<p><strong>Bayesian Linear Regression</strong> combines the <strong>likelihood</strong> and <strong>prior</strong> to form the <strong>posterior</strong>, enabling principled modeling, regularization, and uncertainty quantification.</p>
 <ul>
-<li>Inference via <strong>MCMC</strong> (often <strong>Gibbs sampling</strong>) with posterior draws for <strong>means</strong>, <strong>credible intervals</strong>, and <strong>predictions</strong>.<br>
+<li>Inference is performed via <strong>MCMC</strong>, typically <strong>Gibbs sampling</strong>, producing posterior draws for <strong>means</strong>, <strong>credible intervals</strong>, and <strong>predictions</strong>.<br>
 </li>
-<li><strong>Spike-and-slab priors</strong> enable <strong>sparsity</strong> and <strong>variable selection</strong>, assigning <strong>exact zeros</strong> to irrelevant predictors and identifying key variables via <strong>posterior inclusion probabilities (PIPs)</strong>.<br>
+<li><strong>Spike-and-slab priors</strong> introduce <strong>sparsity</strong> and support <strong>variable selection</strong>, assigning <strong>exact zeros</strong> to irrelevant predictors and identifying key variables through <strong>posterior inclusion probabilities (PIPs)</strong>.<br>
 </li>
-<li><strong>Conjugate and mixture priors</strong> yield <strong>efficient</strong> and <strong>robust inference</strong>, even when <strong><span class="math inline">\(p &gt; n\)</span></strong>.<br>
+<li><strong>Conjugate</strong> and <strong>mixture</strong> priors allow for <strong>efficient</strong> and <strong>robust inference</strong>, even when <strong><span class="math inline">\(p &gt; n\)</span></strong>.<br>
 </li>
-<li>With <strong>proper convergence checks</strong>, Bayesian models provide <strong>stable and reliable inference</strong> across a wide range of data settings.</li>
+<li>With appropriate <strong>convergence diagnostics</strong>, Bayesian models yield <strong>stable and reliable inference</strong> across diverse data settings.</li>
 </ul>
 </section>
-<section id="applications-in-genomics-1" class="slide level2">
+<section id="applications-in-genomics" class="slide level2">
 <h2>Applications in Genomics</h2>
-<p>We have now seen the basic framework of <strong>Bayesian Linear Regression (BLR)</strong><br>
-and will illustrate how it provides a <strong>unified approach</strong> for analyzing genetic and genomic data.</p>
+<p>We have now covered the basic framework of <strong>Bayesian Linear Regression (BLR)</strong> and will illustrate how it provides a <strong>unified approach</strong> for analyzing genetic and genomic data.</p>
 <ul>
-<li><strong>Genome-Wide Association Studies (GWAS)</strong> and <strong>fine-mapping</strong> of causal variants.<br>
+<li><strong>Genome-Wide Association Studies (GWAS)</strong> and <strong>fine-mapping</strong> of causal variants<br>
 </li>
-<li><strong>Genetic prediction</strong> and <strong>heritability estimation</strong>.<br>
+<li><strong>Genetic prediction</strong> and <strong>heritability estimation</strong><br>
 </li>
-<li><strong>Pathway</strong> and <strong>gene-set enrichment</strong> analyses.</li>
+<li><strong>Pathway</strong> and <strong>gene-set enrichment</strong> analyses</li>
 </ul>
-<p>These examples show how BLR connects <strong>statistical modeling</strong> with <strong>biological interpretation</strong> in quantitative genetics.</p>
+<p>These applications demonstrate how BLR connects <strong>statistical modeling</strong> with <strong>biological interpretation</strong> in quantitative genetics.</p>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const backBtn = document.createElement("a");

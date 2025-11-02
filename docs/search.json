@@ -200,49 +200,42 @@
     "href": "bayesian_linear_regression_slides.html#introduction",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Introduction",
-    "text": "Introduction\n\nBayesian Linear Regression (BLR) extends classical regression by incorporating prior information and producing posterior distributions over model parameters.\n\nAdvantages:\n\nHandles high-dimensional and small-sample problems.\n\nProvides full uncertainty quantification.\n\nEnables regularization and integration of prior biological knowledge."
+    "text": "Introduction\nBayesian Linear Regression Models provide a flexible statistical framework for modeling complex biological and healthcare data. They support key applications such as:\n\nGenome-wide association studies (GWAS) and fine-mapping of causal variants\n\nPolygenic risk scoring (PRS) for predicting complex traits and disease risk\n\nGene and pathway enrichment analyses to test biological hypotheses\n\nIntegrative multi-omics modeling across the genome, transcriptome, epigenome, and proteome\n\nApplications to registry-based healthcare data, enabling population-level risk prediction and disease modeling"
   },
   {
-    "objectID": "bayesian_linear_regression_slides.html#applications-in-genomics",
-    "href": "bayesian_linear_regression_slides.html#applications-in-genomics",
+    "objectID": "bayesian_linear_regression_slides.html#introduction-1",
+    "href": "bayesian_linear_regression_slides.html#introduction-1",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Applications in Genomics",
-    "text": "Applications in Genomics\n\nBayesian Linear Regression (BLR) is widely applied in quantitative genetics and genomics.\n\nCommon use cases:\n\nGenome-Wide Association Studies (GWAS) and fine-mapping of causal variants.\n\nGenetic prediction and heritability estimation.\n\nPathway and gene-set enrichment analyses.\n\nIntegrative multi-omics modeling (genome, transcriptome, epigenome)."
+    "section": "Introduction",
+    "text": "Introduction\n\nBayesian Linear Regression (BLR) extends classical regression by incorporating prior information and producing posterior distributions over model parameters.\n\nAdvantages:\n\nHandles high-dimensional and small-sample problems.\n\nProvides full uncertainty quantification.\n\nEnables regularization and integration of prior biological knowledge."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#classical-linear-regression",
     "href": "bayesian_linear_regression_slides.html#classical-linear-regression",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Classical Linear Regression",
-    "text": "Classical Linear Regression\nModel\n\\[\ny = X\\beta + e, \\quad e \\sim \\mathcal{N}(0, \\sigma^2 I_n)\n\\] - \\(y\\): outcomes\n- \\(X\\): design matrix\n- \\(\\beta\\): coefficients\n- \\(e\\): are the residuals\n- \\(\\sigma^2\\): residual variance"
+    "text": "Classical Linear Regression\nThe standard linear regression model, which assumes that the observed outcomes can be expressed as a linear combination of predictors plus random noise:\n\\[\ny = X\\beta + e, \\quad e \\sim \\mathcal{N}(0, \\sigma^2 I_n)\n\\]\n\n\\(y\\): \\(n \\times 1\\) vector of observed outcomes\n\n\\(X\\): \\(n \\times p\\) design matrix of predictors\n\n\\(\\beta\\): \\(p \\times 1\\) vector of unknown coefficients\n\n\\(e\\): Gaussian noise with mean \\(0\\) and variance \\(\\sigma^2\\)"
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#estimation",
     "href": "bayesian_linear_regression_slides.html#estimation",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Estimation",
-    "text": "Estimation\nRegression effects: \\[\n\\hat{\\beta} = (X^\\top X)^{-1} X^\\top y\n\\]\nResidual variance: \\[\n\\hat{\\sigma}^2 = \\frac{1}{n-p}\\sum_i (y_i - x_i^\\top \\hat{\\beta})^2\n\\]\nInference via standard errors and \\(t\\)-tests, confidence intervals, and prediction intervals."
+    "text": "Estimation\nGiven the linear model, we can estimate the regression coefficients and residual variance using the method of ordinary least squares (OLS), which minimizes the sum of squared residuals:\nRegression effects: \\[\n\\hat{\\beta} = (X^\\top X)^{-1} X^\\top y\n\\]\nResidual variance: \\[\n\\hat{\\sigma}^2 = \\frac{1}{n-p}\\sum_i (y_i - x_i^\\top \\hat{\\beta})^2\n\\]\nInference via standard errors and \\(t\\)-tests, confidence intervals, and prediction intervals."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#limitations",
     "href": "bayesian_linear_regression_slides.html#limitations",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Limitations",
-    "text": "Limitations\n\nNo explicit control over effect size distribution\nSensitive when collinearity is high\nNot identifiable when \\(p&gt;n\\)\nUncertainty largely asymptotic unless normality assumptions hold"
+    "text": "Limitations\nWhile ordinary least squares estimation is simple and widely used, it has several important limitations that motivate the use of regularized or Bayesian approaches:\n\nNo explicit control over effect size distribution\nSensitive when collinearity is high\nNot identifiable when \\(p&gt;n\\)\nUncertainty largely asymptotic unless normality assumptions hold"
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#why-bayesian-linear-regression",
     "href": "bayesian_linear_regression_slides.html#why-bayesian-linear-regression",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Why Bayesian Linear Regression?",
-    "text": "Why Bayesian Linear Regression?\n\nCombines likelihood and prior to form the posterior.\n\nPriors express beliefs about effect sizes:\n\nNormal → many small effects\n\nSpike-and-slab → sparse effects\n\n\nActs as a regularizer:\n\nShrinks small/noisy effects toward \\(0\\)\n\nPreserves large, important effects\n\n\nStable when \\(p &gt; n\\) due to prior information.\n\nProvides full posterior distributions for \\(\\beta\\) and \\(\\sigma^2\\)."
-  },
-  {
-    "objectID": "bayesian_linear_regression_slides.html#overview-bayesian-linear-regression",
-    "href": "bayesian_linear_regression_slides.html#overview-bayesian-linear-regression",
-    "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Overview: Bayesian Linear Regression",
-    "text": "Overview: Bayesian Linear Regression\n\nCombines data and prior knowledge using Bayes’ rule.\n\nUses conjugate priors to yield closed-form full conditionals.\n\nEmploys Gibbs sampling to approximate the posterior distribution.\n\nEstimates parameters, uncertainty, and predictions from posterior draws."
+    "text": "Why Bayesian Linear Regression?\nThe Bayesian framework extends linear regression by incorporating prior beliefs about the model parameters and updating them with observed data through Bayes’ theorem:\n\nCombines likelihood and prior to form the posterior.\n\nPriors express beliefs about effect sizes:\n\nNormal → many small effects\n\nSpike-and-slab → sparse effects\n\n\nActs as a regularizer:\n\nShrinks small/noisy effects toward \\(0\\)\n\nPreserves large, important effects\n\n\nStable when \\(p &gt; n\\) due to prior information.\n\nProvides full posterior distributions for \\(\\beta\\) and \\(\\sigma^2\\)."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#bayesian-linear-regression-with-gaussian-priors",
@@ -256,42 +249,35 @@
     "href": "bayesian_linear_regression_slides.html#likelihood-in-bayesian-linear-regression",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Likelihood in Bayesian Linear Regression",
-    "text": "Likelihood in Bayesian Linear Regression\nBecause the residuals are Gaussian, it follows that the marginal distribution of \\(y\\) is:\n\\[\ne \\sim \\mathcal{N}(0, \\sigma^2 I_n)\n\\] The marginal distribution of \\(y\\) is:\n\\[\ny \\sim \\mathcal{N}(X\\beta, \\sigma^2 I_n)\n\\] This defines the likelihood the probability of the observed data given parameters \\(\\beta\\) and \\(\\sigma^2\\):\n\\[\np(y \\mid X, \\beta, \\sigma^2) = \\mathcal{N}(X\\beta, \\sigma^2 I_n)\n\\]"
+    "text": "Likelihood in Bayesian Linear Regression\nBecause the residuals are assumed to be Gaussian,\n\\[\ne \\sim \\mathcal{N}(0, \\sigma^2 I_n)\n\\]\nit follows that the response vector \\(y\\) follows a multivariate normal distribution:\n\\[\ny = X\\beta + e \\quad \\Rightarrow \\quad y \\sim \\mathcal{N}(X\\beta, \\sigma^2 I_n)\n\\]\nThis defines the likelihood, i.e. the probability of the observed data given the model parameters \\(\\beta\\) and \\(\\sigma^2\\):\n\\[\np(y \\mid X, \\beta, \\sigma^2) = \\mathcal{N}(y \\mid X\\beta, \\sigma^2 I_n)\n\\]"
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#introducing-priors",
     "href": "bayesian_linear_regression_slides.html#introducing-priors",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Introducing Priors",
-    "text": "Introducing Priors\nIn Bayesian linear regression, we specify prior distributions that express our beliefs about parameters before seeing the data.\nA common conjugate prior for the regression coefficients is:\n\\[\n\\beta \\mid \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2 I_p)\n\\]\nThis reflects the belief that most effect sizes are small and centered near zero — consistent with the polygenic assumption in genetics."
+    "text": "Introducing Priors\nIn Bayesian linear regression, we specify prior distributions to express our beliefs about the model parameters before observing the data.\nA common conjugate prior for the regression coefficients is\n\\[\n\\beta \\mid \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2 I_p)\n\\]\nThis expresses the belief that most effect sizes are small and centered around zero — consistent with the polygenic assumption often used in genetics.\nUsing conjugate priors ensures that the posterior distributions remain in the same family as the priors (e.g., scaled inverse-chi-squared for variance parameters), enabling closed-form Gibbs sampling updates."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#role-of-the-prior-variance-sigma_b2",
     "href": "bayesian_linear_regression_slides.html#role-of-the-prior-variance-sigma_b2",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Role of the Prior Variance \\(\\sigma_b^2\\)",
-    "text": "Role of the Prior Variance \\(\\sigma_b^2\\)\nThe parameter \\(\\sigma_b^2\\) acts as a shrinkage (regularization) parameter:\n\nSmall \\(\\sigma_b^2\\) → stronger shrinkage toward zero.\n\nLarge \\(\\sigma_b^2\\) → weaker shrinkage, allowing larger effects.\n\nIt controls the strength of regularization and is often treated as an unknown hyperparameter estimated from the data."
+    "text": "Role of the Prior Variance \\(\\sigma_b^2\\)\nThe parameter \\(\\sigma_b^2\\) acts as a shrinkage (or regularization) parameter:\n\nSmall \\(\\sigma_b^2\\) → stronger shrinkage toward zero\n\nLarge \\(\\sigma_b^2\\) → weaker shrinkage, allowing larger effects\n\nIt determines the strength of regularization and is often treated as an unknown hyperparameter to be estimated from the data."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#priors-on-variance-components",
     "href": "bayesian_linear_regression_slides.html#priors-on-variance-components",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Priors on Variance Components",
-    "text": "Priors on Variance Components\nWe also place priors on the variance components to complete the hierarchical model.\n\\[\n\\sigma_b^2 \\mid S_b, v_b \\sim S_b \\, \\chi^{-2}(v_b), \\quad\n\\sigma^2 \\mid S, v \\sim S \\, \\chi^{-2}(v)\n\\]\nHere:\n\n\\(S_b\\) and \\(v_b\\) are user-defined hyperparameters that control the prior distribution on the variance of regression coefficients.\n\n\\(S\\) and \\(v\\) are hyperparameters for the residual variance \\(\\sigma^2\\)."
-  },
-  {
-    "objectID": "bayesian_linear_regression_slides.html#conjugate-priors-and-regularization",
-    "href": "bayesian_linear_regression_slides.html#conjugate-priors-and-regularization",
-    "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Conjugate Priors and Regularization",
-    "text": "Conjugate Priors and Regularization\nConjugate priors keep posteriors in the same family\n(e.g., scaled inverse-chi-squared), allowing closed-form Gibbs updates.\nThey also serve as regularizers:\n\nThe prior on \\(\\beta\\) shrinks small or noisy effects toward zero.\n\nPriors on variance components prevent overfitting, especially when \\(p &gt; n\\).\n\nThus, conjugate priors make Bayesian linear regression efficient and stable."
+    "text": "Priors on Variance Components\nWe also place priors on the variance components to complete the hierarchical model:\n\\[\n\\sigma_b^2 \\mid S_b, v_b \\sim S_b \\, \\chi^{-2}(v_b), \\quad\n\\sigma^2 \\mid S, v \\sim S \\, \\chi^{-2}(v)\n\\]\n\n\\(S_b\\) and \\(v_b\\) are hyperparameters that control the prior distribution for the effect size variance \\(\\sigma_b^2\\).\n\n\\(S\\) and \\(v\\) are hyperparameters for the residual variance \\(\\sigma^2\\).\n\nThese scaled inverse-chi-squared priors ensure conjugacy, enabling closed-form updates for the variance parameters in Gibbs sampling.\nTypical choices:\n- Small degrees of freedom (e.g., \\(v_b = v = 4\\)) give weakly informative, heavy-tailed priors.\n- Scale parameters \\(S_b\\) and \\(S\\) are often set based on expected variance magnitudes (e.g., empirical estimates)."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#posterior-distribution",
     "href": "bayesian_linear_regression_slides.html#posterior-distribution",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Posterior Distribution",
-    "text": "Posterior Distribution\nIn Bayesian analysis, we combine the likelihood and priors using Bayes’ rule to obtain the joint posterior:\n\\[\np(\\beta, \\sigma_b^2, \\sigma^2 \\mid y) \\propto\np(y \\mid \\beta, \\sigma^2)\\;\np(\\beta \\mid \\sigma_b^2)\\;\np(\\sigma_b^2)\\;\np(\\sigma^2)\n\\]\nThis posterior captures all updated knowledge about the unknown parameters after observing the data.\nIt forms the basis for computing posterior means, credible intervals, and predictions."
+    "text": "Posterior Distribution\nIn Bayesian linear regression, we combine the likelihood and prior distributions using Bayes’ rule to obtain the joint posterior:\n\\[\np(\\beta, \\sigma_b^2, \\sigma^2 \\mid y) \\propto\np(y \\mid \\beta, \\sigma^2)\\;\np(\\beta \\mid \\sigma_b^2)\\;\np(\\sigma_b^2)\\;\np(\\sigma^2)\n\\]\nThe posterior distribution represents all updated knowledge about the unknown parameters after observing the data.\nIt serves as the foundation for computing posterior means, credible intervals, and predictions.\nIn practice, the posterior is often too complex to evaluate directly, so we use sampling-based methods such as Gibbs sampling to approximate it."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#conjugacy-and-gibbs-sampling",
@@ -305,21 +291,21 @@
     "href": "bayesian_linear_regression_slides.html#full-conditional-for-beta",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Full Conditional for \\(\\beta\\)",
-    "text": "Full Conditional for \\(\\beta\\)\nGiven \\(\\sigma^2\\), \\(\\sigma_b^2\\), and the data \\(y\\), the regression coefficients have a multivariate normal conditional posterior:\n\\[\n\\beta \\mid \\sigma^2, \\sigma_b^2, y \\sim\n\\mathcal{N}(\\mu_\\beta, \\Sigma_\\beta)\n\\]\nwhere\n\\[\n\\Sigma_\\beta = \\left( \\frac{X^\\top X}{\\sigma^2} + \\frac{I}{\\sigma_b^2} \\right)^{-1},\n\\quad\n\\mu_\\beta = \\Sigma_\\beta \\frac{X^\\top y}{\\sigma^2}\n\\]\nThis distribution represents our updated belief about \\(\\beta\\)\nafter observing the data, while holding \\(\\sigma_b^2\\) and \\(\\sigma^2\\) fixed."
+    "text": "Full Conditional for \\(\\beta\\)\nGiven \\(\\sigma^2\\), \\(\\sigma_b^2\\), and the data \\(y\\), the regression coefficients have a multivariate normal conditional posterior:\n\\[\n\\beta \\mid \\sigma^2, \\sigma_b^2, y \\sim\n\\mathcal{N}(\\mu_\\beta, \\Sigma_\\beta)\n\\]\nwhere\n\\[\n\\Sigma_\\beta = \\left( \\frac{X^\\top X}{\\sigma^2} + \\frac{I}{\\sigma_b^2} \\right)^{-1},\n\\quad\n\\mu_\\beta = \\Sigma_\\beta \\frac{X^\\top y}{\\sigma^2}\n\\]\nThis distribution represents our updated belief about \\(\\beta\\) after observing the data, while holding \\(\\sigma_b^2\\) and \\(\\sigma^2\\) fixed."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#comparison-to-classical-ols",
     "href": "bayesian_linear_regression_slides.html#comparison-to-classical-ols",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Comparison to Classical OLS",
-    "text": "Comparison to Classical OLS\nIn classical regression, the OLS estimator is\n\\[\n\\hat\\beta_{\\text{OLS}} = (X^\\top X)^{-1} X^\\top y,\n\\quad y \\sim \\mathcal{N}(X\\beta, \\sigma^2 I)\n\\]\nThe estimate of \\(\\beta\\) is independent of \\(\\sigma^2\\),\nsince \\(\\sigma^2\\) only scales the likelihood, not its maximum.\nIn Bayesian regression, \\(\\sigma^2\\) appears explicitly in the posterior:\n\\[\n\\Sigma_\\beta = \\left( \\frac{X^\\top X}{\\sigma^2} + \\frac{I}{\\sigma_b^2} \\right)^{-1},\n\\quad\n\\mu_\\beta = \\Sigma_\\beta \\frac{X^\\top y}{\\sigma^2}\n\\]\nThe term \\(\\frac{I}{\\sigma_b^2}\\) introduces shrinkage, regularizing estimates and stabilizing inference especially when \\(p &gt; n\\) or predictors are highly correlated.\nThus, the Bayesian posterior mean is a regularized, uncertainty-aware generalization of OLS."
+    "text": "Comparison to Classical OLS\nIn classical regression, the OLS estimator is\n\\[\n\\hat\\beta_{\\text{OLS}} = (X^\\top X)^{-1} X^\\top y\n\\]\nThe estimate of \\(\\beta\\) is independent of \\(\\sigma^2\\), since \\(\\sigma^2\\) only scales the likelihood, not its maximum.\nIn Bayesian regression, \\(\\sigma^2\\) appears explicitly in the posterior:\n\\[\n\\Sigma_\\beta = \\left( \\frac{X^\\top X}{\\sigma^2} + \\frac{I}{\\sigma_b^2} \\right)^{-1},\n\\quad\n\\mu_\\beta = \\Sigma_\\beta \\frac{X^\\top y}{\\sigma^2}\n\\]\nThe term \\(\\frac{I}{\\sigma_b^2}\\) introduces shrinkage, regularizing estimates and stabilizing inference especially when \\(p &gt; n\\) or predictors are highly correlated. Thus, the Bayesian posterior mean is a regularized, uncertainty-aware generalization of OLS."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#full-conditional-for-beta_j",
     "href": "bayesian_linear_regression_slides.html#full-conditional-for-beta_j",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Full Conditional for \\(\\beta_j\\)",
-    "text": "Full Conditional for \\(\\beta_j\\)\nInstead of sampling \\(\\beta\\) jointly, we can update each coefficient \\(\\beta_j\\) one at a time, holding all others fixed efficient for large \\(p\\) or spike-and-slab models.\nLet \\(X_j\\) be the \\(j\\)th column of \\(X\\) and define the partial residual:\n\\[\nr_j = y - X_{-j} \\beta_{-j}\n\\]\nThen the conditional posterior for \\(\\beta_j\\) is univariate normal:\n\\[\n\\beta_j \\mid D \\sim \\mathcal{N} \\!\\left(\n\\frac{X_j^\\top r_j}{X_j^\\top X_j + \\sigma^2 / \\sigma_b^2},\\;\n\\frac{\\sigma^2}{X_j^\\top X_j + \\sigma^2 / \\sigma_b^2}\n\\right)\n\\]\nThis corresponds to a regularized least-squares update. Residual updates avoid matrix inversion, scale to high dimensions, and extend naturally to sparse (spike-and-slab) models."
+    "text": "Full Conditional for \\(\\beta_j\\)\nInstead of sampling \\(\\beta\\) jointly, we can update each coefficient \\(\\beta_j\\) one at a time, holding all others fixed efficient.\nLet \\(X_j\\) be the \\(j\\)th column of \\(X\\) and define the partial residual:\n\\[\nr_j = y - X_{-j} \\beta_{-j}\n\\]\nThen the conditional posterior for \\(\\beta_j\\) is univariate normal:\n\\[\n\\beta_j \\mid D \\sim \\mathcal{N} \\!\\left(\n\\frac{X_j^\\top r_j}{X_j^\\top X_j + \\sigma^2 / \\sigma_b^2},\\;\n\\frac{\\sigma^2}{X_j^\\top X_j + \\sigma^2 / \\sigma_b^2}\n\\right)\n\\]\nThis corresponds to a regularized least-squares update. Residual updates avoid matrix inversion, scale to high dimensions, and extend naturally to sparse (spike-and-slab) models."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#full-conditional-for-sigma_b2",
@@ -354,7 +340,7 @@
     "href": "bayesian_linear_regression_slides.html#posterior-summaries",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Posterior Summaries",
-    "text": "Posterior Summaries\nAfter running the Gibbs sampler, we obtain posterior draws \\(\\{\\theta^{(t)}\\}_{t=1}^T\\) for parameters such as \\(\\beta_j\\), \\(\\sigma^2\\), or \\(\\sigma_b^2\\).\nWe summarize the posterior distribution via:\n\nPosterior mean\n\\[\n\\mathbb{E}[\\theta \\mid y] \\approx \\frac{1}{T} \\sum_{t=1}^{T} \\theta^{(t)}\n\\]\nPosterior median: the median of \\(\\theta^{(t)}\\)\nCredible interval (95%)\n\\[\n[\\theta]_{0.025}, [\\theta]_{0.975}\n\\]\n\nThese summaries describe the most probable values of \\(\\theta\\)\nand their uncertainty after combining data and prior beliefs."
+    "text": "Posterior Summaries\nAfter running the Gibbs sampler, we obtain a sequence of posterior draws \\(\\{\\theta^{(t)}\\}_{t=1}^T\\) for parameters such as \\(\\beta_j\\), \\(\\sigma^2\\), or \\(\\sigma_b^2\\), where \\(T\\) denotes the total number of MCMC iterations (after burn-in).\nWe can summarize the posterior distribution using:\n\nPosterior mean\n\\[\n\\mathbb{E}[\\theta \\mid y] \\approx \\frac{1}{T} \\sum_{t=1}^{T} \\theta^{(t)}\n\\]\nPosterior median: the median of \\(\\{\\theta^{(t)}\\}\\)\n95% credible interval: the interval between the 2.5th and 97.5th percentiles of \\(\\{\\theta^{(t)}\\}\\)\n\nThese summaries describe the most probable values of \\(\\theta\\) and their associated uncertainty after combining data with prior beliefs."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#estimating-uncertainty",
@@ -396,21 +382,21 @@
     "href": "bayesian_linear_regression_slides.html#autocorrelation",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Autocorrelation",
-    "text": "Autocorrelation\nSamples from a Gibbs sampler are correlated, especially for tightly coupled parameters.\nThe autocorrelation function (ACF) quantifies dependence across lags \\(k\\):\n\\[\n\\hat{\\rho}_k =\n\\frac{\\sum_{t=1}^{T-k} (\\theta^{(t)} - \\bar{\\theta})(\\theta^{(t+k)} - \\bar{\\theta})}\n     {\\sum_{t=1}^{T} (\\theta^{(t)} - \\bar{\\theta})^2}\n\\]\n\nHigh \\(\\hat{\\rho}_k\\) → slow mixing and fewer effective samples\n\nLow \\(\\hat{\\rho}_k\\) → better mixing and faster convergence\n\nReducing autocorrelation may require more iterations,\nreparameterization, or thinning the chain."
+    "text": "Autocorrelation\nSamples from a Gibbs sampler are correlated, especially for tightly coupled parameters.\nThe autocorrelation function (ACF) quantifies dependence across lags \\(k\\):\n\\[\n\\hat{\\rho}_k =\n\\frac{\\sum_{t=1}^{T-k} (\\theta^{(t)} - \\bar{\\theta})(\\theta^{(t+k)} - \\bar{\\theta})}\n     {\\sum_{t=1}^{T} (\\theta^{(t)} - \\bar{\\theta})^2}\n\\]\n\nHigh \\(\\hat{\\rho}_k\\) → slow mixing and fewer effective samples\n\nLow \\(\\hat{\\rho}_k\\) → better mixing and faster convergence\n\nReducing autocorrelation may require more iterations, reparameterization, or thinning the chain."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#effective-sample-size-ess",
     "href": "bayesian_linear_regression_slides.html#effective-sample-size-ess",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Effective Sample Size (ESS)",
-    "text": "Effective Sample Size (ESS)\nAutocorrelation reduces the number of independent samples obtained.\nThe effective sample size (ESS) adjusts for this:\n\\[\n\\text{ESS}(\\theta) =\n\\frac{T}{1 + 2 \\sum_{k=1}^{K} \\hat{\\rho}_k}\n\\]\n\nSmall ESS → chain is highly correlated, less informative\n\nRule of thumb: \\(\\text{ESS} &gt; 100\\) per parameter for stable inference\n\nESS provides a quantitative measure of sampling efficiency\nand helps determine whether more iterations are needed."
+    "text": "Effective Sample Size (ESS)\nAutocorrelation reduces the number of independent samples obtained.\nThe effective sample size (ESS) adjusts for this:\n\\[\n\\text{ESS}(\\theta) =\n\\frac{T}{1 + 2 \\sum_{k=1}^{K} \\hat{\\rho}_k}\n\\]\n\nSmall ESS → chain is highly correlated, less informative\n\nRule of thumb: \\(\\text{ESS} &gt; 100\\) per parameter for stable inference\n\nESS provides a quantitative measure of sampling efficiency and helps determine whether more iterations are needed."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#gelmanrubin-diagnostic-hatr",
     "href": "bayesian_linear_regression_slides.html#gelmanrubin-diagnostic-hatr",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Gelman–Rubin Diagnostic (\\(\\hat{R}\\))",
-    "text": "Gelman–Rubin Diagnostic (\\(\\hat{R}\\))\nWhen running multiple chains, the Gelman–Rubin statistic compares between-chain and within-chain variability.\nFor \\(m\\) chains with \\(T\\) iterations each:\n\\[\nW = \\frac{1}{m} \\sum_{i=1}^{m} s_i^2, \\quad\nB = \\frac{T}{m-1} \\sum_{i=1}^{m} (\\bar{\\theta}_i - \\bar{\\theta})^2\n\\]\nThe potential scale reduction factor:\n\\[\n\\hat{R} = \\sqrt{ \\frac{\\hat{V}}{W} }, \\quad\n\\hat{V} = \\frac{T-1}{T} W + \\frac{1}{T} B\n\\]\n\n\\(\\hat{R} \\approx 1\\) → convergence achieved\n\n\\(\\hat{R} &gt; 1.1\\) → chains have not converged"
+    "text": "Gelman–Rubin Diagnostic (\\(\\hat{R}\\))\nWhen running multiple chains, the Gelman–Rubin statistic compares between-chain and within-chain variability.\nFor \\(m\\) chains with \\(T\\) iterations each:\n\\[\nW = \\frac{1}{m} \\sum_{i=1}^{m} s_i^2, \\quad\nB = \\frac{T}{m-1} \\sum_{i=1}^{m} (\\bar{\\theta}_i - \\bar{\\theta})^2\n\\]\nThe potential scale reduction factor:\n\\[\n\\hat{R} = \\sqrt{ \\frac{\\hat{V}}{W} }, \\quad\n\\hat{V} = \\frac{T-1}{T} W + \\frac{1}{T} B\n\\]\nValues of \\(\\hat{R}\\) close to 1 indicate convergence, whereas \\(\\hat{R} &gt; 1.1\\) suggests that the chains have not yet converged."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#geweke-diagnostic",
@@ -420,88 +406,88 @@
     "text": "Geweke Diagnostic\nThe Geweke test checks whether early and late portions of a single chain have the same mean, indicating stationarity.\n\\[\nZ =\n\\frac{\\bar{\\theta}_A - \\bar{\\theta}_B}\n     {\\sqrt{\\text{Var}(\\bar{\\theta}_A) + \\text{Var}(\\bar{\\theta}_B)}}\n\\]\nTypically:\n\nSegment A = first 10% of the chain\n\nSegment B = last 50% of the chain\n\nUnder convergence, \\(Z \\sim \\mathcal{N}(0,1)\\).\n\n\\(|Z| \\le 2\\) → chain likely stationary\n\n\\(|Z| &gt; 2\\) → potential non-convergence\n\nThese diagnostics ensure that posterior summaries reflect the true target distribution."
   },
   {
-    "objectID": "bayesian_linear_regression_slides.html#spike-and-slab-bayesian-linear-regression",
-    "href": "bayesian_linear_regression_slides.html#spike-and-slab-bayesian-linear-regression",
-    "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Spike-and-Slab Bayesian Linear Regression",
-    "text": "Spike-and-Slab Bayesian Linear Regression\nAs in classical BLR, the outcome is modeled as:\n\\[\ny = Xb + e, \\quad e \\sim \\mathcal{N}(0, \\sigma^2 I_n)\n\\]\nwhere \\(y\\) is the \\(n \\times 1\\) response, \\(X\\) the design matrix, \\(b\\) the regression coefficients, and \\(\\sigma^2\\) the residual variance.\nThis defines the likelihood:\n\\[\ny \\mid b, \\sigma^2 \\sim \\mathcal{N}(Xb, \\sigma^2 I_n)\n\\]\nThe goal is to estimate \\(b\\) and identify which predictors truly contribute to \\(y\\)."
-  },
-  {
     "objectID": "bayesian_linear_regression_slides.html#motivation-for-the-spike-and-slab-prior",
     "href": "bayesian_linear_regression_slides.html#motivation-for-the-spike-and-slab-prior",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Motivation for the Spike-and-Slab Prior",
-    "text": "Motivation for the Spike-and-Slab Prior\nIn standard Bayesian linear regression:\n\\[\n\\beta_j \\sim \\mathcal{N}(0, \\sigma_b^2)\n\\]\nThis Gaussian (shrinkage) prior assumes all predictors have small effects, but it does not allow exact zeros — limiting variable selection.\nThe spike-and-slab prior addresses this by mixing two components:\n\nA spike at zero → excluded predictors\n\nA slab (wide normal) → active predictors\n\nThis yields sparse, interpretable models that select relevant variables."
+    "text": "Motivation for the Spike-and-Slab Prior\nIn standard Bayesian linear regression,\n\\[\n\\beta_j \\sim \\mathcal{N}(0, \\sigma_b^2)\n\\]\nThis Gaussian (shrinkage) prior assumes that all predictors have small effects but does not allow exact zeros, limiting its ability to perform variable selection.\nThe spike-and-slab prior addresses this by mixing two components:\n\nA spike at zero → represents excluded predictors\n\nA slab (wide normal) → represents active predictors\n\nThis formulation produces sparse, interpretable models that automatically select the most relevant variables."
+  },
+  {
+    "objectID": "bayesian_linear_regression_slides.html#spike-and-slab-bayesian-linear-regression",
+    "href": "bayesian_linear_regression_slides.html#spike-and-slab-bayesian-linear-regression",
+    "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
+    "section": "Spike-and-Slab Bayesian Linear Regression",
+    "text": "Spike-and-Slab Bayesian Linear Regression\nAs in classical Bayesian linear regression, the outcome is modeled as\n\\[\ny = Xb + e, \\quad e \\sim \\mathcal{N}(0, \\sigma^2 I_n)\n\\]\nwhere \\(y\\) is the \\(n \\times 1\\) response vector, \\(X\\) is the \\(n \\times p\\) design matrix of predictors, \\(b\\) is the \\(p \\times 1\\) vector of regression coefficients, and \\(\\sigma^2\\) is the residual variance.\nThis defines the likelihood:\n\\[\ny \\mid b, \\sigma^2 \\sim \\mathcal{N}(Xb, \\sigma^2 I_n)\n\\]\nThe goal is to estimate \\(b\\) and determine which predictors truly contribute to explaining variation in \\(y\\)."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#the-spike-and-slab-mixture-prior",
     "href": "bayesian_linear_regression_slides.html#the-spike-and-slab-mixture-prior",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "The Spike-and-Slab Mixture Prior",
-    "text": "The Spike-and-Slab Mixture Prior\nEach regression effect is drawn from a two-component mixture:\n\\[\np(b_i \\mid \\sigma_b^2, \\pi)\n= \\pi\\, \\mathcal{N}(0, \\sigma_b^2) + (1-\\pi)\\, \\delta_0\n\\]\nwhere:\n\n\\(\\pi\\) = prior probability that \\(b_i\\) is non-zero\n\n\\(\\delta_0\\) = point mass at zero\n\nThus, with probability \\(\\pi\\) a predictor is active (slab), and with probability \\(1-\\pi\\) it is excluded (spike)."
+    "text": "The Spike-and-Slab Mixture Prior\nEach regression coefficient \\(b_i\\) is drawn from a two-component mixture prior:\n\\[\np(b_i \\mid \\sigma_b^2, \\pi)\n= \\pi\\, \\mathcal{N}(0, \\sigma_b^2) + (1 - \\pi)\\, \\delta_0\n\\]\nwhere:\n\n\\(\\pi\\) is the prior probability that \\(b_i\\) is nonzero (active predictor)\n\n\\(\\delta_0\\) is a point mass at zero (excluded predictor)\n\nThus, with probability \\(\\pi\\) a predictor belongs to the slab (included), and with probability \\(1 - \\pi\\) it belongs to the spike (excluded).\nThis prior induces sparsity, allowing the model to automatically select relevant predictors while shrinking others exactly to zero."
   },
   {
-    "objectID": "bayesian_linear_regression_slides.html#advantages-of-spike-and-slab-priors",
-    "href": "bayesian_linear_regression_slides.html#advantages-of-spike-and-slab-priors",
+    "objectID": "bayesian_linear_regression_slides.html#hierarchical-indicator-representation",
+    "href": "bayesian_linear_regression_slides.html#hierarchical-indicator-representation",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Advantages of Spike-and-Slab Priors",
-    "text": "Advantages of Spike-and-Slab Priors\nThis hierarchical mixture prior provides several benefits:\n\nSparsity — allows exact zeros for irrelevant predictors\n\nInterpretability — binary indicators give posterior inclusion probabilities (PIPs)\n\nAdaptivity — the inclusion probability \\(\\pi\\) is learned from the data\n\nBalance — captures both strong signals (detection) and small effects (prediction)\n\nHence, spike-and-slab models combine variable selection with Bayesian uncertainty quantification."
-  },
-  {
-    "objectID": "bayesian_linear_regression_slides.html#hierarchical-representation",
-    "href": "bayesian_linear_regression_slides.html#hierarchical-representation",
-    "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Hierarchical Representation",
-    "text": "Hierarchical Representation\nWe express each effect as:\n\\[\nb_i = \\alpha_i \\, \\delta_i\n\\]\nwhere:\n\\[\n\\alpha_i \\mid \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2), \\quad\n\\delta_i \\mid \\pi \\sim \\text{Bernoulli}(\\pi)\n\\]\n\n\\(\\alpha_i\\): effect size when predictor is included\n\n\\(\\delta_i\\): binary inclusion indicator (0 or 1)\n\nMarginalizing over \\(\\delta_i\\) yields the spike-and-slab mixture prior above."
+    "section": "Hierarchical (Indicator) Representation",
+    "text": "Hierarchical (Indicator) Representation\nThe spike-and-slab prior can be expressed hierarchically by introducing a binary inclusion indicator \\(\\delta_i\\):\n\\[\nb_i = \\alpha_i \\, \\delta_i\n\\]\nwhere\n\\[\n\\alpha_i \\mid \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2),\n\\quad\n\\delta_i \\mid \\pi \\sim \\text{Bernoulli}(\\pi)\n\\]\n\n\\(\\alpha_i\\): effect size when the predictor is included\n\n\\(\\delta_i\\): binary variable indicating inclusion (1) or exclusion (0)\n\nThis representation separates effect size (\\(\\alpha_i\\)) from inclusion (\\(\\delta_i\\)), making inference straightforward via Gibbs sampling. Marginalizing over \\(\\delta_i\\) recovers the spike-and-slab mixture prior defined earlier."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#prior-for-the-inclusion-probability-pi",
     "href": "bayesian_linear_regression_slides.html#prior-for-the-inclusion-probability-pi",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Prior for the Inclusion Probability \\(\\pi\\)",
-    "text": "Prior for the Inclusion Probability \\(\\pi\\)\nThe overall sparsity level is controlled by \\(\\pi\\), assigned a Beta prior:\n\\[\n\\pi \\sim \\text{Beta}(\\alpha, \\beta)\n\\]\n\nSmall \\(\\alpha\\), large \\(\\beta\\) → favor sparser models\n\n\\(\\alpha = \\beta = 1\\) → uniform prior\n\nLarger \\(\\alpha\\) → denser models\n\nThis prior lets the data determine the degree of sparsity."
+    "text": "Prior for the Inclusion Probability \\(\\pi\\)\nThe overall sparsity level of the model is controlled by \\(\\pi\\), which represents the prior probability that a predictor is included.\nWe assign \\(\\pi\\) a Beta prior:\n\\[\n\\pi \\sim \\text{Beta}(\\alpha, \\beta)\n\\]\n\nSmall \\(\\alpha\\) and large \\(\\beta\\) → favor sparser models\n\n\\(\\alpha = \\beta = 1\\) → uniform prior (no preference)\n\nLarger \\(\\alpha\\) → favor denser models\n\nThis prior allows the data to inform the degree of sparsity through posterior updating of \\(\\pi\\)."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#priors-for-variance-components",
     "href": "bayesian_linear_regression_slides.html#priors-for-variance-components",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Priors for Variance Components",
-    "text": "Priors for Variance Components\nVariance parameters use scaled inverse-chi-squared priors:\n\\[\n\\sigma_b^2 \\sim S_b \\chi^{-2}(v_b), \\quad\n\\sigma^2 \\sim S \\chi^{-2}(v)\n\\]\nThese are conjugate, providing closed-form conditional updates. Hyperparameters \\((S_b, v_b)\\) and \\((S, v)\\) encode prior beliefs about effect size variability and residual noise."
+    "text": "Priors for Variance Components\nVariance parameters are typically assigned scaled inverse-chi-squared priors:\n\\[\n\\sigma_b^2 \\sim S_b \\chi^{-2}(v_b), \\quad\n\\sigma^2 \\sim S \\chi^{-2}(v)\n\\]\nThese priors are conjugate, yielding closed-form conditional updates for both variance components.\nThe hyperparameters \\((S_b, v_b)\\) and \\((S, v)\\) encode prior beliefs about the variability of effect sizes and residual noise, respectively.\nIn the spike-and-slab model, the sum of squares for updating \\(\\sigma_b^2\\) is computed only over the included effects, i.e.,\n\\[\n\\sum_{i:\\delta_i=1} \\alpha_i^2,\n\\]\nensuring that the variance of inactive predictors (where \\(\\delta_i = 0\\)) does not influence the estimate of \\(\\sigma_b^2\\)."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#joint-posterior-structure",
     "href": "bayesian_linear_regression_slides.html#joint-posterior-structure",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Joint Posterior Structure",
-    "text": "Joint Posterior Structure\nCombining the likelihood and priors, the joint posterior is:\n\\[\np(\\mu, \\alpha, \\delta, \\pi, \\sigma_b^2, \\sigma^2 \\mid y)\n\\propto\np(y \\mid \\mu, \\alpha, \\delta, \\sigma^2)\\,\np(\\alpha \\mid \\sigma_b^2)\\,\np(\\delta \\mid \\pi)\\,\np(\\pi)\\,\np(\\sigma_b^2)\\,\np(\\sigma^2)\n\\]\nThis captures our updated beliefs about effects, inclusion indicators, and variance components."
+    "text": "Joint Posterior Structure\nAs in Bayesian linear regression with normal priors, we combine the likelihood and priors to obtain the joint posterior over all model parameters:\n\\[\np(\\mu, \\alpha, \\delta, \\pi, \\sigma_b^2, \\sigma^2 \\mid y)\n\\propto\np(y \\mid \\mu, \\alpha, \\delta, \\sigma^2)\\,\np(\\alpha \\mid \\sigma_b^2)\\,\np(\\delta \\mid \\pi)\\,\np(\\pi)\\,\np(\\sigma_b^2)\\,\np(\\sigma^2)\n\\]\nThis captures our updated beliefs about effect sizes, inclusion indicators, and variance components after observing the data.\nThe inference procedure follows the same principle as for standard BLR — we use Gibbs sampling to draw from each parameter’s full conditional distribution.\nNext, we derive these full conditional distributions from the joint posterior."
   },
   {
-    "objectID": "bayesian_linear_regression_slides.html#gibbs-sampling-for-spike-and-slab-blr",
-    "href": "bayesian_linear_regression_slides.html#gibbs-sampling-for-spike-and-slab-blr",
+    "objectID": "bayesian_linear_regression_slides.html#gibbs-sampling-the-algorithm-spike-and-slab-blr",
+    "href": "bayesian_linear_regression_slides.html#gibbs-sampling-the-algorithm-spike-and-slab-blr",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
-    "section": "Gibbs Sampling for Spike-and-Slab BLR",
-    "text": "Gibbs Sampling for Spike-and-Slab BLR\nInference proceeds via Gibbs sampling, cycling through these conditional updates:\n\n\\(\\alpha \\mid D\\)\n\n\\(\\delta \\mid D\\)\n\n\\(\\pi \\mid D\\)\n\n\\(\\sigma_b^2 \\mid D\\)\n\n\\(\\sigma^2 \\mid D\\)\n\nHere, \\(D\\) denotes the data and all other current parameter values.\nEach conditional follows a standard distribution (Normal, Bernoulli, Beta, scaled-\\(\\chi^{-2}\\)).\nIterating these updates generates samples from the joint posterior."
+    "section": "Gibbs Sampling: The Algorithm (Spike-and-Slab BLR)",
+    "text": "Gibbs Sampling: The Algorithm (Spike-and-Slab BLR)\nWe iteratively draw from the following full conditionals:\n\n\nSample \\(\\alpha \\mid \\delta, \\sigma_b^2, \\sigma^2, y\\)\n\nSample \\(\\delta \\mid \\alpha, \\pi, y\\)\n\nSample \\(\\pi \\mid \\delta\\)\n\nSample \\(\\sigma_b^2 \\mid \\alpha, \\delta\\)\n\nSample \\(\\sigma^2 \\mid \\alpha, \\delta, y\\)\n\n\nEach step updates one parameter block given the others, and iterating the sequence yields samples from the joint posterior. Since all conditionals have standard forms (Normal, Bernoulli, Beta, scaled inverse-\\(\\chi^2\\)), Gibbs sampling is straightforward and efficient."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#posterior-inclusion-probabilities",
     "href": "bayesian_linear_regression_slides.html#posterior-inclusion-probabilities",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Posterior Inclusion Probabilities",
-    "text": "Posterior Inclusion Probabilities\nThe posterior inclusion probability (PIP) measures how likely each predictor is truly associated with \\(y\\):\n\\[\n\\widehat{\\Pr}(\\delta_i = 1 \\mid y)\n= \\frac{1}{T} \\sum_{t=1}^{T} \\delta_i^{(t)}\n\\]\n\nHigh PIP → predictor is likely important\n\nLow PIP → predictor likely irrelevant\n\nPIPs summarize variable relevance and drive Bayesian feature selection."
+    "text": "Posterior Inclusion Probabilities\nThe posterior inclusion probability (PIP) quantifies how likely each predictor is to be included in the model (i.e., truly associated with \\(y\\)):\n\\[\n\\widehat{\\Pr}(\\delta_i = 1 \\mid y)\n= \\frac{1}{T} \\sum_{t=1}^{T} \\delta_i^{(t)}\n\\]\n\nHigh PIP → predictor is likely important\n\nLow PIP → predictor is likely irrelevant\n\nPIPs provide a direct measure of variable relevance and form the basis for Bayesian feature selection."
+  },
+  {
+    "objectID": "bayesian_linear_regression_slides.html#advantages-of-spike-and-slab-priors",
+    "href": "bayesian_linear_regression_slides.html#advantages-of-spike-and-slab-priors",
+    "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
+    "section": "Advantages of Spike-and-Slab Priors",
+    "text": "Advantages of Spike-and-Slab Priors\nThis hierarchical mixture prior offers several key benefits:\n\nSparsity — allows exact zeros for irrelevant predictors\n\nInterpretability — binary indicators yield posterior inclusion probabilities (PIPs)\n\nAdaptivity — the inclusion probability \\(\\pi\\) is inferred from the data\n\nBalance — captures both strong signals (for detection) and small effects (for prediction)\n\nThus, spike-and-slab models naturally combine variable selection with Bayesian uncertainty quantification."
   },
   {
     "objectID": "bayesian_linear_regression_slides.html#summary-of-bayesian-linear-regression",
     "href": "bayesian_linear_regression_slides.html#summary-of-bayesian-linear-regression",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Summary of Bayesian Linear Regression",
-    "text": "Summary of Bayesian Linear Regression\nBayesian Linear Regression combines likelihood and prior to form the posterior, enabling principled modeling, regularization, and uncertainty quantification.\n\nInference via MCMC (often Gibbs sampling) with posterior draws for means, credible intervals, and predictions.\n\nSpike-and-slab priors enable sparsity and variable selection, assigning exact zeros to irrelevant predictors and identifying key variables via posterior inclusion probabilities (PIPs).\n\nConjugate and mixture priors yield efficient and robust inference, even when \\(p &gt; n\\).\n\nWith proper convergence checks, Bayesian models provide stable and reliable inference across a wide range of data settings."
+    "text": "Summary of Bayesian Linear Regression\nBayesian Linear Regression combines the likelihood and prior to form the posterior, enabling principled modeling, regularization, and uncertainty quantification.\n\nInference is performed via MCMC, typically Gibbs sampling, producing posterior draws for means, credible intervals, and predictions.\n\nSpike-and-slab priors introduce sparsity and support variable selection, assigning exact zeros to irrelevant predictors and identifying key variables through posterior inclusion probabilities (PIPs).\n\nConjugate and mixture priors allow for efficient and robust inference, even when \\(p &gt; n\\).\n\nWith appropriate convergence diagnostics, Bayesian models yield stable and reliable inference across diverse data settings."
   },
   {
-    "objectID": "bayesian_linear_regression_slides.html#applications-in-genomics-1",
-    "href": "bayesian_linear_regression_slides.html#applications-in-genomics-1",
+    "objectID": "bayesian_linear_regression_slides.html#applications-in-genomics",
+    "href": "bayesian_linear_regression_slides.html#applications-in-genomics",
     "title": "Introduction to Bayesian Linear Regression, Posterior Inference, and MCMC",
     "section": "Applications in Genomics",
-    "text": "Applications in Genomics\nWe have now seen the basic framework of Bayesian Linear Regression (BLR)\nand will illustrate how it provides a unified approach for analyzing genetic and genomic data.\n\nGenome-Wide Association Studies (GWAS) and fine-mapping of causal variants.\n\nGenetic prediction and heritability estimation.\n\nPathway and gene-set enrichment analyses.\n\nThese examples show how BLR connects statistical modeling with biological interpretation in quantitative genetics."
+    "text": "Applications in Genomics\nWe have now covered the basic framework of Bayesian Linear Regression (BLR) and will illustrate how it provides a unified approach for analyzing genetic and genomic data.\n\nGenome-Wide Association Studies (GWAS) and fine-mapping of causal variants\n\nGenetic prediction and heritability estimation\n\nPathway and gene-set enrichment analyses\n\nThese applications demonstrate how BLR connects statistical modeling with biological interpretation in quantitative genetics."
   },
   {
     "objectID": "bayesian_gene_set_slides.html#overview",
