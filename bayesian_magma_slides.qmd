@@ -116,7 +116,7 @@ Develop and evaluate a **Bayesian gene-set prioritization approach** using BLR w
 
 - Advantages:  
   - Incorporates **regularization** and **variable selection** via **spike-and-slab priors**.  
-  - Controls false positives and **handles correlated gene sets**.  
+  - Controls false positives and **handles overlapping gene sets**.  
   - Provides **posterior inclusion probabilities (PIP)** as evidence of gene set association.  
 - Flexible framework supporting:  
   - **Single- and multi-trait models**  
@@ -178,22 +178,24 @@ Each row of $\mathbf{Y}$ corresponds to an observation or gene,  and each column
 
 ---
 
+
 ## Bayesian MAGMA: Error and Effect Priors
 
 We extend the univariate priors to the multivariate setting:
-
 $$
 \mathbf{e}_{i\cdot} \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_e)
 $$
 $$
-\mathbf{b}_j \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_b)
+\mathbf{b}_{j\cdot} \sim \mathcal{N}_T(\mathbf{0}, \boldsymbol{\Sigma}_b)
 $$
 
-- $\boldsymbol{\Sigma}_e$: residual covariance among traits  
-- $\boldsymbol{\Sigma}_b$: covariance of effect sizes across traits  
-- When $\boldsymbol{\Sigma}_e$ and $\boldsymbol{\Sigma}_b$ are diagonal,  the model reduces to $T$ independent univariate BLR models.
+- $\boldsymbol{\Sigma}_e$: residual covariance among traits ($\mathbf{e}_{i\cdot}$ is the vector of **residuals** for observation $i$ across all $T$ traits)  
 
-Allows **information sharing across correlated traits or omic layers** and can be used to identify **pleiotropic effects** and **cross-trait genetic architectures**.
+- $\boldsymbol{\Sigma}_b$: covariance of effect sizes across traits ($\mathbf{b}_{j\cdot}$ is the vector of **effect sizes** for feature $j$ across all $T$ traits)
+
+When the **off-diagonal elements are nonzero**, the model **borrows information across correlated traits**, enabling detection of **pleiotropic effects** and **shared genetic factors**.
+
+When $\boldsymbol{\Sigma}_e$ and $\boldsymbol{\Sigma}_b$ are diagonal,  the model reduces to $T$ independent univariate BLR models.
 
 ---
 
@@ -220,10 +222,10 @@ $$
 
 ---
 
-## Bayesian MAGMA: Indicator Variables and PIPs
+## Bayesian MAGMA: Indicator Variables
 
-In the **multivariate BLR**, each feature $j$ may affect multiple outcomes (traits).  
-We extend the indicator variable to capture **cross-trait activity patterns**:
+Each feature $j$ may affect multiple outcomes (traits).  
+We define an indicator vector for **cross-trait activity patterns**:
 
 $$
 \boldsymbol{\delta}_j =
@@ -233,31 +235,39 @@ $$
 \qquad
 \delta_{jt} =
 \begin{cases}
-1, & \text{if feature $j$ affects trait $t$} \\
+1, & \text{if feature $j$ affects trait $t$}, \\
 0, & \text{otherwise.}
 \end{cases}
 $$
 
-After inference, we estimate $\text{PIP}_{jt} = P(\delta_{jt} = 1 \mid \text{data})$ —  the **posterior inclusion probability** that feature *j* affects trait *t*.
+After Gibbs sampling, the **posterior inclusion probability (PIP)** is estimated as:
+
+$$
+\widehat{\text{PIP}}_{jt}
+= \frac{1}{M} \sum_{m=1}^{M} \mathbb{I}\!\left(\delta_{jt}^{(m)} = 1\right)
+\approx P(\delta_{jt} = 1 \mid \text{data}),
+$$
+
+representing the probability that feature $j$ is associated with trait $t$.
 
 ---
 
-## Bayesian MAGMA: Posterior Parameters 
+## Bayesian MAGMA: Posterior Parameters
 
 In the multivariate setting, we generalize each posterior quantity:
 
 | Parameter | Interpretation |
 |------------|----------------|
 | $\mathbf{B} = [\beta_{jt}]$ | Effect matrix across traits ($j$: feature, $t$: trait) |
-| $\text{PIP}_j$ | Probability that feature $j$ affects ≥1 trait |
+| $\mathbf{PIP} = [\text{PIP}_{jt}]$ | Posterior inclusion probability matrix ($j$: feature, $t$: trait) |
 | $\boldsymbol{\Sigma}_b$ | Covariance of effects across traits |
 | $\boldsymbol{\Sigma}_e$ | Residual covariance among traits |
 
-These allow us to identify:
+These posterior quantities allow us to identify:
 
- - **Shared genetic effects** (pleiotropy)  
- - **Trait-specific vs. shared signals**  
- - **Cross-trait enrichment** of biological sets
+- **Shared genetic effects** (pleiotropy)  
+- **Trait-specific vs. shared signals**  
+- **Cross-trait enrichment** of biological or functional sets
 
 ---
 
@@ -268,8 +278,10 @@ Evaluate a **Bayesian gene-set prioritization approach** using BLR within the MA
 **Simulation study:**  
   - Assessed model performance under varying gene set characteristics and genetic architectures.  
   - Used **UK Biobank genetic data** for realistic evaluation.  
+<br>
 **Comparative analysis:**  
   - Benchmarked Bayesian MAGMA against the standard MAGMA approach.  
+<br>
 **Applications:**  
   - Applied to **nine complex traits** using publicly available GWAS data.  
   - Developed a **multi-trait BLR model** to integrate GWAS results across traits and uncover shared genetic architecture.  
@@ -401,6 +413,62 @@ Hjelholt et al., 2025
 
 ---
 
+## Summary
+
+**Advantages**
+
+- Incorporates **regularization** and **variable selection** via *spike-and-slab* priors  
+- Accounts for **correlated gene sets and traits**, increasing power and reducing false positives  
+- Provides **posterior inclusion probabilities (PIPs)** as interpretable measures of association strength  
+- Flexible framework supporting:  
+  - **Single- and multi-trait models**  
+  - **Integration of diverse genomic features**  
+  - **Modeling of correlated traits** to uncover shared genetic architecture  
+
+---
+
+**Limitations**
+
+- Dependent on the **quality and resolution** of GWAS summary statistics  
+- Sensitive to **biases and incompleteness** in functional annotations (e.g., tissue specificity, experimental noise, or overrepresentation of well-studied genes)  
+- **Computationally more demanding** than standard MAGMA, especially for multi-trait analyses  
+
+**Future Work**
+
+- Offers opportunities for **hierarchical model extensions** (e.g., grouping by genomic or functional layers)  
+- **Multi-omics integration** to capture regulatory complexity across biological layers  
+- Systematic **comparisons with machine learning and deep learning** methods to evaluate performance and scalability
+
+---
+
+## References
+
+<div style="font-size: 0.6em; line-height: 1.5;">
+
+**Sørensen P, Rohde PD.**  *A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.*  
+**medRxiv** (2025). [https://doi.org/10.1101/2025.10.01.25337099](https://doi.org/10.1101/2025.10.01.25337099)
+
+**Sørensen IF, Sørensen P.**  *Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.*  
+**medRxiv** (2025). [https://doi.org/10.1101/2025.07.30.25332448](https://doi.org/10.1101/2025.07.30.25332448)
+
+**Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.**  *Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.06.13.25329590](https://doi.org/10.1101/2025.06.13.25329590)
+
+**Gholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases.*  **PLOS Genetics** 20(11): e1011463 (2025). [https://doi.org/10.1371/journal.pgen.1011463](https://doi.org/10.1371/journal.pgen.1011463)
+
+**Bai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.** *Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods.*  **BMC Genomics** 25(1): 1236 (2024). [https://doi.org/10.1186/s12864-024-11026-2](https://doi.org/10.1186/s12864-024-11026-2)
+
+**Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures.*  **PLOS Genetics** 21(7): e1011783 (2025). [https://doi.org/10.1371/journal.pgen.1011783](https://doi.org/10.1371/journal.pgen.1011783)
+
+**Kunkel D, Sørensen P, Shankar V, Morgante F.**  *Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes.*  **PLOS Genetics** 21(1): e1011519 (2025). [https://doi.org/10.1371/journal.pgen.1011519](https://doi.org/10.1371/journal.pgen.1011519)
+
+**Rohde P, Sørensen IF, Sørensen P.**  *Expanded Utility of the R Package qgg with Applications within Genomic Medicine.*  **Bioinformatics** 39:11 (2023). [https://doi.org/10.1093/bioinformatics/btad656](https://doi.org/10.1093/bioinformatics/btad656)
+
+**Rohde P, Sørensen IF, Sørensen P.**  *qgg: An R Package for Large-Scale Quantitative Genetic Analyses.*  **Bioinformatics** 36(8): 2614–2615 (2020). [https://doi.org/10.1093/bioinformatics/btz955](https://doi.org/10.1093/bioinformatics/btz955)
+
+</div>
+
+---
+
 ## Overview of BLR Models used in Gene Set Analyses
 
 <div style="font-size: 0.75em">
@@ -428,56 +496,6 @@ Hjelholt et al., 2025
 | **Indicator variables** | $\delta_j$ (single trait), $\boldsymbol{\delta}_j$ (multi-trait) | Whether feature $j$ is active (and for which traits) | Estimated as posterior inclusion probabilities (PIPs) | Which features are relevant, and whether effects are shared or trait-specific |
 | **Variance components** | $\tau^2$, $\{\tau_k^2\}$, $\{\tau_{gk}^2\}$ | Magnitude of expected effect sizes; heterogeneity across layers or groups | Inferred hierarchically from the data (via MCMC or EM) | How strongly different groups or omic layers contribute |
 | **Covariance components** | $\boldsymbol{\Sigma}_b$, $\{\boldsymbol{\Sigma}_{b,g}\}$ | Correlation of effects across traits or molecular layers | Estimated from joint posterior | Shared pathways, pleiotropy, and cross-layer architecture |
-
-</div>
-
----
-
-## Bayesian MAGMA: Summary
-
-**Advantages**
-
-- Incorporates **regularization** and **variable selection** via *spike-and-slab* priors.  
-- Controls **false positives** and handles **correlated gene sets**.  
-- Provides **posterior inclusion probabilities (PIP)** as evidence of association strength.  
-- Flexible framework supporting:  
-  - **Single- and multi-trait models**  
-  - **Integration of diverse genomic features**  
-  - **Modeling correlated traits** to uncover shared genetic architecture.  
-
-## Limitations and Future Work
-
-- Dependent on the **quality and granularity** of GWAS summary data and annotations.  
-- **Computationally more demanding** than standard MAGMA, especially for multi-trait analyses.  
-- Opportunities for **hierarchical model extensions** (e.g., grouping by pathways/tissues).  
-- **Multi-omics integration** to capture regulatory complexity across data layers.  
-- Systematic **comparisons with machine learning and deep learning** methods to assess performance and scalability.
-
----
-
-## References
-
-<div style="font-size: 0.6em; line-height: 1.5;">
-
-**Sørensen P, Rohde PD.**  *A Versatile Data Repository for GWAS Summary Statistics-Based Downstream Genomic Analysis of Human Complex Traits.*  
-**medRxiv** (2025). [https://doi.org/10.1101/2025.10.01.25337099](https://doi.org/10.1101/2025.10.01.25337099)
-
-**Sørensen IF, Sørensen P.**  *Privacy-Preserving Multivariate Bayesian Regression Models for Overcoming Data Sharing Barriers in Health and Genomics.*  
-**medRxiv** (2025). [https://doi.org/10.1101/2025.07.30.25332448](https://doi.org/10.1101/2025.07.30.25332448)
-
-**Hjelholt AJ, Gholipourshahraki T, Bai Z, Shrestha M, Kjølby M, Sørensen P, Rohde P.**  *Leveraging Genetic Correlations to Prioritize Drug Groups for Repurposing in Type 2 Diabetes.*  **medRxiv** (2025). [https://doi.org/10.1101/2025.06.13.25329590](https://doi.org/10.1101/2025.06.13.25329590)
-
-**Gholipourshahraki T, Bai Z, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Evaluation of Bayesian Linear Regression Models for Gene Set Prioritization in Complex Diseases.*  **PLOS Genetics** 20(11): e1011463 (2025). [https://doi.org/10.1371/journal.pgen.1011463](https://doi.org/10.1371/journal.pgen.1011463)
-
-**Bai Z, Gholipourshahraki T, Shrestha M, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.** *Evaluation of Bayesian Linear Regression Derived Gene Set Test Methods.*  **BMC Genomics** 25(1): 1236 (2024). [https://doi.org/10.1186/s12864-024-11026-2](https://doi.org/10.1186/s12864-024-11026-2)
-
-**Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.**  *Enhanced Genetic Fine Mapping Accuracy with Bayesian Linear Regression Models in Diverse Genetic Architectures.*  **PLOS Genetics** 21(7): e1011783 (2025). [https://doi.org/10.1371/journal.pgen.1011783](https://doi.org/10.1371/journal.pgen.1011783)
-
-**Kunkel D, Sørensen P, Shankar V, Morgante F.**  *Improving Polygenic Prediction from Summary Data by Learning Patterns of Effect Sharing Across Multiple Phenotypes.*  **PLOS Genetics** 21(1): e1011519 (2025). [https://doi.org/10.1371/journal.pgen.1011519](https://doi.org/10.1371/journal.pgen.1011519)
-
-**Rohde P, Sørensen IF, Sørensen P.**  *Expanded Utility of the R Package qgg with Applications within Genomic Medicine.*  **Bioinformatics** 39:11 (2023). [https://doi.org/10.1093/bioinformatics/btad656](https://doi.org/10.1093/bioinformatics/btad656)
-
-**Rohde P, Sørensen IF, Sørensen P.**  *qgg: An R Package for Large-Scale Quantitative Genetic Analyses.*  **Bioinformatics** 36(8): 2614–2615 (2020). [https://doi.org/10.1093/bioinformatics/btz955](https://doi.org/10.1093/bioinformatics/btz955)
 
 </div>
 
