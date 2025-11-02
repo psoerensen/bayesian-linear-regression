@@ -40,22 +40,7 @@ execute:
 ---
 
 
-## Overview
-
-- **Classical Linear Regression**
-  - Model, inference, and limitations  
-
-- **Bayesian Linear Regression**
-  - Motivation, priors, and posteriors  
-  - Conditional posteriors and inference  
-
-- **Computation and Applications**
-  - MCMC and Gibbs sampling  
-  - Diagnostics and R implementation  
-
----
-
-## Introduction
+## Introduction (Applications and motivation in genomics and healthcare)
 
 **Bayesian Linear Regression Models** provide a flexible statistical framework for modeling complex biological and healthcare data. They support key applications such as:
 
@@ -67,13 +52,28 @@ execute:
 
 ---
 
-## Introduction
+## Introduction (Definition and advantages of BLR)
 
 - **Bayesian Linear Regression (BLR)** extends classical regression by incorporating **prior information** and producing **posterior distributions** over model parameters.  
 - **Advantages:**
   - Handles **high-dimensional** and **small-sample** problems.  
   - Provides **full uncertainty quantification**.  
   - Enables **regularization** and integration of **prior biological knowledge**.  
+
+---
+
+## Overview (Structure of the session)
+
+- **Classical Linear Regression**
+  - Model, inference, and limitations  
+
+- **Bayesian Linear Regression**
+  - Motivation, priors, and posteriors  
+  - Conditional posteriors and inference  
+
+- **Computation and Applications**
+  - MCMC and Gibbs sampling  
+  - Diagnostics and R implementation  
 
 
 ---
