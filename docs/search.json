@@ -1148,13 +1148,6 @@
     "text": "Bayesian MAGMA: Error and Effect Priors\nWe extend the univariate priors to the multivariate setting: \\[\n\\mathbf{e}_{i\\cdot} \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_e)\n\\] \\[\n\\mathbf{b}_{j\\cdot} \\sim \\mathcal{N}_T(\\mathbf{0}, \\boldsymbol{\\Sigma}_b)\n\\]\n\n\\(\\boldsymbol{\\Sigma}_e\\): residual covariance among traits (\\(\\mathbf{e}_{i\\cdot}\\) is the vector of residuals for observation \\(i\\) across all \\(T\\) traits)\n\\(\\boldsymbol{\\Sigma}_b\\): covariance of effect sizes across traits (\\(\\mathbf{b}_{j\\cdot}\\) is the vector of effect sizes for feature \\(j\\) across all \\(T\\) traits)\n\nWhen the off-diagonal elements are nonzero, the model borrows information across correlated traits, enabling detection of pleiotropic effects and shared genetic factors.\nWhen \\(\\boldsymbol{\\Sigma}_e\\) and \\(\\boldsymbol{\\Sigma}_b\\) are diagonal, the model reduces to \\(T\\) independent univariate BLR models."
   },
   {
-    "objectID": "bayesian_magma_slides.html#bayesian-magma-estimation-of-effects",
-    "href": "bayesian_magma_slides.html#bayesian-magma-estimation-of-effects",
-    "title": "Gene Set Analyses using Bayesian MAGMA Models",
-    "section": "Bayesian MAGMA: Estimation of Effects",
-    "text": "Bayesian MAGMA: Estimation of Effects\nOrdinary multiple regression \\[\n\\mathbf{b} = (\\mathbf{X}'\\mathbf{X})^{-1}\\mathbf{X}'\\mathbf{y}\n\\]\nWith regularization \\[\n\\mathbf{b} = \\left(\\mathbf{X}'\\mathbf{X} + \\mathbf{I}\\frac{\\sigma_e^{2}}{\\sigma_b^{2}}\\right)^{-1}\\mathbf{X}'\\mathbf{y}\n\\]\nUsing information from multiple responses \\[\n\\mathbf{b} =\n\\left(\n\\mathbf{X}'\\mathbf{X} +\n\\mathbf{I} \\otimes \\boldsymbol{\\Sigma}_{B}^{-1}\\boldsymbol{\\Sigma}_{E}\n\\right)^{-1}\\mathbf{X}'\\mathbf{y}\n\\]"
-  },
-  {
     "objectID": "bayesian_magma_slides.html#bayesian-magma-indicator-variables",
     "href": "bayesian_magma_slides.html#bayesian-magma-indicator-variables",
     "title": "Gene Set Analyses using Bayesian MAGMA Models",

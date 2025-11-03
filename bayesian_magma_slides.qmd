@@ -200,6 +200,8 @@ When the **off-diagonal elements are nonzero**, the model **borrows information 
 
 When $\boldsymbol{\Sigma}_e$ and $\boldsymbol{\Sigma}_b$ are diagonal,  the model reduces to $T$ independent univariate BLR models.
 
+<!---
+
 ---
 
 ## Bayesian MAGMA: Estimation of Effects
@@ -222,6 +224,8 @@ $$
 \mathbf{I} \otimes \boldsymbol{\Sigma}_{B}^{-1}\boldsymbol{\Sigma}_{E}
 \right)^{-1}\mathbf{X}'\mathbf{y}
 $$
+
+--->
 
 ---
 

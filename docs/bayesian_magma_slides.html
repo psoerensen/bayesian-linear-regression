@@ -305,22 +305,32 @@ jointly modeling multiple traits to:
 </ul>
 <p>When the <strong>off-diagonal elements are nonzero</strong>, the model <strong>borrows information across correlated traits</strong>, enabling detection of <strong>pleiotropic effects</strong> and <strong>shared genetic factors</strong>.</p>
 <p>When <span class="math inline">\(\boldsymbol{\Sigma}_e\)</span> and <span class="math inline">\(\boldsymbol{\Sigma}_b\)</span> are diagonal, the model reduces to <span class="math inline">\(T\)</span> independent univariate BLR models.</p>
-</section>
-<section id="bayesian-magma-estimation-of-effects" class="slide level2">
-<h2>Bayesian MAGMA: Estimation of Effects</h2>
-<p><strong>Ordinary multiple regression</strong> <span class="math display">\[
+<!---
+
+---
+
+## Bayesian MAGMA: Estimation of Effects
+
+**Ordinary multiple regression**
+$$
 \mathbf{b} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}
-\]</span></p>
-<p><strong>With regularization</strong> <span class="math display">\[
+$$
+
+**With regularization**
+$$
 \mathbf{b} = \left(\mathbf{X}'\mathbf{X} + \mathbf{I}\frac{\sigma_e^{2}}{\sigma_b^{2}}\right)^{-1}\mathbf{X}'\mathbf{y}
-\]</span></p>
-<p><strong>Using information from multiple responses</strong> <span class="math display">\[
-\mathbf{b} =
+$$
+
+**Using information from multiple responses**
+$$
+\mathbf{b} = 
 \left(
-\mathbf{X}'\mathbf{X} +
+\mathbf{X}'\mathbf{X} + 
 \mathbf{I} \otimes \boldsymbol{\Sigma}_{B}^{-1}\boldsymbol{\Sigma}_{E}
 \right)^{-1}\mathbf{X}'\mathbf{y}
-\]</span></p>
+$$
+
+--->
 </section>
 <section id="bayesian-magma-indicator-variables" class="slide level2">
 <h2>Bayesian MAGMA: Indicator Variables</h2>
