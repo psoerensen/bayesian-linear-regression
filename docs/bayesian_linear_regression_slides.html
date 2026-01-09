@@ -427,8 +427,7 @@ r_j = y - X_{-j} \beta_{-j}
 </section>
 <section id="full-conditional-for-sigma2" class="slide level2">
 <h2>Full Conditional for <span class="math inline">\(\sigma^2\)</span></h2>
-<p>The conditional distribution of the <strong>residual variance</strong> <span class="math inline">\(\sigma^2\)</span>,<br>
-given <span class="math inline">\(\beta\)</span> and the data, is also <strong>scaled inverse-chi-squared</strong>:</p>
+<p>The conditional distribution of the <strong>residual variance</strong> <span class="math inline">\(\sigma^2\)</span>, given <span class="math inline">\(\beta\)</span> and the data, is also <strong>scaled inverse-chi-squared</strong>:</p>
 <p><span class="math display">\[
 \sigma^2 \mid \beta, y \sim \tilde{S} \, \chi^{-2}(\tilde{v})
 \]</span></p>
@@ -437,9 +436,7 @@ given <span class="math inline">\(\beta\)</span> and the data, is also <strong>s
 \tilde{v} = v + n, \quad
 \tilde{S} = \frac{(y - X\beta)^\top (y - X\beta) + v S}{\tilde{v}}
 \]</span></p>
-<p>At each Gibbs iteration, <span class="math inline">\(\sigma^2\)</span> is sampled directly given <span class="math inline">\(\beta\)</span>.<br>
-This captures our updated belief about the <strong>residual variability</strong><br>
-after accounting for the current linear predictor <span class="math inline">\(X\beta\)</span>.</p>
+<p>At each Gibbs iteration, <span class="math inline">\(\sigma^2\)</span> is sampled directly given <span class="math inline">\(\beta\)</span>. This captures our updated belief about the <strong>residual variability</strong> after accounting for the current linear predictor <span class="math inline">\(X\beta\)</span>.</p>
 </section>
 <section id="gibbs-sampling-motivation" class="slide level2">
 <h2>Gibbs Sampling: Motivation</h2>
