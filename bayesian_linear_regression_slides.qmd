@@ -362,8 +362,7 @@ At each Gibbs iteration, $\sigma_b^2$ is sampled directly given $\beta$. This up
 
 ## Full Conditional for $\sigma^2$
 
-The conditional distribution of the **residual variance** $\sigma^2$,  
-given $\beta$ and the data, is also **scaled inverse-chi-squared**:
+The conditional distribution of the **residual variance** $\sigma^2$, given $\beta$ and the data, is also **scaled inverse-chi-squared**:
 
 $$
 \sigma^2 \mid \beta, y \sim \tilde{S} \, \chi^{-2}(\tilde{v})
@@ -376,9 +375,7 @@ $$
 \tilde{S} = \frac{(y - X\beta)^\top (y - X\beta) + v S}{\tilde{v}}
 $$
 
-At each Gibbs iteration, $\sigma^2$ is sampled directly given $\beta$.  
-This captures our updated belief about the **residual variability**  
-after accounting for the current linear predictor $X\beta$.
+At each Gibbs iteration, $\sigma^2$ is sampled directly given $\beta$. This captures our updated belief about the **residual variability**  after accounting for the current linear predictor $X\beta$.
 
 
 ---
