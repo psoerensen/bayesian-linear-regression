@@ -59,3 +59,6 @@ _site/
 
 # Keep docs/ because it's used for GitHub Pages deployment
 !docs/
+
+# Local Codex/agent instructions
+/AGENTS.md
