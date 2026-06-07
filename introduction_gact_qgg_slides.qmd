@@ -159,25 +159,27 @@ binary formats such as **PLINK `.bed` files**.
 
 <div style="font-size: 0.75em">
 
-- [Gene analysis using VEGAS](Document/Gene_analysis_vegas.html):
+The tutorials listed below are external resources and are not included in this repository.
+
+- **Gene analysis using VEGAS**:
 Gene analysis using the VEGAS (Versatile Gene-based Association Study)
 approach using the 1000G LD reference data processed above,  
 
-- [Gene set analysis using Bayesian MAGMA](Document/Gene_set_analysis_bayesian_magma.html): Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).  
+- **Gene set analysis using Bayesian MAGMA**: Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).  
 
-- [Gene ranking using PoPS](Document/Gene_ranking_bayesian_pops.html): Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level
+- **Gene ranking using PoPS**: Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level
 statistics derived from VEGAS (work in progress).  
 
-- [Finemapping using BLR models](Document/Finemapping_bayesian_linear_regression_real_data.html): Finemapping of gene and LD regions using single trait Bayesian Linear
+- **Finemapping using BLR models**: Finemapping of gene and LD regions using single trait Bayesian Linear
 Regression models (Shrestha et al.2025).  
 
-- [Polygenic scoring using BLR models](Document/Polygenic_scoring_bayesian_linear_regression.html): Polygenic scoring (PGS) using Bayesian Linear Regression models and
+- **Polygenic scoring using BLR models**: Polygenic scoring (PGS) using Bayesian Linear Regression models and
 biological pathway information (work in progress).  
 
-- [Polygenic scoring using PGS Catalog](Document/Polygenic_scoring_pgscatalog.html): Polygenic scoring (PGS) using summary statistics from PGS catalog and
+- **Polygenic scoring using PGS Catalog**: Polygenic scoring (PGS) using summary statistics from PGS catalog and
 biological pathway information.  
 
-- [LD score regression](Document/LD_score_regression.html): LD score regression for estimating genomic heritability and
+- **LD score regression**: LD score regression for estimating genomic heritability and
 correlations.  
 
 </div>
