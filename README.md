@@ -1,33 +1,100 @@
 # Bayesian Linear Regression
 
-**Author:** [Peter S?rensen](https://psoerensen.github.io/)  
-**Affiliation:** Center for Quantitative Genetics and Genomics, Aarhus University  
+This repository is a self-contained Quarto course website for teaching Bayesian
+Linear Regression. It contains theoretical notes, lecture slides, narrated
+slides, and reproducible R tutorials. Topics include classical linear
+regression, prior distributions, posterior inference, Gibbs sampling,
+convergence diagnostics, spike-and-slab models, and applications in genetics
+and genomics.
 
----
+The rendered course website is available at
+[https://psoerensen.github.io/bayesian-linear-regression/](https://psoerensen.github.io/bayesian-linear-regression/).
 
-This repository includes theoretical notes, slides, and hands-on R examples for exploring **Bayesian Linear Regression**.
-It introduces both classical and Bayesian regression methods, showing how to estimate parameters, define priors, perform posterior inference via Gibbs sampling, and assess convergence - all through practical R code.
+## Active Course Sources
 
-The full rendered website is available here:  
-**[https://psoerensen.github.io/bayesian-linear-regression/](https://psoerensen.github.io/bayesian-linear-regression/)**
+The `project.render` list in `_quarto.yml` is the source of truth for files
+included when the course website is rendered.
 
----
+### Website
 
-## Overview of Materials
+- `index.qmd`: course landing page and overview.
 
-| **Section** | **Description** |
-|--------------|----------------|
-| [**Notes**](https://psoerensen.github.io/bayesian-linear-regression/notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
-| [**Slides**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations. |
-| [**Classical Regression**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
-| [**Bayesian (Gaussian Prior)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R. |
-| [**Bayesian (Spike & Slab)**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity in R. |
-| [**Bayesian MAGMA**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_magma_tutorial.html) | Bayesian gene set analysis in R. |
+### Notes
 
-[Download Notes (PDF)](https://psoerensen.github.io/bayesian-linear-regression/notes.pdf)  
-[Download Slides (PDF)](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_slides.pdf)
+- `notes.qmd`: main theoretical notes on Bayesian Linear Regression, posterior
+  inference, Gibbs sampling, convergence diagnostics, and spike-and-slab
+  models.
 
----
+### Slides
+
+- `bayesian_linear_regression_slides.qmd`: core Bayesian Linear Regression and
+  MCMC lecture.
+- `narrated_bayesian_linear_regression_slides.qmd`: narrated version of the
+  core lecture.
+- `advanced_bayesian_linear_regression_slides.qmd`: advanced Bayesian gene-set
+  analysis material.
+- `bayesian_magma_slides.qmd`: Bayesian MAGMA lecture.
+- `introduction_gact_qgg_slides.qmd`: introduction to the `gact` and `qgg` R
+  packages.
+
+### Tutorials
+
+- `classical_linear_regression_simulation.qmd`: classical linear regression
+  simulation and estimation.
+- `bayesian_linear_regression_conjugate.qmd`: Bayesian Linear Regression with
+  conjugate priors.
+- `bayesian_spike_and_slab.qmd`: Bayesian variable selection with
+  spike-and-slab priors.
+- `bayesian_magma_tutorial.qmd`: pathway prioritization using a simulated
+  Bayesian MAGMA workflow.
+
+## Repository Structure
+
+- `Images/`: source figures and images used by course materials.
+- `narration/`: audio files used by the narrated slide deck.
+- `scripts/`: supporting R scripts, including narration generation.
+- `docs/`: rendered GitHub Pages output. This directory is generated from the
+  active Quarto sources and is retained for website publishing.
+- `_site/`: local Quarto preview or render output. This is generated locally.
+- `.quarto/`: Quarto caches, indexes, execution results, and other generated
+  project metadata.
+
+Folders such as `_site/` and `.quarto/` are generated locally and are not
+authored course sources. Files outside the `_quarto.yml` `project.render` list
+are not part of the active website build unless they are included as resources.
+
+## Rendering
+
+Render the full active course website from the repository root:
+
+```bash
+quarto render
+```
+
+The active website outputs are written to `docs/`, as configured in
+`_quarto.yml`.
+
+Render one source file when making a focused change:
+
+```bash
+quarto render notes.qmd
+```
+
+Replace `notes.qmd` with another active source path as needed.
+
+## Narration
+
+The narrated slide deck reads audio files from `narration/`. Narration can be
+generated with:
+
+```bash
+Rscript scripts/generate_narration.R
+```
+
+The script uses the OpenAI speech API and may require an `OPENAI_API_KEY`
+environment variable, network access, `curl`, and the R packages `stringr`,
+`fs`, and `jsonlite`. Existing narration files are skipped unless the script's
+`update_all` setting is changed.
 
 ## Further Reading
 
