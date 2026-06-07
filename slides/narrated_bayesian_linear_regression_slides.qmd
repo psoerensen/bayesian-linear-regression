@@ -893,11 +893,6 @@ and will illustrate how it provides a **unified approach** for analyzing genetic
 These examples show how BLR connects **statistical modeling** with **biological interpretation** in quantitative genetics.
 
 
-```{r, include=FALSE}
-if (file.exists("bayesian_linear_regression_slides.pdf")) file.copy("bayesian_linear_regression_slides.pdf", "../docs/slides/bayesian_linear_regression_slides.pdf", overwrite = TRUE)
-```
-
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const backBtn = document.createElement("a");

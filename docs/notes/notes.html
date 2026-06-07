@@ -4087,7 +4087,6 @@ window.Quarto = {
 <p>The BLR model builds on the familiar linear regression formulation, where the observed outcome is modeled as a linear function of predictors plus Gaussian noise. However, unlike classical inference—which relies on least squares or maximum likelihood estimation and provides only point estimates and asymptotic intervals—Bayesian inference yields full posterior distributions over the unknown coefficients and variance. This allows for richer uncertainty quantification and more robust inference.</p>
 <p>Several motivations drive the use of Bayesian methods in linear regression. First, BLR naturally quantifies uncertainty through posterior distributions, allowing the analyst to compute credible intervals, posterior probabilities, and predictive distributions. Second, prior distributions act as regularizers, helping to stabilize estimation in noisy or underdetermined settings, such as when the number of predictors <span class="math inline">\(p\)</span> exceeds the number of observations <span class="math inline">\(n\)</span>. Gaussian priors encourage shrinkage toward zero, while more structured priors (such as spike-and-slab) enable sparse or grouped solutions. Third, BLR makes it straightforward to incorporate external knowledge—such as biological relevance or prior experimental results—into the modeling process.</p>
 <p>These notes begin by reviewing the classical linear regression model and its limitations. We then introduce the Bayesian linear regression model, outline the inference workflow, and show how to derive the full conditional posterior distributions for the model parameters using conjugate priors. Finally, we describe how posterior inference is performed using Gibbs sampling and conclude with practical considerations for implementation, diagnostics, and applications in R.</p>
-<div style="page-break-after: always;"></div>
 </section>
 <section id="classical-linear-regression" class="level1">
 <h1>Classical Linear Regression</h1>
@@ -4172,7 +4171,6 @@ t_j = \frac{\hat\beta_j}{\mathrm{SE}(\hat\beta_j)}
 <li>Uncertainty quantification relies on <strong>asymptotic results</strong> or the assumption of Gaussian errors, which may not always hold in practice.</li>
 </ul>
 <p>These limitations motivate the development and application of <strong>Bayesian linear regression</strong>, which extends the classical framework by incorporating prior distributions and producing full posterior distributions for all unknown parameters.</p>
-<div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="bayesian-linear-regression-with-gaussian-priors" class="level1">
@@ -4308,7 +4306,6 @@ y \sim \mathcal{N}(X\beta, \sigma^2 I)
 <li><span class="math inline">\(\tilde{S} = \dfrac{(y - X\beta)^\top (y - X\beta) + v S}{\tilde{v}}\)</span> is the updated scale parameter.</li>
 </ul>
 <p>This form is convenient for <strong>Gibbs sampling</strong>: at each iteration, a new value of <span class="math inline">\(\sigma^2\)</span> can be sampled directly, given the current values of <span class="math inline">\(\beta\)</span>. It reflects our updated belief about the residual variability in the data after accounting for the current linear predictor <span class="math inline">\(X\beta\)</span>.</p>
-<div style="page-break-after: always;"></div>
 </section>
 </section>
 </section>
@@ -4390,7 +4387,6 @@ y_{\text{new}}^{(t)} \sim \mathcal{N}\left(x_{\text{new}}^\top \beta^{(t)},\; \s
 <li><p><strong>Bayes factors</strong> and <strong>marginal likelihoods</strong> can be computed or approximated for formal hypothesis testing or model comparison, though these often require specialized methods beyond standard Gibbs output.</p></li>
 </ul>
 <p>These procedures allow us to move beyond point estimates and engage in a full Bayesian analysis that accounts for uncertainty in parameter estimation, prediction, and decision-making.</p>
-<div style="page-break-after: always;"></div>
 </section>
 </section>
 </section>
@@ -4478,7 +4474,6 @@ Z = \frac{\bar{\theta}_A - \bar{\theta}_B}{\sqrt{ \text{Var}(\bar{\theta}_A) + \
 </ul>
 <p>Values of <span class="math inline">\(Z\)</span> far from zero (e.g., <span class="math inline">\(|Z| &gt; 2\)</span>) suggest that the chain has <strong>not converged</strong>, as early and late samples differ systematically.</p>
 <p>Monitoring these diagnostics ensures that posterior summaries and predictions are based on reliable samples from the true posterior distribution.</p>
-<div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="bayesian-linear-regression-with-spike-and-slab-priors" class="level1">

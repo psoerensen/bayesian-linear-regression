@@ -854,11 +854,6 @@ where $\delta_i^{(t)}$ is the sampled value of $\delta_i$ in iteration $t$ of th
 
 This posterior quantity reflects our **updated belief** about whether each marker is truly associated with the trait, and is a key quantity used in Bayesian fine-mapping.
 
-```{r, include=FALSE}
-if (file.exists("notes.pdf")) file.copy("notes.pdf", "../docs/notes/notes.pdf", overwrite = TRUE)
-```
-
-
 <!-- Explain this section more later 
 
 

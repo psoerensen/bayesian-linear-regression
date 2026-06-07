@@ -825,11 +825,6 @@ We have now covered the basic framework of **Bayesian Linear Regression (BLR)** 
 These applications demonstrate how BLR connects **statistical modeling** with **biological interpretation** in quantitative genetics.
 
 
-```{r, include=FALSE}
-if (file.exists("bayesian_linear_regression_slides.pdf")) file.copy("bayesian_linear_regression_slides.pdf", "../docs/slides/bayesian_linear_regression_slides.pdf", overwrite = TRUE)
-```
-
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const backBtn = document.createElement("a");
