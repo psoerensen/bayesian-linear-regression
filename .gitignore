@@ -53,5 +53,9 @@ Thumbs.db
 # Ignore _site (used for local preview)
 _site/
 
+# Ignore root-level generated Quarto output
+/README.html
+/site_libs/
+
 # Keep docs/ because it's used for GitHub Pages deployment
 !docs/
