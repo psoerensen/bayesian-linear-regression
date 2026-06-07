@@ -17,17 +17,17 @@ Explore the sections below to find the corresponding materials.
 
 | **Section** | **Description** |
 |--------------|----------------|
-| [**BLR notes**](notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
-| [**BLR slides**](bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations in Bayesian Linear Regression Analyses. |
-| [**BLR-GSEA slides**](advanced_bayesian_linear_regression_slides.html) | Lecture slides introducing Bayesian Linear Regression Models used in Gene Set Analyses. |
-| [**Bayesian MAGMA slides**](bayesian_magma_slides.html) | Lecture slides introducing Gene Set Analyses using Bayesian MAGMA Models. |
-| [**Classical Regression tutorial**](https://psoerensen.github.io/bayesian-linear-regression/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
-| [**Bayesian (Gaussian Prior)  tutorial**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R. |
-| [**Bayesian (Spike & Slab)  tutorial**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity in R. |
-| [**Bayesian MAGMA tutorial**](https://psoerensen.github.io/bayesian-linear-regression/bayesian_magma_tutorial.html) | Bayesian gene set analysis in R. |
+| [**BLR notes**](notes/notes.html) | Theoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics. |
+| [**BLR slides**](slides/bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations in Bayesian Linear Regression Analyses. |
+| [**BLR-GSEA slides**](slides/advanced_bayesian_linear_regression_slides.html) | Lecture slides introducing Bayesian Linear Regression Models used in Gene Set Analyses. |
+| [**Bayesian MAGMA slides**](slides/bayesian_magma_slides.html) | Lecture slides introducing Gene Set Analyses using Bayesian MAGMA Models. |
+| [**Classical Regression tutorial**](tutorials/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
+| [**Bayesian (Gaussian Prior)  tutorial**](tutorials/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R. |
+| [**Bayesian (Spike & Slab)  tutorial**](tutorials/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity in R. |
+| [**Bayesian MAGMA tutorial**](tutorials/bayesian_magma_tutorial.html) | Bayesian gene set analysis in R. |
 
-[Download Notes (PDF)](notes.pdf)  
-[Download Slides (PDF)](bayesian_linear_regression_slides.pdf)
+[Download Notes (PDF)](notes/notes.pdf)  
+[Download Slides (PDF)](slides/bayesian_linear_regression_slides.pdf)
 
 ---
 
@@ -65,7 +65,7 @@ binary formats such as **PLINK `.bed` files**.
 
 *gact* is intended to serve as **a practical implementation of integrative genomics**, bridging **statistical modeling** and **biological interpretation**, and supporting **reproducible** and **extensible** workflows.
 
-[**Slides introducing the *qgg* and *gact* R packages**](https://psoerensen.github.io/bayesian-linear-regression/introduction_gact_qgg_slides.html)
+[**Slides introducing the *qgg* and *gact* R packages**](slides/introduction_gact_qgg_slides.html)
 
 [**Tutorials using the *qgg* and *gact* R packages**](https://psoerensen.github.io/gact/)
 

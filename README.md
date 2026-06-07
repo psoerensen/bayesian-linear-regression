@@ -21,31 +21,31 @@ included when the course website is rendered.
 
 ### Notes
 
-- `notes.qmd`: main theoretical notes on Bayesian Linear Regression, posterior
+- `notes/notes.qmd`: main theoretical notes on Bayesian Linear Regression, posterior
   inference, Gibbs sampling, convergence diagnostics, and spike-and-slab
   models.
 
 ### Slides
 
-- `bayesian_linear_regression_slides.qmd`: core Bayesian Linear Regression and
+- `slides/bayesian_linear_regression_slides.qmd`: core Bayesian Linear Regression and
   MCMC lecture.
-- `narrated_bayesian_linear_regression_slides.qmd`: narrated version of the
+- `slides/narrated_bayesian_linear_regression_slides.qmd`: narrated version of the
   core lecture.
-- `advanced_bayesian_linear_regression_slides.qmd`: advanced Bayesian gene-set
+- `slides/advanced_bayesian_linear_regression_slides.qmd`: advanced Bayesian gene-set
   analysis material.
-- `bayesian_magma_slides.qmd`: Bayesian MAGMA lecture.
-- `introduction_gact_qgg_slides.qmd`: introduction to the `gact` and `qgg` R
+- `slides/bayesian_magma_slides.qmd`: Bayesian MAGMA lecture.
+- `slides/introduction_gact_qgg_slides.qmd`: introduction to the `gact` and `qgg` R
   packages.
 
 ### Tutorials
 
-- `classical_linear_regression_simulation.qmd`: classical linear regression
+- `tutorials/classical_linear_regression_simulation.qmd`: classical linear regression
   simulation and estimation.
-- `bayesian_linear_regression_conjugate.qmd`: Bayesian Linear Regression with
+- `tutorials/bayesian_linear_regression_conjugate.qmd`: Bayesian Linear Regression with
   conjugate priors.
-- `bayesian_spike_and_slab.qmd`: Bayesian variable selection with
+- `tutorials/bayesian_spike_and_slab.qmd`: Bayesian variable selection with
   spike-and-slab priors.
-- `bayesian_magma_tutorial.qmd`: pathway prioritization using a simulated
+- `tutorials/bayesian_magma_tutorial.qmd`: pathway prioritization using a simulated
   Bayesian MAGMA workflow.
 
 ## Repository Structure
@@ -77,10 +77,10 @@ The active website outputs are written to `docs/`, as configured in
 Render one source file when making a focused change:
 
 ```bash
-quarto render notes.qmd
+quarto render notes/notes.qmd
 ```
 
-Replace `notes.qmd` with another active source path as needed.
+Replace `notes/notes.qmd` with another active source path as needed.
 
 ## Narration
 

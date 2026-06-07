@@ -3,16 +3,16 @@ project:
   output-dir: docs
   render:
     - index.qmd
-    - notes.qmd
-    - bayesian_linear_regression_slides.qmd
-    - narrated_bayesian_linear_regression_slides.qmd
-    - advanced_bayesian_linear_regression_slides.qmd
-    - bayesian_magma_slides.qmd
-    - introduction_gact_qgg_slides.qmd
-    - classical_linear_regression_simulation.qmd
-    - bayesian_linear_regression_conjugate.qmd
-    - bayesian_spike_and_slab.qmd
-    - bayesian_magma_tutorial.qmd
+    - notes/notes.qmd
+    - slides/bayesian_linear_regression_slides.qmd
+    - slides/narrated_bayesian_linear_regression_slides.qmd
+    - slides/advanced_bayesian_linear_regression_slides.qmd
+    - slides/bayesian_magma_slides.qmd
+    - slides/introduction_gact_qgg_slides.qmd
+    - tutorials/classical_linear_regression_simulation.qmd
+    - tutorials/bayesian_linear_regression_conjugate.qmd
+    - tutorials/bayesian_spike_and_slab.qmd
+    - tutorials/bayesian_magma_tutorial.qmd
   resources:
     - narration/**
 
@@ -24,21 +24,21 @@ website:
       - text: "Home"
         href: index.html
       - text: "Notes"
-        href: notes.html
+        href: notes/notes.html
       - text: "BLR slides"
-        href: bayesian_linear_regression_slides.html
+        href: slides/bayesian_linear_regression_slides.html
       - text: "BLR_GSEA slides"
-        href: advanced_bayesian_linear_regression_slides.html
+        href: slides/advanced_bayesian_linear_regression_slides.html
       - text: "Bayesian MAGMA slides"
-        href: bayesian_magma_slides.html
+        href: slides/bayesian_magma_slides.html
       - text: "Classical Regression tutorial"
-        href: classical_linear_regression_simulation.html
+        href: tutorials/classical_linear_regression_simulation.html
       - text: "Bayesian (Gaussian Prior) tutorial"
-        href: bayesian_linear_regression_conjugate.html
+        href: tutorials/bayesian_linear_regression_conjugate.html
       - text: "Bayesian (Spike & Slab) tutorial"
-        href: bayesian_spike_and_slab.html
+        href: tutorials/bayesian_spike_and_slab.html
       - text: "Bayesian MAGMA tutorial"
-        href: bayesian_magma_tutorial.html
+        href: tutorials/bayesian_magma_tutorial.html
 
 format:
   html:

@@ -3,7 +3,7 @@ library(fs)
 library(jsonlite)
 
 # Path to main slide file
-qmd_files <- "narrated_bayesian_linear_regression_slides.qmd"
+qmd_files <- "slides/narrated_bayesian_linear_regression_slides.qmd"
 
 # Ensure narration folder exists
 dir_create("narration", recurse = TRUE)
