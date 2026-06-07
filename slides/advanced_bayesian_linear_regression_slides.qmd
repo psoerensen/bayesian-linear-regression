@@ -43,7 +43,7 @@ execute:
 ## From GWAS to Biological Discovery
 
 ::: {.center}
-![](../Images/Concept.png){width=80%}
+![](../images/Concept.png){width=80%}
 :::
 
 ----
@@ -317,7 +317,7 @@ Evaluate a **Bayesian gene-set prioritization approach** using BLR within the MA
 ## Bayesian MAGMA: Overview 
 
 ::: {.center}
-![](../Images/Bayesian_MAGMA.png){width=70%}
+![](../images/Bayesian_MAGMA.png){width=70%}
 :::
 
 - Fits a Bayesian regression model that allows **regularization** and **variable selection**  
@@ -335,7 +335,7 @@ Gholipourshahraki et al., 2025
 ## Bayesian MAGMA: Gene-level Statistics 
 
 ::: {.center}
-![](../Images/gene_level_statistics_new.png){width=80%}
+![](../images/gene_level_statistics_new.png){width=80%}
 :::
 
 Compute gene-level (or other feature-level) association statistics:
@@ -354,7 +354,7 @@ Bai et al., 2025
 ## Bayesian MAGMA: Gene-level Statistics 
 
 ::: {.center}
-![](../Images/compare_gene_stat_methods.png){width=60%}
+![](../images/compare_gene_stat_methods.png){width=60%}
 :::
 
 --->
@@ -376,7 +376,7 @@ Bai et al., 2025
 ::: {.column width="50%" .vcenter}
 
 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-  <img src="../Images/bayesian_magma_kegg_ST.png" alt="KEGG Pathway Associations" style="max-width: 100%; max-height: 90%;">
+  <img src="../images/bayesian_magma_kegg_ST.png" alt="KEGG Pathway Associations" style="max-width: 100%; max-height: 90%;">
 </div>
 
 :::
@@ -394,7 +394,7 @@ Gholipourshahraki et al., 2025
 When the **off-diagonal elements of $\boldsymbol{\Sigma}_b$ are nonzero**, the model **borrows information across correlated traits**, enabling detection of **pleiotropic effects** and **shared genetic factors**.
 
 ::: {.center}
-![](../Images/bayesian_magma_kegg_MT.png){width=85%}
+![](../images/bayesian_magma_kegg_MT.png){width=85%}
 :::
 
 <div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
@@ -407,7 +407,7 @@ Gholipourshahraki et al., 2025
 **Gene sets** are defined by genes linked to the **Anatomical Therapeutic Chemical (ATC)** classification system using the **Drug–Gene Interaction Database (DGIdb)**
 
 ::: {.center}
-![](../Images/drug-repurposing.png){width=65%}
+![](../images/drug-repurposing.png){width=65%}
 :::
 
 <div style="position: absolute; bottom: 1%; right: 2%; font-size: 0.8em; color: gray;">
@@ -427,7 +427,7 @@ Hjelholt et al., 2025
 - Traits genetically correlated with **Type 2 Diabetes (T2D)**
 
 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-  <img src="../Images/rg.png"style="max-width: 50%; max-height: 50%;">
+  <img src="../images/rg.png"style="max-width: 50%; max-height: 50%;">
 </div>
 
 - **Drug gene sets relevant to diabetes** show associations with **T2D** and related traits  
@@ -438,7 +438,7 @@ Hjelholt et al., 2025
 
 ::: {.column width="40%" .vcenter}
 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-  <img src="../Images/bayesian_magma_dgidb_new.png" alt="Drug Gene Set Associations (DGIdb)" style="max-width: 100%; max-height: 100%;">
+  <img src="../images/bayesian_magma_dgidb_new.png" alt="Drug Gene Set Associations (DGIdb)" style="max-width: 100%; max-height: 100%;">
 </div>
 :::
 
@@ -465,7 +465,7 @@ Hjelholt et al., 2025
 
 ::: {.column width="50%" .vcenter}
 <div style="display: flex; align-items: center; justify-content: center;">
-  <img src="../Images/bayesian_magma_ancestry_new.png" alt="Cross-Ancestry Pathway Associations" style="width: 120%; height: 100%;">
+  <img src="../images/bayesian_magma_ancestry_new.png" alt="Cross-Ancestry Pathway Associations" style="width: 120%; height: 100%;">
 </div>
 :::
 
@@ -505,7 +505,7 @@ Many different gene set analysis approaches have been proposed.
 :::
 
 ::: {.column width="50%" }
-![](../Images/PoPS.png){width=75% .center}
+![](../images/PoPS.png){width=75% .center}
 
 :::
 
@@ -533,7 +533,7 @@ Many different gene set analysis approaches have been proposed.
 :::
 
 ::: {.column width="50%" }
-![](../Images/PoPS.png){width=75% .center}
+![](../images/PoPS.png){width=75% .center}
 
 :::
 
@@ -545,7 +545,7 @@ Many different gene set analysis approaches have been proposed.
 
 Simulation studies investigating influence of gene overlaps among the sets on the prediction accuracy \[$Cor(\textbf{y}, \hat{\textbf{y}})$\] of PoPS procedures:
 
-![](../Images/PoPS_sim.png){width=75% .center}
+![](../images/PoPS_sim.png){width=75% .center}
 
   **Bayesian PoPS** has **higher prediction accuracy** compared standard PoPS procedure
 
@@ -568,7 +568,7 @@ Comparison of gene prioriterisation for Type 2 Diabetes using different PoPS pro
 :::
 
 ::: {.column width="50%" }
-![](../Images/PoPS_pred.png){width=95% .center}
+![](../images/PoPS_pred.png){width=95% .center}
 
 :::
 
@@ -622,7 +622,7 @@ Comparison of gene prioriterisation for Type 2 Diabetes using different PoPS pro
 
 ::: {.column width="50%" }
 
-![](../Images/gact.png){width=90% .center}
+![](../images/gact.png){width=90% .center}
 
 
 :::
@@ -681,7 +681,7 @@ $$
 
 ::: {.columns align="center"}
 ::: {.column width="15%"}
-![](../Images/gact-logo.png){height=3em}
+![](../images/gact-logo.png){height=3em}
 :::
 
 ::: {.column width="85%"}
@@ -702,7 +702,7 @@ DOI: 10.1101/2025.10.01.25337099v1</a>)
 
 ::: {.columns align="center"}
 ::: {.column width="15%"}
-![](../Images/qgg-logo.png){height=3em}
+![](../images/qgg-logo.png){height=3em}
 :::
 
 ::: {.column width="85%"}

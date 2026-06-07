@@ -50,7 +50,7 @@ included when the course website is rendered.
 
 ## Repository Structure
 
-- `Images/`: source figures and images used by course materials.
+- `images/`: source figures and images used by course materials.
 - `narration/`: audio files used by the narrated slide deck.
 - `scripts/`: supporting R scripts, including narration generation.
 - `docs/`: rendered GitHub Pages output. This directory is generated from the

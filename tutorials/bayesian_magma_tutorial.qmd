@@ -31,7 +31,7 @@ See full details in *Gholipourshahraki T, et al.  PLOS Genet. 20, e1011463 (2024
 <br>
 
 ::: {.center}
-![](../Images/Bayesian_MAGMA.png){width=75%}
+![](../images/Bayesian_MAGMA.png){width=75%}
 Figure 1. Schematic overview of the Bayesian MAGMA workflow.
 :::
 

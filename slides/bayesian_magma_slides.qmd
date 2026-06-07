@@ -43,7 +43,7 @@ execute:
 ## From GWAS to Biological Discovery
 
 ::: {.center}
-![](../Images/Concept.png){width=80%}
+![](../images/Concept.png){width=80%}
 :::
 
 ----
@@ -298,7 +298,7 @@ Evaluate a **Bayesian gene-set prioritization approach** using BLR within the MA
 ## Bayesian MAGMA: Overview 
 
 ::: {.center}
-![](../Images/Bayesian_MAGMA.png){width=70%}
+![](../images/Bayesian_MAGMA.png){width=70%}
 :::
 
 - Fits a Bayesian regression model that allows **regularization** and **variable selection**  
@@ -316,7 +316,7 @@ Gholipourshahraki et al., 2024
 ## Bayesian MAGMA: Gene-level Statistics 
 
 ::: {.center}
-![](../Images/gene_level_statistics.png){width=80%}
+![](../images/gene_level_statistics.png){width=80%}
 :::
 
 Compute gene-level (or other feature-level) association statistics:
@@ -335,7 +335,7 @@ Bai et al., 2025
 ## Bayesian MAGMA: Gene-level Statistics 
 
 ::: {.center}
-![](../Images/compare_gene_stat_methods.png){width=60%}
+![](../images/compare_gene_stat_methods.png){width=60%}
 :::
 
 --->
@@ -357,7 +357,7 @@ Bai et al., 2025
 ::: {.column width="50%" .vcenter}
 
 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-  <img src="../Images/bayesian_magma_kegg.png" alt="KEGG Pathway Associations" style="max-width: 100%; max-height: 90%;">
+  <img src="../images/bayesian_magma_kegg.png" alt="KEGG Pathway Associations" style="max-width: 100%; max-height: 90%;">
 </div>
 
 :::
@@ -385,7 +385,7 @@ Gholipourshahraki et al., 2024
 
 ::: {.column width="50%" .vcenter}
 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-  <img src="../Images/bayesian_magma_dgidb.png" alt="Drug Gene Set Associations (DGIdb)" style="max-width: 80%; max-height: 70%;">
+  <img src="../images/bayesian_magma_dgidb.png" alt="Drug Gene Set Associations (DGIdb)" style="max-width: 80%; max-height: 70%;">
 </div>
 :::
 
@@ -412,7 +412,7 @@ Hjelholt et al., 2025
 
 ::: {.column width="50%" .vcenter}
 <div style="display: flex; align-items: center; justify-content: center;">
-  <img src="../Images/bayesian_magma_ancestry.png" alt="Cross-Ancestry Pathway Associations" style="width: 120%; height: 100%;">
+  <img src="../images/bayesian_magma_ancestry.png" alt="Cross-Ancestry Pathway Associations" style="width: 120%; height: 100%;">
 </div>
 :::
 
