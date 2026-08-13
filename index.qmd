@@ -27,6 +27,7 @@ Explore the sections below to find the corresponding materials.
 | [**Bayesian MAGMA tutorial**](tutorials/bayesian_magma_tutorial.html) | Bayesian gene set analysis in R. |
 
 [Download Notes (PDF)](notes/notes.pdf)  
+[Download Data](data/genotypes.txt)  
 [Download Slides (PDF)](slides/bayesian_linear_regression_slides.pdf)
 
 ---
