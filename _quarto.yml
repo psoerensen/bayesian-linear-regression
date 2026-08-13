@@ -8,13 +8,16 @@ project:
     - slides/narrated_bayesian_linear_regression_slides.qmd
     - slides/advanced_bayesian_linear_regression_slides.qmd
     - slides/bayesian_magma_slides.qmd
+    - slides/bayesian_fine_mapping_bayesc_slides.qmd
     - slides/introduction_gact_qgg_slides.qmd
     - tutorials/classical_linear_regression_simulation.qmd
     - tutorials/bayesian_linear_regression_conjugate.qmd
     - tutorials/bayesian_spike_and_slab.qmd
     - tutorials/bayesian_magma_tutorial.qmd
+    - tutorials/bayesian_fine_mapping_bayesc.qmd
   resources:
     - narration/**
+    - data/**
 
 website:
   title: "Bayesian Linear Regression"
@@ -31,6 +34,12 @@ website:
         href: slides/advanced_bayesian_linear_regression_slides.html
       - text: "Bayesian MAGMA slides"
         href: slides/bayesian_magma_slides.html
+      - text: "Fine-Mapping"
+        menu:
+          - text: "Bayesian Fine-Mapping with BayesC — Slides"
+            href: slides/bayesian_fine_mapping_bayesc_slides.html
+          - text: "Bayesian Fine-Mapping with BayesC — Tutorial"
+            href: tutorials/bayesian_fine_mapping_bayesc.html
       - text: "Classical Regression tutorial"
         href: tutorials/classical_linear_regression_simulation.html
       - text: "Bayesian (Gaussian Prior) tutorial"

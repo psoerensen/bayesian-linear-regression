@@ -34,6 +34,9 @@ included when the course website is rendered.
 - `slides/advanced_bayesian_linear_regression_slides.qmd`: advanced Bayesian gene-set
   analysis material.
 - `slides/bayesian_magma_slides.qmd`: Bayesian MAGMA lecture.
+- `slides/bayesian_fine_mapping_bayesc_slides.qmd`: Bayesian fine-mapping with
+  BayesC, posterior inclusion probabilities, local credible sets, and
+  annotation-informed priors.
 - `slides/introduction_gact_qgg_slides.qmd`: introduction to the `gact` and `qgg` R
   packages.
 
@@ -47,6 +50,8 @@ included when the course website is rendered.
   spike-and-slab priors.
 - `tutorials/bayesian_magma_tutorial.qmd`: pathway prioritization using a simulated
   Bayesian MAGMA workflow.
+- `tutorials/bayesian_fine_mapping_bayesc.qmd`: reproducible 30-SNP BayesC
+  fine-mapping example using simulated phenotype data and `data/genotypes.txt`.
 
 ## Repository Structure
 

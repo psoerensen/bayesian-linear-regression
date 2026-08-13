@@ -1,0 +1,1083 @@
+---
+title: "Bayesian Fine-Mapping with BayesC"
+author:
+  - name: "<br>Peter Sørensen"
+    affiliation:
+      - "<br>Center for Quantitative Genetics and Genomics, Aarhus University, Denmark"
+  - name: "<br>Palle Duun Rohde"
+    affiliation:
+      - "<br>Genomic Medicine, Department of Health Science and Technology, Aalborg University, Denmark"
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    toc: false
+    incremental: false
+    auto-scale: true
+    embed-resources: true
+    self-contained-math: true
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"
+        
+    width: 1366
+    height: 768
+    margin: 0.05
+
+    math:
+      scale: 0.9
+
+    css: ../slides.css
+  beamer:
+    theme: default
+    slide-level: 2
+    keep-tex: true
+    pdf-engine: lualatex
+    fontsize: 11pt
+    header-includes: |
+      \setbeamertemplate{itemize item}{\textendash}
+      \setbeamertemplate{itemize subitem}{\textbullet}
+      \setbeamertemplate{itemize subsubitem}{$\cdot$}
+      \makeatletter
+      \patchcmd{\beamer@framesetup}{\centering}{}{}{}
+      \makeatother
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+
+## GWAS Regions Rarely Identify a Unique Causal Variant
+
+- A GWAS association usually identifies an **associated region**, not a unique causal variant.
+
+- Because nearby SNPs are correlated through **linkage disequilibrium (LD)**, several SNPs can show strong association even when only one is causal.
+
+Fine-mapping moves from
+
+$$
+\text{associated region}
+\quad\longrightarrow\quad
+\text{small set of plausible causal variants}.
+$$
+
+The goal is to quantify which variants remain plausible causal explanations after accounting for LD.
+
+
+## Fine-Mapping Connects Association Signals to Biology
+
+- **Biological interpretation:** connect associated variants to genes, regulatory elements, and molecular mechanisms.
+- **Functional follow-up:** prioritize variants, genes, and pathways for experimental studies.
+- **Quantifying uncertainty:** distinguish one strongly supported variant from several LD-linked alternatives.
+- **Functional information:** combine genetic evidence with eQTL, chromatin, conservation, and coding annotations.
+
+
+
+## Standard GWAS Tests One SNP at a Time
+
+In a standard **genome-wide association study (GWAS)**, each SNP is tested separately for association with the phenotype.
+
+
+For SNP $j$, fit a separate regression:
+
+$$
+y_i
+=
+\mu
++
+x_{ij}\beta_j
++
+e_i,
+\qquad
+e_i \sim \mathcal{N}(0,\sigma^2).
+$$
+
+Test whether the SNP is associated with the phenotype:
+
+$$
+H_0:\beta_j=0
+\qquad\text{versus}\qquad
+H_1:\beta_j\neq0.
+$$
+
+Each SNP is tested **one at a time**.
+
+## Standard GWAS Reports Marginal Evidence
+
+For every SNP, GWAS typically reports:
+
+- estimated effect $\widehat{\beta}_j$
+- standard error $\operatorname{SE}(\widehat{\beta}_j)$
+- $z$- or $t$-statistic
+- $p$-value
+
+The result is a marker-by-marker summary of **marginal association evidence**.
+
+
+**Important:** GWAS identifies **associated SNPs**, not necessarily the causal SNP.
+
+
+## LD Makes Multiple SNPs Look Associated
+
+Nearby SNPs are often correlated because of **linkage disequilibrium (LD)**. If SNP $j^\ast$ is causal,
+
+$$
+y=x_{j^\ast}\beta_{j^\ast}+e.
+$$
+
+Another SNP $j$ can still show strong marginal association when
+
+$$
+\operatorname{Cor}(x_j,x_{j^\ast})\neq0
+\qquad\text{but}\qquad
+\beta_j=0.
+$$
+
+A GWAS peak can therefore represent an **associated region**, not a unique causal variant.
+
+
+
+
+```{r}
+#| include: false
+# Same simulated 30-SNP locus used in the tutorial
+
+geno <- read.delim(
+  "../data/genotypes.txt",
+  header = TRUE,
+  row.names = 1,
+  check.names = FALSE
+)
+
+X_all <- as.matrix(geno)
+region <- 114:143
+X <- scale(
+  X_all[, region, drop = FALSE],
+  center = TRUE,
+  scale = TRUE
+)
+
+n <- nrow(X)
+m <- ncol(X)
+snp <- colnames(X)
+R <- cor(X)
+
+set.seed(123)
+causal <- 11
+beta_true <- rep(0, m)
+beta_true[causal] <- 0.35
+
+g <- drop(X %*% beta_true)
+h2 <- 0.30
+vare <- var(g) * (1 - h2) / h2
+y <- g + rnorm(n, 0, sqrt(vare))
+
+# Marginal GWAS in the same locus
+
+gwas_p <- numeric(m)
+for (j in seq_len(m)) {
+  fit_j <- lm(y ~ X[, j])
+  gwas_p[j] <- summary(fit_j)$coefficients[2, 4]
+}
+
+# Base-R two-state BayesC Gibbs sampler used in the tutorial
+fit_bayesc <- function(
+  X,
+  y,
+  niter = 2000,
+  pi = 0.03,
+  start_h2 = 0.30
+) {
+  n <- nrow(X)
+  m <- ncol(X)
+
+  stopifnot(
+    pi > 0,
+    pi < 1,
+    start_h2 > 0,
+    start_h2 < 1
+  )
+
+  vary <- var(y)
+  varg <- vary * start_h2
+  vare <- vary * (1 - start_h2)
+  varb <- varg / (m * pi)
+
+  nub <- 4
+  nue <- 4
+  scale_b <- (nub - 2) / nub * varb
+  scale_e <- (nue - 2) / nue * vare
+
+  beta <- numeric(m)
+  delta <- integer(m)
+  mu <- mean(y)
+  ycorr <- y - mu
+  xpx <- colSums(X^2)
+
+  beta_mcmc <- matrix(0, nrow = niter, ncol = m)
+  delta_mcmc <- matrix(0L, nrow = niter, ncol = m)
+
+  for (iter in seq_len(niter)) {
+    ycorr <- ycorr + mu
+    mu <- rnorm(1, mean = mean(ycorr), sd = sqrt(vare / n))
+    ycorr <- ycorr - mu
+
+    for (j in seq_len(m)) {
+      xj <- X[, j]
+      old_beta <- beta[j]
+      residual_without_j <- ycorr + xj * old_beta
+      rhs <- sum(xj * residual_without_j)
+
+      Cj <- xpx[j] + vare / varb
+      post_mean <- rhs / Cj
+      post_var <- vare / Cj
+
+      log_prob_zero <- log(1 - pi)
+      log_prob_active <-
+        log(pi) +
+        0.5 * (
+          log(vare) -
+          log(varb) -
+          log(Cj) +
+          rhs^2 / (vare * Cj)
+        )
+
+      max_log <- max(log_prob_zero, log_prob_active)
+      prob <- exp(c(log_prob_zero, log_prob_active) - max_log)
+      prob <- prob / sum(prob)
+
+      delta[j] <- sample(c(0L, 1L), size = 1, prob = prob)
+      beta[j] <- if (delta[j] == 0L) {
+        0
+      } else {
+        rnorm(1, mean = post_mean, sd = sqrt(post_var))
+      }
+
+      ycorr <- residual_without_j - xj * beta[j]
+    }
+
+    active <- which(delta == 1L)
+    nactive <- length(active)
+    shape_b <- 0.5 * (nub + nactive)
+    rate_b <- 0.5 * nub * scale_b
+    if (nactive > 0) {
+      rate_b <- rate_b + 0.5 * sum(beta[active]^2)
+    }
+    varb <- 1 / rgamma(1, shape = shape_b, rate = rate_b)
+
+    resid <- y - mu - drop(X %*% beta)
+    shape_e <- 0.5 * (nue + n)
+    rate_e <- 0.5 * (nue * scale_e + sum(resid^2))
+    vare <- 1 / rgamma(1, shape = shape_e, rate = rate_e)
+
+    beta_mcmc[iter, ] <- beta
+    delta_mcmc[iter, ] <- delta
+  }
+
+  colnames(beta_mcmc) <- colnames(X)
+  colnames(delta_mcmc) <- colnames(X)
+
+  list(beta = beta_mcmc, delta = delta_mcmc)
+}
+
+set.seed(1)
+fit_C <- fit_bayesc(
+  X,
+  y,
+  niter = 2000,
+  pi = 0.03,
+  start_h2 = 0.30
+)
+
+keep <- 501:2000
+PIP_C <- colMeans(fit_C$delta[keep, , drop = FALSE])
+beta_C <- colMeans(fit_C$beta[keep, , drop = FALSE])
+
+bayesc_results <- data.frame(
+  SNP = snp,
+  marker = seq_len(m),
+  LD_with_causal = R[causal, ],
+  true_effect = beta_true,
+  PIP = PIP_C,
+  posterior_mean_effect = beta_C,
+  causal = seq_len(m) == causal
+)
+
+noncausal_index <- setdiff(seq_len(m), causal)
+best_noncausal_index <- noncausal_index[which.max(PIP_C[noncausal_index])]
+best_noncausal <- PIP_C[best_noncausal_index]
+causal_rank <- rank(-PIP_C, ties.method = "min")[causal]
+
+bayesc_summary <- data.frame(
+  quantity = c(
+    "Causal SNP PIP",
+    "Causal SNP rank",
+    "Best non-causal PIP",
+    "PIP gap",
+    "Posterior expected active SNPs",
+    "Best competitor marker",
+    "Best competitor SNP"
+  ),
+  value = c(
+    round(PIP_C[causal], 3),
+    causal_rank,
+    round(best_noncausal, 3),
+    round(PIP_C[causal] - best_noncausal, 3),
+    round(sum(PIP_C), 3),
+    best_noncausal_index,
+    snp[best_noncausal_index]
+  )
+)
+
+bayesc_top <- bayesc_results[order(-bayesc_results$PIP), c(
+  "marker",
+  "SNP",
+  "PIP",
+  "LD_with_causal",
+  "posterior_mean_effect",
+  "causal"
+)]
+
+bayesc_top$PIP <- round(bayesc_top$PIP, 3)
+bayesc_top$LD_with_causal <- round(bayesc_top$LD_with_causal, 3)
+bayesc_top$posterior_mean_effect <- round(bayesc_top$posterior_mean_effect, 3)
+
+result_interpretation <- data.frame(
+  question = c(
+    "Does the causal SNP rank first?",
+    "How much support does the strongest competitor have?",
+    "How much larger is the causal PIP?",
+    "How many active SNPs does the posterior expect?"
+  ),
+  answer = c(
+    ifelse(causal_rank == 1, "Yes", "No"),
+    paste0(
+      "PIP = ",
+      round(best_noncausal, 3),
+      " at marker ",
+      best_noncausal_index
+    ),
+    paste0(
+      "PIP gap = ",
+      round(PIP_C[causal] - best_noncausal, 3)
+    ),
+    paste0(
+      "sum(PIPs) = ",
+      round(sum(PIP_C), 3)
+    )
+  )
+)
+
+
+focal_marker <- which.max(PIP_C)
+local_ld_threshold <- 0.5
+local_candidates <- which((R[focal_marker, ]^2) >= local_ld_threshold)
+local_order <- local_candidates[order(PIP_C[local_candidates], decreasing = TRUE)]
+local_cum_pip <- cumsum(PIP_C[local_order])
+lcs_cut <- which(local_cum_pip >= 0.90)[1]
+if (is.na(lcs_cut)) {
+  lcs_cut <- length(local_order)
+  warning(
+    "Cumulative PIP in the local LD neighborhood does not reach 0.90."
+  )
+}
+local_credible_set <- local_order[seq_len(lcs_cut)]
+
+lcs_table <- data.frame(
+  marker = local_order,
+  SNP = snp[local_order],
+  PIP = round(PIP_C[local_order], 3),
+  r2_with_focal = round(R[focal_marker, local_order]^2, 3),
+  cumulative_PIP = round(local_cum_pip, 3),
+  in_LCS = seq_along(local_order) <= lcs_cut,
+  causal = local_order == causal
+)
+
+lcs_display <- head(lcs_table, 8)
+
+lcs_summary <- data.frame(
+  quantity = c(
+    "Top-PIP focal marker",
+    "Local LD threshold",
+    "Candidate SNPs in local region",
+    "0.9 LCS size",
+    "Causal SNP in 0.9 LCS?",
+    "Causal SNP PIP",
+    "Final cumulative PIP"
+  ),
+  value = c(
+    focal_marker,
+    paste0("r^2 >= ", local_ld_threshold),
+    length(local_candidates),
+    length(local_credible_set),
+    ifelse(causal %in% local_credible_set, "Yes", "No"),
+    round(PIP_C[causal], 3),
+    round(local_cum_pip[lcs_cut], 3)
+  )
+)
+```
+
+
+## LD Explains the Cluster of Marginal Associations
+
+The same simulated 30-SNP region is shown in both panels. The causal SNP is marked in red.
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+#### LD with the causal SNP
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+par(mar = c(4, 4, 1, 1))
+plot(
+  seq_len(m),
+  R[causal, ]^2,
+  type = "h",
+  lwd = 5,
+  ylim = c(0, 1),
+  xlab = "SNP index",
+  ylab = expression(r^2)
+)
+points(causal, 1, pch = 19, col = "red")
+abline(v = causal, col = "red", lty = 2)
+```
+
+:::
+
+::: {.column width="50%"}
+
+#### Marginal GWAS evidence
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+par(mar = c(4, 4, 1, 1))
+plot(
+  seq_len(m),
+  -log10(gwas_p),
+  type = "h",
+  lwd = 5,
+  xlab = "SNP index",
+  ylab = expression(-log[10](p))
+)
+points(
+  causal,
+  -log10(gwas_p[causal]),
+  pch = 19,
+  col = "red"
+)
+abline(v = causal, col = "red", lty = 2)
+```
+
+:::
+
+:::
+
+
+## Fine-Mapping: Key Inputs
+
+Fine-mapping aims to identify which SNPs within a GWAS-associated region remain plausible causal variants after accounting for LD.
+
+
+- **Marker-level association evidence:** e.g. marginal effect estimates $\hat{\beta}_j$ and their standard errors $\mathrm{SE}(\hat{\beta}_j)$.
+
+- **LD between candidate SNPs:** represented by the LD correlation matrix, e.g. $R=\operatorname{cor}(X)$.
+
+- **A sparse joint model for genetic effects:** e.g. BayesC / spike-and-slab.
+
+Here we use individual-level genotypes and phenotypes. Summary-statistic methods instead combine compatible GWAS evidence with external LD.
+
+## Fine-Mapping: Key Outputs
+
+- **Posterior inclusion probabilities (PIPs):** probability that each SNP has a non-zero effect.
+
+- **Posterior effect estimates:** model-averaged SNP effects.
+
+- **Prioritized variant sets:** small sets of plausible causal variants.
+
+- **Fine-mapping uncertainty:** one leading SNP or several LD-linked alternatives.
+
+
+## Fine-Mapping Fits SNP Effects Jointly
+
+
+All SNPs are fitted **jointly**, allowing correlated SNPs to compete to explain the same association signal:
+
+$$
+y_i
+=
+\mu
++
+\sum_{j=1}^{m}x_{ij}b_j
++
+e_i,
+\qquad
+e_i\sim\mathcal{N}(0,\sigma_e^2).
+$$
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+- $y$ — phenotype
+- $\mu$ — overall mean
+- $X$ — genotype matrix
+
+:::
+
+::: {.column width="50%"}
+
+- $b$ — SNP effects
+- $e$ — residual effects
+- $\sigma_e^2$ — residual variance
+
+
+:::
+
+:::
+
+
+## BayesC Uses Inclusion Indicators
+
+BayesC assumes that each SNP is either **inactive** or **active**. The point mass at zero creates a **sparse model** in which many SNP effects are exactly zero.
+
+
+Introduce an inclusion indicator:
+
+$$
+d_j \in \{0,1\},
+\qquad
+d_j \sim \operatorname{Bernoulli}(\pi).
+$$
+
+Conditional on the indicator:
+
+$$
+b_j\mid(d_j=0)=0,
+$$
+
+$$
+b_j\mid(d_j=1)
+\sim
+\mathcal{N}(0,\sigma_b^2).
+$$
+
+## BayesC Is a Spike-and-Slab Prior
+
+Equivalently,
+
+$$
+b_j
+\sim
+(1-\pi)\delta_0
++
+\pi\mathcal{N}(0,\sigma_b^2).
+$$
+
+```{r}
+#| fig-width: 7
+#| fig-height: 3.2
+par(mar = c(3, 3, 1, 1))
+x_prior <- seq(-4, 4, length.out = 400)
+plot(
+  x_prior,
+  dnorm(x_prior),
+  type = "l",
+  lwd = 3,
+  ylim = c(0, 0.68),
+  axes = FALSE,
+  xlab = expression(b[j]),
+  ylab = "Prior density"
+)
+axis(1, at = c(-4, 0, 4), labels = c("", "0", ""))
+segments(0, 0, 0, 0.58, lwd = 6)
+text(0, 0.62, "spike", cex = 0.9)
+text(1.8, 0.20, "slab", cex = 0.9)
+```
+
+$\pi$ controls how often SNPs are active; $\sigma_b^2$ controls the variance of non-zero effects.
+
+
+## Correlated SNPs Compete Across Posterior Models
+
+The sampler repeatedly explores possible explanations of the association signal.
+
+::: {.columns}
+
+::: {.column width="43%"}
+
+#### Marker state at iteration $t$
+
+$$
+b_j^{(t)}=
+\begin{cases}
+0, & d_j^{(t)}=0,\\
+\text{non-zero draw}, & d_j^{(t)}=1.
+\end{cases}
+$$
+
+The sampler updates $d_j$ and $b_j$ conditional on the current states of the other SNPs.
+
+:::
+
+::: {.column width="57%"}
+
+#### Sampled inclusion states
+
+```{r}
+#| fig-width: 6
+#| fig-height: 4
+show_iterations <- unique(round(seq(
+  min(keep),
+  max(keep),
+  length.out = 60
+)))
+delta_show <- fit_C$delta[show_iterations, , drop = FALSE]
+
+par(mar = c(4, 4, 1, 1))
+image(
+  seq_len(m),
+  seq_len(nrow(delta_show)),
+  t(delta_show),
+  col = c("grey95", "#2C3E50"),
+  xlab = "SNP index",
+  ylab = "Posterior sample",
+  axes = FALSE
+)
+axis(1)
+axis(2)
+abline(v = causal, col = "red", lty = 2, lwd = 2)
+```
+
+:::
+
+:::
+
+
+## Posterior Samples Become Marker-Level Evidence
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+#### Posterior inclusion probability
+
+$$
+\begin{aligned}
+\operatorname{PIP}_j
+&=\Pr(d_j=1\mid\mathcal D), \\
+\widehat{\operatorname{PIP}}_j
+&=\frac{1}{T}\sum_{t=1}^{T}d_j^{(t)}.
+\end{aligned}
+$$
+
+**PIP:** how often SNP $j$ is needed in posterior models.
+
+:::
+
+::: {.column width="50%"}
+
+#### Posterior mean effect
+
+$$
+\begin{aligned}
+\widehat b_j
+&=E(b_j\mid\mathcal D), \\
+\widehat b_j
+&=\frac{1}{T}\sum_{t=1}^{T}b_j^{(t)}.
+\end{aligned}
+$$
+
+**Posterior mean:** the effect after averaging across posterior models.
+
+:::
+
+:::
+
+
+## Joint Modelling Redistributes the GWAS Signal
+
+The marginal GWAS signal is compared with support from the joint BayesC model.
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+#### Marginal GWAS
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+par(mar = c(4, 4, 1, 1))
+plot(
+  seq_len(m),
+  -log10(gwas_p),
+  type = "h",
+  lwd = 5,
+  xlab = "SNP index",
+  ylab = expression(-log[10](p))
+)
+points(
+  causal,
+  -log10(gwas_p[causal]),
+  pch = 19,
+  col = "red"
+)
+abline(v = causal, col = "red", lty = 2)
+```
+
+:::
+
+::: {.column width="50%"}
+
+#### BayesC PIPs
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+par(mar = c(4, 4, 1, 1))
+plot(
+  seq_len(m),
+  PIP_C,
+  type = "h",
+  lwd = 5,
+  ylim = c(0, 1),
+  xlab = "SNP index",
+  ylab = "Posterior inclusion probability"
+)
+points(causal, PIP_C[causal], pch = 19, col = "red")
+abline(v = causal, col = "red", lty = 2)
+```
+
+:::
+
+:::
+
+
+## PIP and Effect Size Answer Different Questions
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+#### Posterior inclusion probability
+
+$$
+\operatorname{PIP}_j
+=
+\Pr(b_j\neq0\mid\mathcal D).
+$$
+
+Measures how often SNP $j$ is included in posterior models.
+
+A SNP can have a **high PIP but a moderate effect** if it is frequently active with a relatively small effect.
+
+:::
+
+::: {.column width="50%"}
+
+#### Posterior mean effect
+
+$$
+E(b_j\mid\mathcal D).
+$$
+
+Measures the model-averaged effect of SNP $j$, including iterations in which its effect is zero.
+
+A SNP can have a **lower PIP but large non-zero effects** when it is selected.
+
+:::
+
+:::
+
+## Constructing a Local 0.9 Credible Set
+
+A practical **local credible set (LCS)** summarizes the leading signal as a small set of plausible causal variants.
+
+1. Identify the SNP with the highest PIP.
+2. Select its LD neighborhood, for example $r^2\ge0.5$.
+3. Rank these SNPs by decreasing PIP.
+4. Add their PIPs until
+
+   $$
+   \sum_{j\in\mathcal C}\operatorname{PIP}_j
+   \ge 0.90.
+   $$
+
+## Interpreting the Local Credible Set
+
+- PIPs come from the **joint model** and account for LD.
+- A small LCS indicates a well-localized signal.
+- A larger LCS indicates uncertainty among correlated SNPs.
+- Raw PIPs are used without normalization.
+
+Because BayesC allows multiple active SNPs, this is a **practical local summary**, not a formal $90\%$ posterior coverage set.
+
+
+
+## Fine-Mapping Result: Local 0.9 Credible Set
+
+::: {.columns}
+
+::: {.column width="52%"}
+
+#### Variants in the LCS
+
+```{r}
+knitr::kable(
+  lcs_table[
+    seq_len(lcs_cut),
+    c(
+      "marker",
+      "SNP",
+      "PIP",
+      "r2_with_focal",
+      "cumulative_PIP",
+      "causal"
+    )
+  ],
+  row.names = FALSE,
+  align = "lrrrrl"
+)
+```
+
+:::
+
+::: {.column width="48%"}
+
+#### Cumulative PIP
+
+```{r}
+plot(
+  seq_len(nrow(lcs_table)),
+  lcs_table$cumulative_PIP,
+  type = "b",
+  pch = 19,
+  xlab = "PIP rank",
+  ylab = "Cumulative PIP",
+  ylim = c(0, 1),
+  main = ""
+)
+
+abline(h = 0.90, lty = 2, col = "red")
+abline(v = lcs_cut, lty = 2, col = "blue")
+```
+
+:::
+
+:::
+
+The LCS contains `r length(local_credible_set)` SNPs and includes the simulated causal SNP: **`r ifelse(causal %in% local_credible_set, "yes", "no")`**.
+
+
+## Functional Information Can Refine Fine-Mapping
+
+When LD leaves several plausible SNPs, functional information can refine their prior support.
+
+::: {.columns}
+
+::: {.column width="46%"}
+
+#### Functional information
+
+Examples include:
+
+- coding consequences;
+- regulatory and eQTL evidence;
+- chromatin accessibility;
+- conservation and tissue- or cell-specific annotations.
+
+:::
+
+::: {.column width="8%"}
+:::
+
+::: {.column width="46%"}
+
+#### Bayesian interpretation
+
+Bayesian updating combines:
+
+- genetic evidence from the locus;
+- prior information for each SNP.
+
+It changes a SNP's **prior plausibility**. It does not declare that SNP to be causal.
+
+:::
+
+:::
+
+
+
+
+## Annotation-Informed Inclusion Probabilities
+
+Standard BayesC gives every SNP the same prior probability of being active:
+
+$$
+d_j \sim \operatorname{Bernoulli}(\pi).
+$$
+
+Annotations can make that probability **SNP-specific**:
+
+$$
+P(d_j=1)=\pi_j.
+$$
+
+A relevant annotation may therefore raise a SNP's prior probability of having a non-zero effect.
+
+
+## Annotation-Informed Effect Variances
+
+Standard BayesC uses a common variance for active effects:
+
+$$
+b_j\mid d_j=1 \sim \mathcal{N}(0,\sigma_b^2).
+$$
+
+Annotations can make the active-effect variance **SNP-specific**:
+
+$$
+b_j\mid d_j=1 \sim \mathcal{N}(0,\sigma_{b,j}^2).
+$$
+
+An annotated SNP may therefore be assigned a larger prior variance for its non-zero effect.
+
+
+
+## Annotations Reweight Competing Causal Explanations
+
+Suppose two SNPs have similar statistical evidence because they are in strong LD.
+
+::: {.columns}
+
+::: {.column width="48%"}
+
+#### Equal versus annotation-informed priors
+
+$$
+\begin{aligned}
+P(d_1=1)=P(d_2=1)&=\pi
+&&\text{(equal priors)}, \\
+P(d_1=1)=\pi_1,\quad P(d_2=1)&=\pi_2
+&&\text{(annotation-informed)}.
+\end{aligned}
+$$
+
+where a relevant annotation can imply $\pi_1>\pi_2$.
+
+:::
+
+::: {.column width="52%"}
+
+#### Schematic prior reweighting
+
+```{r}
+#| fig-width: 5
+#| fig-height: 3.2
+prior_weights <- matrix(
+  c(1, 1, 1.5, 0.5),
+  nrow = 2
+)
+
+par(mar = c(4, 4, 1, 1))
+barplot(
+  prior_weights,
+  beside = TRUE,
+  names.arg = c("Equal prior", "Annotation-informed"),
+  col = c("#C7CEDB", "#536A8A"),
+  border = NA,
+  yaxt = "n",
+  ylab = "Relative prior weight",
+  legend.text = c("SNP 1", "SNP 2"),
+  args.legend = list(bty = "n", x = "topright")
+)
+```
+
+:::
+
+:::
+
+
+
+
+
+## Annotation-Informed Fine-Mapping Workflow
+
+::: {.columns}
+
+::: {.column width="47%"}
+
+#### Standard prior
+
+- GWAS and LD evidence
+- A common prior across SNPs
+- Posterior PIPs
+
+:::
+
+::: {.column width="6%"}
+:::
+
+::: {.column width="47%"}
+
+#### Annotation-informed prior
+
+- GWAS and LD evidence
+- SNP-specific prior information
+- Annotation-informed PIPs
+
+:::
+
+:::
+
+Both approaches report PIPs, ranked candidates, posterior effects, and local credible sets.
+
+Only the prior assigned to each SNP changes—through its inclusion probability, non-zero effect variance, or both.
+
+
+## Summary
+
+::: {.columns}
+
+::: {.column width="46%"}
+
+#### From association to joint evidence
+
+- GWAS peaks identify **associated regions**, not unique causal variants.
+- Joint fitting makes correlated variants compete to explain the signal.
+- BayesC represents SNPs as inactive or active.
+
+:::
+
+::: {.column width="8%"}
+:::
+
+::: {.column width="46%"}
+
+#### Interpreting the posterior
+
+- PIPs and posterior means answer different questions.
+- A BayesC LCS is practical, not automatically a formal $90\%$ coverage set.
+- Functional annotations modify priors, not the genetic evidence.
+
+:::
+
+:::
+
+
+## Further Reading {.smaller}
+
+[**Companion tutorial: Bayesian Fine-Mapping with BayesC**](../tutorials/bayesian_fine_mapping_bayesc.html)
+
+- **Genome-wide fine-mapping — SBayesRC:** **Wu Y, Zheng Z, Thibaut L, Lin T, Feng Q, Cheng H, Yengo L, Goddard ME, Wray NR, Visscher PM, Zeng J.** Genome-wide fine-mapping improves identification of causal variants. *Nature Genetics* **58**, 940–951 (2026). DOI: [10.1038/s41588-026-02549-3](https://doi.org/10.1038/s41588-026-02549-3)
+
+- **BayesC and BayesR for fine-mapping:** **Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P.** Enhanced genetic fine mapping accuracy with Bayesian Linear Regression models in diverse genetic architectures. *PLOS Genetics* **21**(7), e1011783 (2025). DOI: [10.1371/journal.pgen.1011783](https://doi.org/10.1371/journal.pgen.1011783)
+
+- **Original SBayesRC method and prediction study:** **Zheng Z et al.** Leveraging functional genomic annotations and genome coverage to improve polygenic prediction of complex traits within and between ancestries. *Nature Genetics* **56**, 767–777 (2024). DOI: [10.1038/s41588-024-01704-y](https://doi.org/10.1038/s41588-024-01704-y)

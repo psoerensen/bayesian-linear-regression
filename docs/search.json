@@ -1,220 +1,451 @@
 [
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html",
-    "href": "tutorials/bayesian_magma_tutorial.html",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html",
+    "title": "Bayesian Fine-Mapping with BayesC",
     "section": "",
-    "text": "This tutorial introduces Bayesian MAGMA — a gene set prioritization approach utilizing Bayesian Linear Regression (BLR) models within the MAGMA gene set analysis framework.\nThe figure below shows a schematic overview of the workflow.\nIn the initial step, GWAS summary data for the traits of interest are used to compute gene-level Z-scores using the VEGAS (Versatile Gene-Based Association Study) approach.\nNext, a design matrix linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).\nThe Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.\nThis results in posterior inclusion probabilities (PIPs) for each gene set, representing the probability that the set is included in the model.\nGene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.\nThe approach can also be extended to multi-trait analyses, enabling cross-trait exploration of pathway relevance.\nSee full details in Gholipourshahraki T, et al. PLOS Genet. 20, e1011463 (2024).\n\n\n Figure 1. Schematic overview of the Bayesian MAGMA workflow."
+    "text": "A genome-wide association study (GWAS) often identifies an associated region rather than a unique causal variant. Nearby SNPs are correlated through linkage disequilibrium (LD), so several SNPs can show strong marginal association even when only one SNP is truly causal.\nFine-mapping asks a more focused question:\n\nWhich SNPs in the associated region remain plausible causal explanations after accounting for LD?\n\nIn this tutorial we use BayesC as a simple Bayesian fine-mapping model. BayesC is a spike-and-slab model in which each SNP is either inactive with effect exactly zero, or active with an effect drawn from a normal distribution.\n\nCompanion presentation: Bayesian Fine-Mapping with BayesC — Slides\n\nThe workflow mirrors the accompanying slide deck:\n\nload a small genotype region;\nsimulate one causal SNP;\nperform marginal GWAS tests;\ninspect LD among the candidate SNPs;\nfit all SNPs jointly with BayesC;\ncalculate posterior inclusion probabilities (PIPs) and posterior mean effects;\nrank candidate SNPs;\nconstruct a 0.9 local credible set (LCS) by ranking SNPs in the local LD neighborhood and summing their raw PIPs.\n\nEverything is implemented in base R. The only external data file required is:\n../data/genotypes.txt"
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#introduction",
-    "href": "tutorials/bayesian_magma_tutorial.html#introduction",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#introduction",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#introduction",
+    "title": "Bayesian Fine-Mapping with BayesC",
     "section": "",
-    "text": "This tutorial introduces Bayesian MAGMA — a gene set prioritization approach utilizing Bayesian Linear Regression (BLR) models within the MAGMA gene set analysis framework.\nThe figure below shows a schematic overview of the workflow.\nIn the initial step, GWAS summary data for the traits of interest are used to compute gene-level Z-scores using the VEGAS (Versatile Gene-Based Association Study) approach.\nNext, a design matrix linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).\nThe Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.\nThis results in posterior inclusion probabilities (PIPs) for each gene set, representing the probability that the set is included in the model.\nGene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.\nThe approach can also be extended to multi-trait analyses, enabling cross-trait exploration of pathway relevance.\nSee full details in Gholipourshahraki T, et al. PLOS Genet. 20, e1011463 (2024).\n\n\n Figure 1. Schematic overview of the Bayesian MAGMA workflow."
+    "text": "A genome-wide association study (GWAS) often identifies an associated region rather than a unique causal variant. Nearby SNPs are correlated through linkage disequilibrium (LD), so several SNPs can show strong marginal association even when only one SNP is truly causal.\nFine-mapping asks a more focused question:\n\nWhich SNPs in the associated region remain plausible causal explanations after accounting for LD?\n\nIn this tutorial we use BayesC as a simple Bayesian fine-mapping model. BayesC is a spike-and-slab model in which each SNP is either inactive with effect exactly zero, or active with an effect drawn from a normal distribution.\n\nCompanion presentation: Bayesian Fine-Mapping with BayesC — Slides\n\nThe workflow mirrors the accompanying slide deck:\n\nload a small genotype region;\nsimulate one causal SNP;\nperform marginal GWAS tests;\ninspect LD among the candidate SNPs;\nfit all SNPs jointly with BayesC;\ncalculate posterior inclusion probabilities (PIPs) and posterior mean effects;\nrank candidate SNPs;\nconstruct a 0.9 local credible set (LCS) by ranking SNPs in the local LD neighborhood and summing their raw PIPs.\n\nEverything is implemented in base R. The only external data file required is:\n../data/genotypes.txt"
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#simulation-set-up",
-    "href": "tutorials/bayesian_magma_tutorial.html#simulation-set-up",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Simulation set up",
-    "text": "Simulation set up\nThis tutorial demonstrates how to simulate gene-level association statistics and overlapping gene sets (pathways) for enrichment analysis using MAGMA-style approaches, implemented either as OLS joint estimation or via Bayesian inference with BayesC or BayesR priors.\nThe tutorial includes the following key steps:\n\nSimulate gene-level Z-scores with causal genes.\n\nCreate overlapping pathways with realistic size distributions.\n\nEnrich specific pathways with causal genes.\n\nVisualize pathway sizes and overlaps.\n\nPerform gene set analysis using magma()-style models (linear and Bayesian)."
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#load-the-genotype-data",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#load-the-genotype-data",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Load the Genotype Data",
+    "text": "Load the Genotype Data\nRead the genotype matrix and select the same 30-SNP region used in the slides.\n\n\nCode\ngeno &lt;- read.delim(\n  \"../data/genotypes.txt\",\n  header = TRUE,\n  row.names = 1,\n  check.names = FALSE\n)\n\nX_all &lt;- as.matrix(geno)\n\nregion &lt;- 114:143\nX &lt;- scale(\n  X_all[, region, drop = FALSE],\n  center = TRUE,\n  scale = TRUE\n)\n\nn &lt;- nrow(X)\nm &lt;- ncol(X)\nsnp &lt;- colnames(X)\n\nc(n = n, m = m)\n\n\n  n   m \n503  30 \n\n\nThe rows are individuals and the columns are SNPs. In this example the locus contains 30 candidate SNPs. Each genotype column is centered and standardized to unit sample variance, so the prior variance calculations and marker cross-products use a common scale."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-0-load-libraries",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-0-load-libraries",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 0: Load libraries",
-    "text": "Step 0: Load libraries\n\n\nCode\nlibrary(qgg)\nlibrary(ggplot2)"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#simulate-one-causal-snp",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#simulate-one-causal-snp",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Simulate One Causal SNP",
+    "text": "Simulate One Causal SNP\nWe simulate a phenotype using SNP 11 as the causal variant.\n\n\nCode\nset.seed(123)\n\ncausal &lt;- 11\n\nbeta_true &lt;- rep(0, m)\nbeta_true[causal] &lt;- 0.35\n\ng &lt;- drop(X %*% beta_true)\n\nh2 &lt;- 0.30\nvare_true &lt;- var(g) * (1 - h2) / h2\n\ny &lt;- g + rnorm(n, 0, sqrt(vare_true))\n\n\nThe causal SNP is:\n\n\nCode\nsnp[causal]\n\n\n[1] \"rs200766023_G\"\n\n\nThe simulation is deliberately simple: there is one true causal SNP in the region. This makes it possible to see directly whether the fine-mapping model concentrates posterior support on the correct marker or distributes support across LD-correlated alternatives."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-1-basic-parameters",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-1-basic-parameters",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 1: Basic Parameters",
-    "text": "Step 1: Basic Parameters\n\n\nCode\nset.seed(123)\nn_genes &lt;- 20000\nn_assoc &lt;-  100\nn_pathways &lt;- 100\neffect_mean &lt;- 2\neffect_sd &lt;- 1"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#standard-gwas-one-snp-at-a-time",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#standard-gwas-one-snp-at-a-time",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Standard GWAS: One SNP at a Time",
+    "text": "Standard GWAS: One SNP at a Time\nA standard GWAS tests each SNP separately. For SNP \\(j\\) we fit\n\\[\ny_i = \\mu + x_{ij}\\beta_j + e_i.\n\\]\nThe resulting effect estimate, standard error, and \\(p\\)-value describe marginal association evidence. They do not condition on the other SNPs in the region.\nWe calculate these quantities for all 30 SNPs.\n\n\nCode\ngwas_beta &lt;- numeric(m)\ngwas_se &lt;- numeric(m)\ngwas_p &lt;- numeric(m)\n\nfor (j in seq_len(m)) {\n  fit_j &lt;- lm(y ~ X[, j])\n  coef_j &lt;- summary(fit_j)$coefficients\n\n  gwas_beta[j] &lt;- unname(coef_j[2, 1])\n  gwas_se[j] &lt;- unname(coef_j[2, 2])\n  gwas_p[j] &lt;- unname(coef_j[2, 4])\n}\n\ngwas_results &lt;- data.frame(\n  marker = seq_len(m),\n  SNP = snp,\n  beta_hat = gwas_beta,\n  SE = gwas_se,\n  p_value = gwas_p,\n  causal = seq_len(m) == causal\n)\n\ngwas_results[order(gwas_results$p_value), ]\n\n\n   marker           SNP    beta_hat         SE      p_value causal\n11     11 rs200766023_G  0.34990887 0.02322565 1.420561e-42   TRUE\n8       8 rs199676333_C -0.30211540 0.02452817 1.223803e-30  FALSE\n2       2 rs143764217_C  0.29621070 0.02467150 2.311365e-29  FALSE\n14     14 rs149771619_A  0.27890547 0.02507087 7.645056e-26  FALSE\n13     13 rs372428423_A  0.27785589 0.02509412 1.220905e-25  FALSE\n17     17 rs199985493_T  0.27289436 0.02520256 1.077893e-24  FALSE\n4       4  rs77714226_T -0.27012336 0.02526207 3.549144e-24  FALSE\n1       1 rs144666531_G  0.26658638 0.02533696 1.583992e-23  FALSE\n3       3 rs138139885_C  0.26573288 0.02535485 2.263028e-23  FALSE\n7       7   rs2716416_C  0.26569930 0.02535555 2.294936e-23  FALSE\n26     26  rs78913776_T  0.26081248 0.02545662 1.714950e-22  FALSE\n27     27 rs371582893_A  0.25955620 0.02548224 2.851915e-22  FALSE\n23     23 rs148271204_G  0.25894083 0.02549473 3.654194e-22  FALSE\n20     20 rs201317463_T  0.25210072 0.02563120 5.441767e-21  FALSE\n12     12 rs201631627_T -0.24130531 0.02583777 3.168011e-19  FALSE\n29     29 rs114833654_T  0.23125685 0.02602054 1.128395e-17  FALSE\n25     25 rs146675715_T  0.23106385 0.02602396 1.206224e-17  FALSE\n10     10 rs201331129_A  0.22066305 0.02620352 3.953248e-16  FALSE\n18     18 rs201146901_C -0.21368041 0.02631878 3.676519e-15  FALSE\n21     21 rs199697997_T -0.20244187 0.02649552 1.107620e-13  FALSE\n19     19 rs201944730_T -0.19903847 0.02654694 2.973910e-13  FALSE\n28     28 rs370880731_C -0.15890098 0.02708166 8.050312e-09  FALSE\n16     16 rs370414481_A  0.09326122 0.02768490 8.135171e-04  FALSE\n6       6   rs2007911_C  0.08119491 0.02776068 3.602798e-03  FALSE\n9       9 rs368834055_A  0.07647489 0.02778742 6.135385e-03  FALSE\n5       5 rs368129211_G  0.05397037 0.02789266 5.356129e-02  FALSE\n15     15  rs77287660_A -0.04378200 0.02792827 1.175922e-01  FALSE\n22     22 rs370167421_C -0.02979486 0.02796502 2.871932e-01  FALSE\n24     24   rs2212121_T -0.02574751 0.02797304 3.577857e-01  FALSE\n30     30 rs201836474_C  0.00582386 0.02799548 8.352912e-01  FALSE"
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-2-simulate-gene-level-association-statistics",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-2-simulate-gene-level-association-statistics",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 2: Simulate Gene-Level Association Statistics",
-    "text": "Step 2: Simulate Gene-Level Association Statistics\nIn this step, we simulate gene-level Z-scores for 20,000 genes,\nwhere a subset of 100 are truly associated (causal).\nWe then visualize the results using a QQ plot that distinguishes\ncausal genes (red) from null genes (grey).\n\n\nCode\ngenes &lt;- paste0(\"Gene\", seq_len(n_genes))\n\n# --- Step 1: Null genes centered around 0 ---\nz_scores &lt;- rnorm(n_genes, mean = 0, sd = 1)\nnames(z_scores) &lt;- genes\n\n# --- Step 2: Define causal genes (stronger, possibly positive or negative) ---\nassociated_genes &lt;- sample(genes, n_assoc)\nz_scores[associated_genes] &lt;- rnorm(n_assoc, mean = effect_mean, sd = effect_sd)\n\n# --- Step 3: Compute two-tailed p-values (VEGAS-style) ---\np_values &lt;- 2 * pnorm(-abs(z_scores))\n\n# --- Step 4: QQ plot ---\ndf &lt;- data.frame(\n  Gene = genes,\n  P = p_values,\n  causal = genes %in% associated_genes\n)\ndf &lt;- df[order(df$P), ]\ndf$expected &lt;- -log10(ppoints(n_genes))\ndf$observed &lt;- -log10(df$P)\n\ncol_map &lt;- c(\"FALSE\" = \"grey60\", \"TRUE\" = \"firebrick\")\n\nplot(df$expected, df$observed,\n     pch = 19, cex = 0.6,\n     col = col_map[as.character(df$causal)],\n     xlab = expression(Expected~~-log[10](italic(p))),\n     ylab = expression(Observed~~-log[10](italic(p))),\n     main = \"QQ Plot of Simulated VEGAS-Style Gene Z-scores\")\n\nabline(0, 1, col = \"black\", lwd = 2)\nlegend(\"topleft\",\n       legend = c(\"Null genes\", \"Causal genes\"),\n       col = c(\"grey60\", \"firebrick\"), pch = 19, bty = \"n\")\n\n\n\n\n\nQQ plot of simulated gene-level associations showing causal (red) and null (grey) genes."
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#local-manhattan-plot",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#local-manhattan-plot",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Local Manhattan Plot",
+    "text": "Local Manhattan Plot\nA local Manhattan-style plot shows the marginal GWAS signal across the locus.\n\n\nCode\nplot(\n  seq_len(m),\n  -log10(gwas_p),\n  type = \"h\",\n  lwd = 4,\n  xlab = \"SNP position in the local region\",\n  ylab = expression(-log[10](p)),\n  main = \"Marginal GWAS signal in the locus\"\n)\n\npoints(\n  causal,\n  -log10(gwas_p[causal]),\n  pch = 19,\n  cex = 1.4,\n  col = \"red\"\n)\n\nabline(v = causal, col = \"red\", lty = 2)\n\n\n\n\n\n\n\n\n\nSeveral nearby SNPs can look associated because they tag the same underlying signal through LD. The GWAS therefore identifies an associated region, but it does not necessarily identify a unique causal variant."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-3-draw-realistic-gene-set-sizes",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-3-draw-realistic-gene-set-sizes",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 3: Draw Realistic Gene Set Sizes",
-    "text": "Step 3: Draw Realistic Gene Set Sizes\nWe use a log-normal distribution to simulate pathway sizes, resulting in a right-skewed distribution (many small pathways, few large ones).\n\n\nCode\nsizes_raw &lt;- round(rlnorm(n_pathways, meanlog = log(80), sdlog = 0.6))\nsizes &lt;- pmin(pmax(sizes_raw, 15), 500)  # truncate to 15–500\nsummary(sizes)\n\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  15.00   53.75   75.00   92.77  119.25  259.00"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#inspect-linkage-disequilibrium",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#inspect-linkage-disequilibrium",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Inspect Linkage Disequilibrium",
+    "text": "Inspect Linkage Disequilibrium\nThe LD correlation matrix for the candidate SNPs is\n\\[\nR = \\operatorname{cor}(X).\n\\]\n\n\nCode\nR &lt;- cor(X)\n\nimage(\n  R,\n  axes = FALSE,\n  main = \"LD correlation matrix\"\n)\n\naxis(\n  1,\n  at = seq(0, 1, length.out = m),\n  labels = seq_len(m),\n  cex.axis = 0.7\n)\n\naxis(\n  2,\n  at = seq(0, 1, length.out = m),\n  labels = seq_len(m),\n  cex.axis = 0.7\n)\n\n\n\n\n\n\n\n\n\nWe can also inspect LD with the true causal SNP directly.\n\n\nCode\nplot(\n  seq_len(m),\n  R[causal, ]^2,\n  type = \"h\",\n  lwd = 3,\n  xlab = \"SNP\",\n  ylab = expression(r^2~\"with causal SNP\"),\n  main = \"LD around the causal SNP\"\n)\n\nabline(v = causal, col = \"red\", lty = 2)\n\n\n\n\n\n\n\n\n\nA non-causal SNP can have a strong marginal GWAS signal simply because it is strongly correlated with the causal SNP."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-4-create-overlapping-pathways",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-4-create-overlapping-pathways",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 4: Create Overlapping Pathways",
-    "text": "Step 4: Create Overlapping Pathways\nHere, we simulate overlapping pathways. Each pathway shares some genes with previous ones, mimicking realistic biological redundancy.\n\n\nCode\npathway_list &lt;- vector(\"list\", n_pathways)\nnames(pathway_list) &lt;- paste0(\"Pathway_\", seq_len(n_pathways))\n\nfor (i in seq_len(n_pathways)) {\n  size &lt;- sizes[i]\n  \n  if (i &gt; 1 && runif(1) &lt; 0.9) {  # 90% chance to overlap\n    j &lt;- sample(seq_len(i - 1), 1)  # pick existing pathway\n    target_overlap &lt;- round(size * runif(1, 0.20, 0.50))  # 20–50% overlap\n    overlap_pool &lt;- pathway_list[[j]]\n    k &lt;- min(target_overlap, length(overlap_pool), size)\n    overlap_genes &lt;- if (k &gt; 0) sample(overlap_pool, k) else character(0)\n    remaining_pool &lt;- setdiff(genes, overlap_genes)\n    n_remaining &lt;- size - length(overlap_genes)\n    new_genes &lt;- if (n_remaining &gt; 0) sample(remaining_pool, n_remaining) else character(0)\n    pathway_list[[i]] &lt;- unique(c(overlap_genes, new_genes))\n  } else {\n    pathway_list[[i]] &lt;- sample(genes, size)\n  }\n}"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#fine-mapping-inputs-and-outputs",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#fine-mapping-inputs-and-outputs",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping: Inputs and Outputs",
+    "text": "Fine-Mapping: Inputs and Outputs\nThe main inputs are:\n\nmarker-level association information, represented here by the phenotype and genotype data and summarized by \\(\\hat\\beta_j\\) and \\(\\mathrm{SE}(\\hat\\beta_j)\\);\nLD among candidate SNPs, represented by \\(R\\) or equivalently by the genotype cross-product structure;\na sparse joint model, here BayesC.\n\nThe main outputs are:\n\nposterior inclusion probabilities (PIPs);\nposterior mean SNP effects;\nranked candidate variants;\na local credible set summarizing the strongest signal and its LD-related alternatives.\n\nThe key difference from GWAS is that fine-mapping evaluates the SNPs jointly."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-5-create-causal-pathways",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-5-create-causal-pathways",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 5: Create Causal Pathways",
-    "text": "Step 5: Create Causal Pathways\nWe enrich 1–2 pathways with truly associated genes to simulate signal.\n\n\nCode\nn_enriched_paths &lt;- 2\nenriched_paths &lt;- sample(names(pathway_list), n_enriched_paths)\n\nfor (p in enriched_paths) {\n  n_enriched_genes &lt;- 30\n  enriched_genes &lt;- sample(associated_genes, n_enriched_genes)\n  pathway_list[[p]] &lt;- unique(c(pathway_list[[p]], enriched_genes))\n}\n\ncat(\"Created\", n_pathways, \"pathways (15–500 genes each)\\n\")\n\n\nCreated 100 pathways (15–500 genes each)\n\n\nCode\ncat(\"Causal pathways:\", paste(enriched_paths, collapse = \", \"), \"\\n\")\n\n\nCausal pathways: Pathway_75, Pathway_53"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#bayesc-fine-mapping-model",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#bayesc-fine-mapping-model",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "BayesC Fine-Mapping Model",
+    "text": "BayesC Fine-Mapping Model\nAt the individual-data level we use\n\\[\ny = \\mu + Xb + e,\n\\qquad\ne \\sim \\mathcal{N}(0,v_e I_N).\n\\]\nHere:\n\n\\(X\\) is the genotype matrix;\n\\(b=(b_1,\\ldots,b_M)^\\top\\) is the vector of SNP effects;\n\\(v_e\\) is the residual variance.\n\nBecause all SNPs are fitted together, LD enters the joint likelihood through the genotype cross-product structure \\(X^\\top X\\).\nThis is the important conceptual transition from GWAS to fine-mapping:\n\\[\n\\text{marginal association}\n\\quad\\longrightarrow\\quad\n\\text{joint posterior evidence}.\n\\]\nCorrelated SNPs can now compete to explain the same association signal."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-6-visualize-pathway-size-distribution",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-6-visualize-pathway-size-distribution",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 6: Visualize Pathway Size Distribution",
-    "text": "Step 6: Visualize Pathway Size Distribution\n\n\nCode\nsizes_df &lt;- data.frame(Pathway = names(pathway_list), Size = sizes)\n\nggplot(sizes_df, aes(x = Size)) +\n  geom_histogram(bins = 30, fill = \"steelblue\", color = \"white\") +\n  theme_minimal(base_size = 13) +\n  labs(\n    title = \"Distribution of Simulated Pathway Sizes\",\n    x = \"Number of genes per pathway\",\n    y = \"Count\"\n  )"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#bayesc-prior",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#bayesc-prior",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "BayesC Prior",
+    "text": "BayesC Prior\nBayesC assumes that each SNP is either inactive or active. Introduce an indicator\n\\[\nd_j \\in \\{0,1\\}.\n\\]\nThe prior is\n\\[\nd_j \\sim \\operatorname{Bernoulli}(\\pi),\n\\]\nwith\n\\[\nb_j = 0\n\\qquad\\text{if }d_j=0,\n\\]\nand\n\\[\nb_j\\mid d_j=1\n\\sim \\mathcal{N}(0,v_b).\n\\]\nEquivalently,\n\\[\nb_j\n\\sim\n(1-\\pi)\\delta_0\n+\n\\pi \\mathcal{N}(0,v_b).\n\\]\nWe use\n\n\nCode\npi_active &lt;- 0.03\n\nc(\n  prior_P_active = pi_active,\n  prior_expected_active_SNPs = m * pi_active\n)\n\n\n            prior_P_active prior_expected_active_SNPs \n                      0.03                       0.90 \n\n\nThus each SNP has prior probability 0.03 of being active, corresponding to a prior expectation of 0.9 active SNPs among the 30 markers.\nFor this tutorial we keep \\(\\pi\\) fixed. The goal is to study the local fine-mapping problem, not to estimate genome-wide architecture parameters from only 30 SNPs."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-7-visualize-pathway-overlap",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-7-visualize-pathway-overlap",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 7: Visualize Pathway Overlap",
-    "text": "Step 7: Visualize Pathway Overlap\nWe calculate the Jaccard index (|A∩B| / |A∪B|) between pathways and visualize it with a heatmap.\n\n\nCode\nn_show &lt;- 30  # display subset\noverlap_matrix &lt;- matrix(NA, n_show, n_show,\n                         dimnames = list(names(pathway_list)[1:n_show],\n                                         names(pathway_list)[1:n_show]))\n\nfor (i in seq_len(n_show)) {\n  for (j in seq_len(n_show)) {\n    g1 &lt;- pathway_list[[i]]\n    g2 &lt;- pathway_list[[j]]\n    overlap_matrix[i, j] &lt;- length(intersect(g1, g2)) / length(union(g1, g2))\n  }\n}\n\nif (requireNamespace(\"pheatmap\", quietly = TRUE)) {\n  library(pheatmap)\n  pheatmap(\n    overlap_matrix,\n    main = \"Pathway Overlap (Jaccard Index)\",\n    color = colorRampPalette(c(\"white\", \"red\"))(50),\n    border_color = NA\n  )\n}"
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#what-the-gibbs-sampler-does",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#what-the-gibbs-sampler-does",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "What the Gibbs Sampler Does",
+    "text": "What the Gibbs Sampler Does\nAt each MCMC iteration the sampler updates every SNP conditional on the current values of the other SNP effects.\nFor SNP \\(j\\) it considers two possibilities:\n\\[\nd_j=0\n\\quad\\Rightarrow\\quad\nb_j=0,\n\\]\nor\n\\[\nd_j=1\n\\quad\\Rightarrow\\quad\nb_j\\neq0.\n\\]\nBecause the residual signal changes whenever another SNP is included or excluded, the inclusion probability for SNP \\(j\\) automatically reflects competition with LD-correlated SNPs.\nThe sampler also updates the non-zero effect variance and residual variance."
   },
   {
-    "objectID": "tutorials/bayesian_magma_tutorial.html#step-8-run-and-compare-magma-style-gene-set-analyses",
-    "href": "tutorials/bayesian_magma_tutorial.html#step-8-run-and-compare-magma-style-gene-set-analyses",
-    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
-    "section": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses",
-    "text": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses\nHere we compare three approaches implemented in qgg::magma():\n\n\n\n\n\n\n\n\n\nMethod\nModel Type\nConcept\nOutput\n\n\n\n\nJoint (fitM)\nLinear regression\nTests all pathways simultaneously\nβ-coefficients, SEs, p-values\n\n\nBayesC (fitC)\nBayesian spike-and-slab\nSelects relevant pathways by posterior inclusion probability (PIP)\nPosterior means, PIPs\n\n\nBayesR (fitR)\nBayesian mixture prior\nAllows pathways to have small, moderate, or large effects\nPosterior means, PIPs\n\n\n\n\nClassical joint model (standard MAGMA-style regression)\n\n\nCode\nfitM &lt;- magma(stat = z_scores, sets = pathway_list, type = \"joint\")\nhead(fitM)\n\n\n           ID  m      b    seb      z            p\n53 Pathway_53 45 0.0586 0.0072 8.1323 2.105592e-16\n75 Pathway_75 76 0.0446 0.0076 5.8493 2.467936e-09\n71 Pathway_71 63 0.0191 0.0083 2.2936 1.090724e-02\n49 Pathway_49 61 0.0156 0.0082 1.9083 2.817681e-02\n82 Pathway_82 85 0.0167 0.0091 1.8455 3.248288e-02\n74 Pathway_74 54 0.0130 0.0072 1.7987 3.603322e-02\n\n\n\n\nBayesian sparse model (BayesC)\n\n\nCode\nfitC &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesC\")\nhead(fitC)\n\n\n           ID   m      b    PIP\n53 Pathway_53  45 0.0586 1.0000\n75 Pathway_75  76 0.0441 1.0000\n28 Pathway_28  48 0.0000 0.0020\n62 Pathway_62 109 0.0000 0.0018\n71 Pathway_71  63 0.0000 0.0018\n13 Pathway_13 119 0.0000 0.0016\n\n\n\n\nBayesian mixture model (BayesR)\n\n\nCode\nfitR &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesR\")\nhead(fitR)\n\n\n           ID   m       b    PIP\n53 Pathway_53  45  0.0586 1.0000\n75 Pathway_75  76  0.0440 1.0000\n28 Pathway_28  48 -0.0005 0.0284\n82 Pathway_82  85  0.0003 0.0166\n13 Pathway_13 119 -0.0002 0.0146\n63 Pathway_63 187 -0.0002 0.0130\n\n\n\n\nSummarize and Compare Outputs\n\n\nCode\n# Extract comparable metrics\nresults &lt;- list(\n  Joint = fitM[, c(\"ID\", \"b\", \"p\")],\n  BayesC = fitC[, c(\"ID\", \"b\", \"PIP\")],\n  BayesR = fitR[, c(\"ID\", \"b\", \"PIP\")]\n)\n\n# Merge results by Pathway ID\nmerged_results &lt;- Reduce(function(x, y) merge(x, y, by = \"ID\", all = TRUE), results)\ncolnames(merged_results) &lt;- c(\"Pathway\", \"b_joint\", \"p_joint\", \"b_bayesC\", \"PIP_bayesC\", \"b_bayesR\", \"PIP_bayesR\")\nmerged_results$is_enriched &lt;- merged_results$Pathway %in% enriched_paths\n\nhead(merged_results[order(-merged_results$PIP_bayesC), ])\n\n\n      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR\n50 Pathway_53  0.0586 2.105592e-16   0.0586     1.0000   0.0586     1.0000\n74 Pathway_75  0.0446 2.467936e-09   0.0441     1.0000   0.0440     1.0000\n22 Pathway_28 -0.0188 9.947193e-01   0.0000     0.0020  -0.0005     0.0284\n60 Pathway_62  0.0134 3.969070e-02   0.0000     0.0018   0.0001     0.0120\n70 Pathway_71  0.0191 1.090724e-02   0.0000     0.0018   0.0001     0.0068\n6  Pathway_13 -0.0154 9.553190e-01   0.0000     0.0016  -0.0002     0.0146\n   is_enriched\n50        TRUE\n74        TRUE\n22       FALSE\n60       FALSE\n70       FALSE\n6        FALSE\n\n\n\n\nVisualize Comparison of Evidence\n\n\nCode\nlibrary(ggplot2)\n\nggplot(merged_results, aes(x = -log10(p_joint), y = PIP_bayesC, color = is_enriched)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text(data = subset(merged_results, is_enriched), aes(label = Pathway),\n            vjust = -1, size = 3.2) +\n  scale_color_manual(values = c(\"FALSE\" = \"grey60\", \"TRUE\" = \"firebrick\")) +\n  labs(\n    x = expression(-log[10](italic(p))~~\"(Joint model)\"),\n    y = \"Posterior Inclusion Probability (BayesC)\",\n    title = \"Comparison of Classical and Bayesian MAGMA Results\"\n  ) +\n  theme_minimal(base_size = 13)\n\n\n\n\n\n\n\n\n\n\n\nInterpretation\nThe joint linear model detects a broad set of pathways with small effects but cannot quantify inclusion evidence. BayesC and BayesR provide posterior probabilities reflecting uncertainty and sparsity. In this simulation, truly enriched pathways (in red) show both low p-values and high PIPs (&gt;0.9), illustrating consistency between classical and Bayesian inference while offering a probabilistic measure of pathway relevance."
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#base-r-bayesc-gibbs-sampler",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#base-r-bayesc-gibbs-sampler",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Base-R BayesC Gibbs Sampler",
+    "text": "Base-R BayesC Gibbs Sampler\nThe following implementation is intentionally compact and teaching-oriented. It uses only base R.\n\n\nCode\nfit_bayesc &lt;- function(\n  X,\n  y,\n  niter = 2000,\n  pi = 0.03,\n  start_h2 = 0.30\n) {\n\n  n &lt;- nrow(X)\n  m &lt;- ncol(X)\n\n  stopifnot(\n    pi &gt; 0,\n    pi &lt; 1,\n    start_h2 &gt; 0,\n    start_h2 &lt; 1\n  )\n\n  # ------------------------------------------------------------\n  # Starting values\n  # ------------------------------------------------------------\n  vary &lt;- var(y)\n  varg &lt;- vary * start_h2\n  vare &lt;- vary * (1 - start_h2)\n\n  # With one non-zero component, E(number active) = m * pi.\n  varb &lt;- varg / (m * pi)\n\n  # Scaled inverse-chi-square priors for varb and vare.\n  nub &lt;- 4\n  nue &lt;- 4\n\n  scale_b &lt;- (nub - 2) / nub * varb\n  scale_e &lt;- (nue - 2) / nue * vare\n\n  # ------------------------------------------------------------\n  # State variables\n  # ------------------------------------------------------------\n  beta &lt;- numeric(m)\n  delta &lt;- integer(m)\n  mu &lt;- mean(y)\n\n  # ycorr is the current residual y - mu - X beta.\n  ycorr &lt;- y - mu\n  xpx &lt;- colSums(X^2)\n\n  beta_mcmc &lt;- matrix(\n    0,\n    nrow = niter,\n    ncol = m\n  )\n\n  delta_mcmc &lt;- matrix(\n    0L,\n    nrow = niter,\n    ncol = m\n  )\n\n  par_mcmc &lt;- matrix(\n    NA_real_,\n    nrow = niter,\n    ncol = 5\n  )\n\n  colnames(par_mcmc) &lt;- c(\n    \"Nactive\",\n    \"Varb\",\n    \"Vare\",\n    \"Varg\",\n    \"h2\"\n  )\n\n  # ------------------------------------------------------------\n  # Gibbs sampler\n  # ------------------------------------------------------------\n  for (iter in seq_len(niter)) {\n\n    # 1. Update the intercept.\n    ycorr &lt;- ycorr + mu\n\n    mu_hat &lt;- mean(ycorr)\n    mu &lt;- rnorm(\n      1,\n      mean = mu_hat,\n      sd = sqrt(vare / n)\n    )\n\n    ycorr &lt;- ycorr - mu\n\n    # 2. Update SNPs one at a time.\n    for (j in seq_len(m)) {\n\n      xj &lt;- X[, j]\n      old_beta &lt;- beta[j]\n\n      # Add the current SNP effect back before updating it.\n      residual_without_j &lt;- ycorr + xj * old_beta\n\n      rhs &lt;- sum(xj * residual_without_j)\n\n      # Posterior distribution if the SNP is active.\n      Cj &lt;- xpx[j] + vare / varb\n      post_mean &lt;- rhs / Cj\n      post_var &lt;- vare / Cj\n\n      # Integrated evidence for the active component.\n      log_prob_zero &lt;- log(1 - pi)\n\n      log_prob_active &lt;-\n        log(pi) +\n        0.5 * (\n          log(vare) -\n          log(varb) -\n          log(Cj) +\n          rhs^2 / (vare * Cj)\n        )\n\n      max_log &lt;- max(\n        log_prob_zero,\n        log_prob_active\n      )\n\n      prob &lt;- exp(\n        c(\n          log_prob_zero,\n          log_prob_active\n        ) - max_log\n      )\n\n      prob &lt;- prob / sum(prob)\n\n      delta[j] &lt;- sample(\n        c(0L, 1L),\n        size = 1,\n        prob = prob\n      )\n\n      if (delta[j] == 0L) {\n        beta[j] &lt;- 0\n      } else {\n        beta[j] &lt;- rnorm(\n          1,\n          mean = post_mean,\n          sd = sqrt(post_var)\n        )\n      }\n\n      # Update residual after the new SNP effect is sampled.\n      ycorr &lt;- residual_without_j - xj * beta[j]\n    }\n\n    # 3. Update the variance of active SNP effects.\n    active &lt;- which(delta == 1L)\n    nactive &lt;- length(active)\n\n    shape_b &lt;- 0.5 * (nub + nactive)\n    rate_b &lt;- 0.5 * nub * scale_b\n\n    if (nactive &gt; 0) {\n      rate_b &lt;-\n        rate_b +\n        0.5 * sum(beta[active]^2)\n    }\n\n    varb &lt;- 1 / rgamma(\n      1,\n      shape = shape_b,\n      rate = rate_b\n    )\n\n    # 4. Update residual variance.\n    resid &lt;- y - mu - drop(X %*% beta)\n\n    shape_e &lt;- 0.5 * (nue + n)\n    rate_e &lt;-\n      0.5 * (\n        nue * scale_e +\n        sum(resid^2)\n      )\n\n    vare &lt;- 1 / rgamma(\n      1,\n      shape = shape_e,\n      rate = rate_e\n    )\n\n    # 5. Derived quantities and storage.\n    varg_iter &lt;- var(drop(X %*% beta))\n    h2_iter &lt;- varg_iter / (varg_iter + vare)\n\n    beta_mcmc[iter, ] &lt;- beta\n    delta_mcmc[iter, ] &lt;- delta\n\n    par_mcmc[iter, ] &lt;- c(\n      nactive,\n      varb,\n      vare,\n      varg_iter,\n      h2_iter\n    )\n  }\n\n  colnames(beta_mcmc) &lt;- colnames(X)\n  colnames(delta_mcmc) &lt;- colnames(X)\n\n  list(\n    beta = beta_mcmc,\n    delta = delta_mcmc,\n    par = par_mcmc,\n    input = list(\n      niter = niter,\n      pi = pi,\n      start_h2 = start_h2\n    )\n  )\n}\n\n\nThe important part for fine-mapping is the sampled inclusion indicator \\(d_j\\). A SNP that is repeatedly required to explain the signal will be active in a large fraction of posterior samples."
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#fit-bayesc",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#fit-bayesc",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fit BayesC",
+    "text": "Fit BayesC\nUse the same prior probability as above and keep the first 500 iterations as burn-in.\n\n\nCode\nset.seed(1)\n\nniter &lt;- 2000\nburn_in &lt;- 500\n\nfit &lt;- fit_bayesc(\n  X = X,\n  y = y,\n  niter = niter,\n  pi = pi_active,\n  start_h2 = 0.30\n)\n\nkeep &lt;- (burn_in + 1):niter"
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#posterior-inclusion-probabilities",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#posterior-inclusion-probabilities",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Posterior Inclusion Probabilities",
+    "text": "Posterior Inclusion Probabilities\nThe posterior inclusion probability for SNP \\(j\\) is\n\\[\n\\operatorname{PIP}_j\n=\nP(d_j=1\\mid\\mathcal D).\n\\]\nFrom the MCMC samples we estimate it as\n\\[\n\\widehat{\\operatorname{PIP}}_j\n=\n\\frac{1}{T}\n\\sum_{t=1}^T d_j^{(t)}.\n\\]\n\n\nCode\nPIP &lt;- colMeans(\n  fit$delta[keep, , drop = FALSE]\n)\n\n\nThe PIP comes from the joint BayesC model. SNP \\(j\\) is updated conditional on the current values of the other SNPs, and the final PIP averages over uncertainty in those other posterior states.\nThis is sometimes called a marginal PIP because the other model states have been marginalized out. It should not be confused with a marginal GWAS analysis: the underlying fit is joint."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#posterior-mean-effects",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#posterior-mean-effects",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Posterior Mean Effects",
+    "text": "Posterior Mean Effects\nThe posterior mean SNP effect is\n\\[\nE(b_j\\mid\\mathcal D),\n\\]\nestimated by averaging the sampled SNP effects over all retained iterations, including the iterations in which the SNP is inactive.\n\n\nCode\nbeta_post &lt;- colMeans(\n  fit$beta[keep, , drop = FALSE]\n)\n\n\nPIP and posterior mean effect answer different questions:\n\nPIP: how strongly does the posterior support inclusion of this SNP?\nposterior mean effect: what is the average effect after model averaging over inclusion and exclusion?"
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#fine-mapping-results",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#fine-mapping-results",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping Results",
+    "text": "Fine-Mapping Results\nCombine the marginal GWAS evidence, LD, true simulation information, and BayesC posterior summaries.\n\n\nCode\nresults &lt;- data.frame(\n  marker = seq_len(m),\n  SNP = snp,\n  marginal_beta = gwas_beta,\n  marginal_p = gwas_p,\n  r2_with_causal = R[causal, ]^2,\n  true_effect = beta_true,\n  PIP = PIP,\n  posterior_mean_effect = beta_post,\n  causal = seq_len(m) == causal\n)\n\nranked_results &lt;-\n  results[\n    order(-results$PIP),\n    ,\n    drop = FALSE\n  ]\n\nhead(ranked_results, 10)\n\n\n              marker           SNP marginal_beta   marginal_p r2_with_causal\nrs200766023_G     11 rs200766023_G    0.34990887 1.420561e-42     1.00000000\nrs77714226_T       4  rs77714226_T   -0.27012336 3.549144e-24     0.74015325\nrs2716416_C        7   rs2716416_C    0.26569930 2.294936e-23     0.69876803\nrs143764217_C      2 rs143764217_C    0.29621070 2.311365e-29     0.78917002\nrs146675715_T     25 rs146675715_T    0.23106385 1.206224e-17     0.49484714\nrs149771619_A     14 rs149771619_A    0.27890547 7.645056e-26     0.61846167\nrs199985493_T     17 rs199985493_T    0.27289436 1.077893e-24     0.54557553\nrs368129211_G      5 rs368129211_G    0.05397037 5.356129e-02     0.05815418\nrs370880731_C     28 rs370880731_C   -0.15890098 8.050312e-09     0.13961262\nrs148271204_G     23 rs148271204_G    0.25894083 3.654194e-22     0.53566334\n              true_effect         PIP posterior_mean_effect causal\nrs200766023_G        0.35 1.000000000          0.3607370502   TRUE\nrs77714226_T         0.00 0.116666667          0.0130069629  FALSE\nrs2716416_C          0.00 0.024666667         -0.0019739998  FALSE\nrs143764217_C        0.00 0.016000000         -0.0004875785  FALSE\nrs146675715_T        0.00 0.011333333         -0.0006590190  FALSE\nrs149771619_A        0.00 0.010000000          0.0006546902  FALSE\nrs199985493_T        0.00 0.007333333          0.0002872568  FALSE\nrs368129211_G        0.00 0.006666667         -0.0001970794  FALSE\nrs370880731_C        0.00 0.006666667         -0.0001951910  FALSE\nrs148271204_G        0.00 0.006000000          0.0001140686  FALSE\n\n\nThe important comparison is between the marginal GWAS ranking and the posterior fine-mapping ranking. Several SNPs may show strong marginal association, while the joint BayesC analysis can concentrate posterior support more strongly on the SNPs that best explain the signal after accounting for LD."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#plot-the-pips",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#plot-the-pips",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Plot the PIPs",
+    "text": "Plot the PIPs\n\n\nCode\nplot(\n  seq_len(m),\n  PIP,\n  type = \"h\",\n  lwd = 5,\n  ylim = c(0, 1),\n  xlab = \"SNP index in the 30-marker region\",\n  ylab = \"Posterior inclusion probability\",\n  main = \"BayesC fine-mapping result\"\n)\n\npoints(\n  causal,\n  PIP[causal],\n  pch = 19,\n  cex = 1.4,\n  col = \"red\"\n)\n\nabline(v = causal, col = \"red\", lty = 2)\n\nlegend(\n  \"topright\",\n  legend = c(\"BayesC PIP\", \"causal SNP\"),\n  col = c(\"black\", \"red\"),\n  lwd = c(5, 1),\n  lty = c(1, 2),\n  pch = c(NA, 19),\n  bty = \"n\"\n)\n\n\n\n\n\n\n\n\n\nThe causal SNP should receive strong posterior support. LD proxies can still retain non-zero PIP because they provide alternative explanations of the same association signal."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#quantify-fine-mapping-uncertainty",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#quantify-fine-mapping-uncertainty",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Quantify Fine-Mapping Uncertainty",
+    "text": "Quantify Fine-Mapping Uncertainty\nBecause this is a simulation, we know which SNP is causal and can calculate a few useful summaries.\n\n\nCode\nnoncausal &lt;- setdiff(\n  seq_len(m),\n  causal\n)\n\nbest_noncausal &lt;-\n  noncausal[\n    which.max(PIP[noncausal])\n  ]\n\ncausal_rank &lt;-\n  rank(\n    -PIP,\n    ties.method = \"min\"\n  )[causal]\n\nfinemap_summary &lt;- data.frame(\n  quantity = c(\n    \"Causal SNP PIP\",\n    \"Causal SNP rank\",\n    \"Best non-causal PIP\",\n    \"PIP gap\",\n    \"Posterior expected active SNPs\",\n    \"Best competitor marker\",\n    \"Best competitor SNP\"\n  ),\n  value = c(\n    round(PIP[causal], 3),\n    causal_rank,\n    round(PIP[best_noncausal], 3),\n    round(\n      PIP[causal] -\n      PIP[best_noncausal],\n      3\n    ),\n    round(sum(PIP), 3),\n    best_noncausal,\n    snp[best_noncausal]\n  )\n)\n\nfinemap_summary\n\n\n                        quantity        value\n1                 Causal SNP PIP            1\n2                Causal SNP rank            1\n3            Best non-causal PIP        0.117\n4                        PIP gap        0.883\n5 Posterior expected active SNPs        1.277\n6         Best competitor marker            4\n7            Best competitor SNP rs77714226_T\n\n\nThe summaries have direct interpretations:\n\ncausal SNP PIP: posterior support for the true causal SNP;\ncausal rank: whether the true causal SNP is the leading candidate;\nbest non-causal PIP: support retained by the strongest alternative;\nPIP gap: separation between the causal SNP and its strongest competitor;\nsum of PIPs: posterior expected number of active SNPs in the region.\n\nThe last identity follows because\n\\[\nE(N_{\\mathrm{active}}\\mid\\mathcal D)\n=\nE\\left(\\sum_j d_j\\mid\\mathcal D\\right)\n=\n\\sum_j \\operatorname{PIP}_j.\n\\]"
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#pip-and-ld",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#pip-and-ld",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "PIP and LD",
+    "text": "PIP and LD\nA useful diagnostic is to compare PIP with LD to the causal SNP.\n\n\nCode\nplot(\n  R[causal, ]^2,\n  PIP,\n  pch = 19,\n  xlab = expression(r^2~\"with causal SNP\"),\n  ylab = \"BayesC PIP\",\n  main = \"LD and posterior inclusion probability\"\n)\n\npoints(\n  R[causal, causal]^2,\n  PIP[causal],\n  pch = 19,\n  col = \"red\",\n  cex = 1.5\n)\n\n\n\n\n\n\n\n\n\nStrong LD does not automatically imply high PIP. Instead, it tells us which SNPs contain similar information. The joint posterior determines how much support each of those correlated alternatives retains."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#pip-is-not-the-same-as-effect-size",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#pip-is-not-the-same-as-effect-size",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "PIP Is Not the Same as Effect Size",
+    "text": "PIP Is Not the Same as Effect Size\n\n\nCode\nplot(\n  PIP,\n  abs(beta_post),\n  pch = 19,\n  xlab = \"Posterior inclusion probability\",\n  ylab = \"Absolute posterior mean effect\",\n  main = \"PIP versus posterior mean effect\"\n)\n\npoints(\n  PIP[causal],\n  abs(beta_post[causal]),\n  pch = 19,\n  col = \"red\",\n  cex = 1.5\n)\n\n\n\n\n\n\n\n\n\nA SNP can have appreciable PIP but a modest posterior mean effect if it is active only in part of the posterior or if its active effects are small. Conversely, a SNP selected less frequently can have a relatively large effect when it is selected.\nFor fine-mapping, PIP is the main marker-level measure of support for inclusion."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#from-pips-to-a-local-credible-set",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#from-pips-to-a-local-credible-set",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "From PIPs to a Local Credible Set",
+    "text": "From PIPs to a Local Credible Set\nWe now use the same local credible-set construction as in the slide deck.\nThe procedure is:\n\nidentify the SNP with the highest PIP;\ndefine the local LD neighborhood around that focal SNP, here using \\(r^2\\ge0.5\\);\nrank SNPs in that neighborhood by decreasing raw PIP;\nadd PIPs until the cumulative sum reaches 0.90.\n\nThus the 0.9 local credible set \\(\\mathcal C\\) satisfies\n\\[\n\\sum_{j\\in\\mathcal C}\n\\operatorname{PIP}_j\n\\ge 0.90.\n\\]\nWe do not normalize the PIPs by their total across the locus.\nBecause BayesC permits several SNPs to be active, this cumulative-raw-PIP LCS is a practical localization summary. Without a single-causal-variant assumption or a configuration-based calculation, it is not a formal \\(90\\%\\) posterior coverage set."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#construct-the-0.9-local-credible-set",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#construct-the-0.9-local-credible-set",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Construct the 0.9 Local Credible Set",
+    "text": "Construct the 0.9 Local Credible Set\n\n\nCode\nmake_local_credible_set &lt;- function(\n  PIP,\n  R,\n  SNP,\n  coverage = 0.90,\n  r2_threshold = 0.50\n) {\n\n  # SNP with highest posterior inclusion probability.\n  focal &lt;- which.max(PIP)\n\n  # Local LD neighborhood of the focal SNP.\n  local &lt;- which(\n    R[focal, ]^2 &gt;= r2_threshold\n  )\n\n  # Rank local candidates by raw PIP.\n  ord &lt;-\n    local[\n      order(\n        PIP[local],\n        decreasing = TRUE\n      )\n    ]\n\n  cumulative_PIP &lt;- cumsum(PIP[ord])\n\n  # Smallest number of ranked SNPs reaching the target.\n  if (any(cumulative_PIP &gt;= coverage)) {\n    n_keep &lt;- which(\n      cumulative_PIP &gt;= coverage\n    )[1]\n  } else {\n    n_keep &lt;- length(ord)\n    warning(\n      \"Cumulative PIP in the local LD neighborhood does not reach the requested coverage.\"\n    )\n  }\n\n  in_set &lt;- seq_along(ord) &lt;= n_keep\n\n  table &lt;- data.frame(\n    rank = seq_along(ord),\n    marker = ord,\n    SNP = SNP[ord],\n    PIP = PIP[ord],\n    r2_with_focal = R[focal, ord]^2,\n    cumulative_PIP = cumulative_PIP,\n    in_LCS = in_set\n  )\n\n  list(\n    focal = focal,\n    local_candidates = local,\n    LCS = ord[in_set],\n    table = table,\n    coverage = coverage,\n    r2_threshold = r2_threshold\n  )\n}\n\nlcs &lt;- make_local_credible_set(\n  PIP = PIP,\n  R = R,\n  SNP = snp,\n  coverage = 0.90,\n  r2_threshold = 0.50\n)\n\n\nInspect the focal SNP and the local candidate set.\n\n\nCode\nc(\n  focal_marker = lcs$focal,\n  focal_SNP = snp[lcs$focal],\n  number_local_candidates = length(lcs$local_candidates),\n  LCS_size = length(lcs$LCS),\n  causal_in_LCS = causal %in% lcs$LCS\n)\n\n\nfocal_marker.rs200766023_G                  focal_SNP \n                      \"11\"            \"rs200766023_G\" \n   number_local_candidates                   LCS_size \n                      \"13\"                        \"1\" \n             causal_in_LCS \n                    \"TRUE\" \n\n\nInspect the ranked local candidates.\n\n\nCode\nlcs$table\n\n\n              rank marker           SNP         PIP r2_with_focal\nrs200766023_G    1     11 rs200766023_G 1.000000000     1.0000000\nrs77714226_T     2      4  rs77714226_T 0.116666667     0.7401532\nrs2716416_C      3      7   rs2716416_C 0.024666667     0.6987680\nrs143764217_C    4      2 rs143764217_C 0.016000000     0.7891700\nrs149771619_A    5     14 rs149771619_A 0.010000000     0.6184617\nrs199985493_T    6     17 rs199985493_T 0.007333333     0.5455755\nrs148271204_G    7     23 rs148271204_G 0.006000000     0.5356633\nrs371582893_A    8     27 rs371582893_A 0.005333333     0.5007914\nrs199676333_C    9      8 rs199676333_C 0.004666667     0.8156835\nrs138139885_C   10      3 rs138139885_C 0.004000000     0.6066870\nrs78913776_T    11     26  rs78913776_T 0.004000000     0.5434041\nrs144666531_G   12      1 rs144666531_G 0.002666667     0.5671530\nrs372428423_A   13     13 rs372428423_A 0.002000000     0.6135135\n              cumulative_PIP in_LCS\nrs200766023_G       1.000000   TRUE\nrs77714226_T        1.116667  FALSE\nrs2716416_C         1.141333  FALSE\nrs143764217_C       1.157333  FALSE\nrs149771619_A       1.167333  FALSE\nrs199985493_T       1.174667  FALSE\nrs148271204_G       1.180667  FALSE\nrs371582893_A       1.186000  FALSE\nrs199676333_C       1.190667  FALSE\nrs138139885_C       1.194667  FALSE\nrs78913776_T        1.198667  FALSE\nrs144666531_G       1.201333  FALSE\nrs372428423_A       1.203333  FALSE\n\n\nThe rows with in_LCS = TRUE form the 0.9 local credible set.\nIf the leading SNP itself has PIP above 0.90, the 0.9 LCS contains only that SNP. If posterior support is distributed among several LD-correlated variants, several SNPs will be needed before the cumulative PIP reaches 0.90."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#visualize-construction-of-the-lcs",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#visualize-construction-of-the-lcs",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Visualize Construction of the LCS",
+    "text": "Visualize Construction of the LCS\n\n\nCode\nplot(\n  lcs$table$rank,\n  lcs$table$cumulative_PIP,\n  type = \"b\",\n  pch = 19,\n  xlab = \"Rank within local LD neighborhood\",\n  ylab = \"Cumulative PIP\",\n  ylim = c(0, 1),\n  main = \"Building the 0.9 local credible set\"\n)\n\nabline(\n  h = 0.90,\n  lty = 2,\n  col = \"red\"\n)\n\nabline(\n  v = length(lcs$LCS),\n  lty = 2,\n  col = \"blue\"\n)\n\n\n\n\n\n\n\n\n\nThe LCS converts the marker-by-marker PIP output into an interpretable local candidate set. A small LCS indicates that posterior support is strongly concentrated, whereas a larger LCS reflects greater uncertainty among LD-related alternatives.\nThis is a local, signal-oriented summary. BayesC itself still allows more than one SNP to be active in a posterior sample."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#compare-gwas-and-fine-mapping-rankings",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#compare-gwas-and-fine-mapping-rankings",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Compare GWAS and Fine-Mapping Rankings",
+    "text": "Compare GWAS and Fine-Mapping Rankings\nIt is useful to compare the top SNPs under marginal GWAS evidence and BayesC PIP.\n\n\nCode\ntop_gwas &lt;- order(gwas_p)[1:5]\ntop_pip &lt;- order(PIP, decreasing = TRUE)[1:5]\n\ncomparison &lt;- data.frame(\n  rank = 1:5,\n  GWAS_marker = top_gwas,\n  GWAS_SNP = snp[top_gwas],\n  GWAS_p = gwas_p[top_gwas],\n  BayesC_marker = top_pip,\n  BayesC_SNP = snp[top_pip],\n  BayesC_PIP = PIP[top_pip]\n)\n\ncomparison\n\n\n              rank GWAS_marker      GWAS_SNP       GWAS_p BayesC_marker\nrs200766023_G    1          11 rs200766023_G 1.420561e-42            11\nrs77714226_T     2           8 rs199676333_C 1.223803e-30             4\nrs2716416_C      3           2 rs143764217_C 2.311365e-29             7\nrs143764217_C    4          14 rs149771619_A 7.645056e-26             2\nrs146675715_T    5          13 rs372428423_A 1.220905e-25            25\n                 BayesC_SNP BayesC_PIP\nrs200766023_G rs200766023_G 1.00000000\nrs77714226_T   rs77714226_T 0.11666667\nrs2716416_C     rs2716416_C 0.02466667\nrs143764217_C rs143764217_C 0.01600000\nrs146675715_T rs146675715_T 0.01133333\n\n\nThe GWAS ranking is based on one-SNP-at-a-time tests. The BayesC ranking is based on a joint posterior model in which correlated SNPs compete to explain the phenotype."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#mcmc-diagnostics",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#mcmc-diagnostics",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "MCMC Diagnostics",
+    "text": "MCMC Diagnostics\nFine-mapping summaries should be based on a sampler that has reached a stable posterior region. The following simple trace plots are useful teaching diagnostics.\n\nNumber of Active SNPs\n\n\nCode\nplot(\n  fit$par[, \"Nactive\"],\n  type = \"l\",\n  xlab = \"Iteration\",\n  ylab = \"Number of active SNPs\",\n  main = \"Trace plot: active SNPs\"\n)\n\nabline(\n  v = burn_in,\n  lty = 2,\n  col = \"red\"\n)\n\n\n\n\n\n\n\n\n\nThe sampler can move among models containing different numbers of active SNPs. The posterior average can be compared with the sum of PIPs.\n\n\nCode\nc(\n  mean_sampled_active =\n    mean(\n      fit$par[keep, \"Nactive\"]\n    ),\n  sum_PIP = sum(PIP)\n)\n\n\nmean_sampled_active             sum_PIP \n           1.276667            1.276667 \n\n\nThese two quantities should agree up to Monte Carlo error.\n\n\nActive-Effect Variance\n\n\nCode\nplot(\n  fit$par[, \"Varb\"],\n  type = \"l\",\n  xlab = \"Iteration\",\n  ylab = expression(v[b]),\n  main = \"Trace plot: active-effect variance\"\n)\n\nabline(\n  v = burn_in,\n  lty = 2,\n  col = \"red\"\n)\n\n\n\n\n\n\n\n\n\n\n\nHeritability\n\n\nCode\nplot(\n  fit$par[, \"h2\"],\n  type = \"l\",\n  xlab = \"Iteration\",\n  ylab = expression(h^2),\n  main = \"Trace plot: sampled heritability\"\n)\n\nabline(\n  h = h2,\n  lty = 2,\n  col = \"blue\"\n)\n\nabline(\n  v = burn_in,\n  lty = 2,\n  col = \"red\"\n)\n\n\n\n\n\n\n\n\n\nCode\nmean(fit$par[keep, \"h2\"])\n\n\n[1] 0.3100284\n\n\nThe simulated value is \\(h^2=0.30\\). The posterior trace should fluctuate around a stable region rather than showing a persistent trend."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#what-have-we-learned",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#what-have-we-learned",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "What Have We Learned?",
+    "text": "What Have We Learned?\nThis tutorial follows the complete fine-mapping workflow from association evidence to posterior candidate variants.\nThe main points are:\n\nstandard GWAS tests SNPs one at a time and therefore identifies associated markers, not necessarily causal variants;\nLD causes several SNPs to carry similar association information;\nBayesC fits the SNPs jointly under a sparse spike-and-slab prior;\neach SNP is either inactive or active in each posterior sample;\nthe posterior inclusion probability\n\n\\[\n\\operatorname{PIP}_j\n=\nP(d_j=1\\mid\\mathcal D)\n\\]\nsummarizes how strongly the joint posterior supports inclusion of SNP \\(j\\);\n\nthe posterior mean effect and PIP answer different questions;\ncorrelated SNPs can retain non-zero PIP because they provide alternative explanations of the same signal;\n\\(\\sum_j\\operatorname{PIP}_j\\) is the posterior expected number of active SNPs;\ncandidate SNPs can be ranked directly by PIP;\na 0.9 local credible set can be constructed by defining an LD neighborhood around the leading SNP, ranking those SNPs by raw PIP, and summing PIPs until the cumulative value reaches 0.90;\nno normalization of the PIPs is used in this LCS construction.\n\nThe overall workflow is therefore\n\\[\n\\begin{aligned}\n\\text{GWAS evidence + LD}\n&\\longrightarrow \\text{BayesC joint model} \\\\\n&\\longrightarrow \\text{posterior samples} \\\\\n&\\longrightarrow \\text{PIPs, effects, and local credible set}.\n\\end{aligned}\n\\]\nThis provides the foundation for the next tutorial, where prior inclusion probabilities can be informed by functional annotations."
+  },
+  {
+    "objectID": "tutorials/bayesian_fine_mapping_bayesc.html#further-reading",
+    "href": "tutorials/bayesian_fine_mapping_bayesc.html#further-reading",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Further Reading",
+    "text": "Further Reading\nWu Y, Zheng Z, Thibaut L, Lin T, Feng Q, Cheng H, Yengo L, Goddard ME, Wray NR, Visscher PM, Zeng J. Genome-wide fine-mapping improves identification of causal variants. Nature Genetics 58, 940–951 (2026). https://doi.org/10.1038/s41588-026-02549-3\nIntroduces SBayesRC for genome-wide fine-mapping.\nShrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Enhanced genetic fine mapping accuracy with Bayesian Linear Regression models in diverse genetic architectures. PLOS Genetics 21(7), e1011783 (2025). https://doi.org/10.1371/journal.pgen.1011783\nEvaluates BayesC and BayesR for fine-mapping across genetic architectures.\nZheng Z et al. Leveraging functional genomic annotations and genome coverage to improve polygenic prediction of complex traits within and between ancestries. Nature Genetics 56, 767–777 (2024). https://doi.org/10.1038/s41588-024-01704-y\nPresents the original SBayesRC method and its polygenic-prediction study."
+  },
+  {
+    "objectID": "tutorials/bayesian_spike_and_slab.html",
+    "href": "tutorials/bayesian_spike_and_slab.html",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "",
-    "text": "This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics."
+    "text": "This document demonstrates Bayesian Linear Regression using spike-and-slab priors, as described in the notes. We implement a Gibbs sampler that updates parameters from their full conditionals, computes posterior summaries (including posterior inclusion probabilities), and evaluates convergence using diagnostic statistics."
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#introduction",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#introduction",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#introduction",
+    "href": "tutorials/bayesian_spike_and_slab.html#introduction",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "",
-    "text": "This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics."
+    "text": "This document demonstrates Bayesian Linear Regression using spike-and-slab priors, as described in the notes. We implement a Gibbs sampler that updates parameters from their full conditionals, computes posterior summaries (including posterior inclusion probabilities), and evaluates convergence using diagnostic statistics."
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#model-setup-and-data-simulation",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#model-setup-and-data-simulation",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#model-setup-and-data-simulation",
+    "href": "tutorials/bayesian_spike_and_slab.html#model-setup-and-data-simulation",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Model Setup and Data Simulation",
-    "text": "Model Setup and Data Simulation\n\n\nCode\nset.seed(123)\n\n# Simulate data (same as in the classical regression example)\nn &lt;- 100\np &lt;- 3\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))\nbeta_true &lt;- c(2, 0.5, -1, 1.5)\nsigma_true &lt;- 1\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)"
+    "text": "Model Setup and Data Simulation\n\n\nCode\nset.seed(123)\n\n# Simulate data\nn &lt;- 100\np &lt;- 5\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))\nbeta_true &lt;- c(2, 1.2, 0, 0, 0, 1.5)  # some zeros (spike)\nsigma_true &lt;- 1\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)"
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#gibbs-sampler-implementation",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#gibbs-sampler-implementation",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#gibbs-sampler-implementation",
+    "href": "tutorials/bayesian_spike_and_slab.html#gibbs-sampler-implementation",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Gibbs Sampler Implementation",
-    "text": "Gibbs Sampler Implementation\nWe use conjugate priors:\n\n\\(\\beta \\mid \\sigma^2, \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2 I_p)\\)\n\\(\\sigma_b^2 \\sim S_b \\chi^{-2}(v_b)\\)\n\\(\\sigma^2 \\sim S \\chi^{-2}(v)\\)\n\n\n\nCode\n# Hyperparameters\nv_b &lt;- 4\nS_b &lt;- 1\nv &lt;- 4\nS &lt;- 1\n\n# Initialization\nbeta &lt;- rep(0, ncol(X))\nsigma2 &lt;- 1\nsigma2_b &lt;- 1\n\nn_iter &lt;- 5000\nburn_in &lt;- 1000\n\n# Store samples\nbeta_samples &lt;- matrix(NA, n_iter, ncol(X))\nsigma2_samples &lt;- numeric(n_iter)\nsigma2_b_samples &lt;- numeric(n_iter)\n\nfor (t in 1:n_iter) {\n  # Sample beta | sigma2, sigma2_b, y\n  Sigma_beta &lt;- solve(t(X) %*% X / sigma2 + diag(1 / sigma2_b, ncol(X)))\n  mu_beta &lt;- Sigma_beta %*% t(X) %*% y / sigma2\n  beta &lt;- as.numeric(mu_beta + t(chol(Sigma_beta)) %*% rnorm(ncol(X)))\n  \n  # Sample sigma_b^2 | beta\n  v_b_tilde &lt;- v_b + ncol(X)\n  S_b_tilde &lt;- (sum(beta^2) + v_b * S_b) / v_b_tilde\n  sigma2_b &lt;- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)\n  \n  # Sample sigma^2 | beta, y\n  v_tilde &lt;- v + n\n  resid &lt;- y - X %*% beta\n  S_tilde &lt;- (sum(resid^2) + v * S) / v_tilde\n  sigma2 &lt;- v_tilde * S_tilde / rchisq(1, df = v_tilde)\n  \n  # Store samples\n  beta_samples[t, ] &lt;- beta\n  sigma2_samples[t] &lt;- sigma2\n  sigma2_b_samples[t] &lt;- sigma2_b\n}"
+    "text": "Gibbs Sampler Implementation\nWe use the following priors:\n\n\\(\\alpha_i \\mid \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2)\\)\n\\(\\delta_i \\mid \\pi \\sim \\text{Bernoulli}(\\pi)\\)\n\\(\\pi \\sim \\text{Beta}(a, b)\\)\n\\(\\sigma_b^2 \\sim S_b \\chi^{-2}(v_b)\\)\n\\(\\sigma^2 \\sim S \\chi^{-2}(v)\\)\n\n\n\nCode\n# Hyperparameters\na_pi &lt;- 1\nb_pi &lt;- 1\nv_b &lt;- 4\nS_b &lt;- 1\nv &lt;- 4\nS &lt;- 1\n\n# Gibbs sampler setup\nn_iter &lt;- 4000\nburn_in &lt;- 1000\nchains &lt;- 2\n\n# Storage\nbeta_samples &lt;- vector(\"list\", chains)\ndelta_samples &lt;- vector(\"list\", chains)\npi_samples &lt;- vector(\"list\", chains)\nsigma2_samples &lt;- vector(\"list\", chains)\nsigma2b_samples &lt;- vector(\"list\", chains)\n\nfor (c in 1:chains) {\n  # Initial values\n  alpha &lt;- rnorm(ncol(X), 0, 1)\n  delta &lt;- rbinom(ncol(X), 1, 0.5)\n  sigma2 &lt;- 1\n  sigma2_b &lt;- 1\n  pi &lt;- 0.5\n  \n  # Containers\n  alpha_chain &lt;- matrix(NA, n_iter, ncol(X))\n  delta_chain &lt;- matrix(NA, n_iter, ncol(X))\n  sigma2_chain &lt;- numeric(n_iter)\n  sigma2b_chain &lt;- numeric(n_iter)\n  pi_chain &lt;- numeric(n_iter)\n  \n  for (t in 1:n_iter) {\n    # Sample each alpha_i given delta_i\n    for (j in 1:ncol(X)) {\n      X_j &lt;- X[, j]\n      r_j &lt;- y - X %*% (alpha * delta) + X_j * alpha[j] * delta[j]\n      \n      if (delta[j] == 1) {\n        var_j &lt;- sigma2 / (t(X_j) %*% X_j + sigma2 / sigma2_b)\n        mean_j &lt;- as.numeric(var_j * t(X_j) %*% r_j / sigma2)\n        alpha[j] &lt;- rnorm(1, mean_j, sqrt(var_j))\n      } else {\n        alpha[j] &lt;- rnorm(1, 0, sqrt(sigma2_b))  # prior draw\n      }\n    }\n    \n    # Sample delta_i given alpha_i\n    for (j in 1:ncol(X)) {\n      X_j &lt;- X[, j]\n      r_j &lt;- y - X %*% (alpha * delta) + X_j * alpha[j] * delta[j]\n      rss0 &lt;- sum((r_j)^2)\n      rss1 &lt;- sum((r_j - X_j * alpha[j])^2)\n      \n      logodds &lt;- 0.5 / sigma2 * (rss0 - rss1) + log(pi) - log(1 - pi)\n      p1 &lt;- 1 / (1 + exp(-logodds))\n      delta[j] &lt;- rbinom(1, 1, p1)\n    }\n    \n    # Update pi\n    pi &lt;- rbeta(1, a_pi + sum(delta), b_pi + ncol(X) - sum(delta))\n    \n    # Update sigma_b^2\n    p_incl &lt;- sum(delta)\n    v_b_tilde &lt;- v_b + p_incl\n    S_b_tilde &lt;- (sum((alpha * delta)^2) + v_b * S_b) / v_b_tilde\n    sigma2_b &lt;- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)\n    \n    # Update sigma^2\n    resid &lt;- y - X %*% (alpha * delta)\n    v_tilde &lt;- v + n\n    S_tilde &lt;- (sum(resid^2) + v * S) / v_tilde\n    sigma2 &lt;- v_tilde * S_tilde / rchisq(1, df = v_tilde)\n    \n    # Store\n    alpha_chain[t, ] &lt;- alpha * delta\n    delta_chain[t, ] &lt;- delta\n    pi_chain[t] &lt;- pi\n    sigma2_chain[t] &lt;- sigma2\n    sigma2b_chain[t] &lt;- sigma2_b\n  }\n  \n  beta_samples[[c]] &lt;- alpha_chain\n  delta_samples[[c]] &lt;- delta_chain\n  pi_samples[[c]] &lt;- pi_chain\n  sigma2_samples[[c]] &lt;- sigma2_chain\n  sigma2b_samples[[c]] &lt;- sigma2b_chain\n}"
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#posterior-summaries",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#posterior-summaries",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#posterior-summaries",
+    "href": "tutorials/bayesian_spike_and_slab.html#posterior-summaries",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Posterior Summaries",
-    "text": "Posterior Summaries\n\n\nCode\nposterior_summary &lt;- function(samples, probs = c(0.025, 0.5, 0.975)) {\n  c(\n    mean = mean(samples),\n    sd = sd(samples),\n    quantile(samples, probs = probs)\n  )\n}\n\n# Summaries for betas\nbeta_summary &lt;- t(apply(beta_samples[burn_in:n_iter, ], 2, posterior_summary))\nrownames(beta_summary) &lt;- paste0(\"beta\", 0:p)\n\n# Summaries for variance parameters\nsigma2_summary &lt;- posterior_summary(sigma2_samples[burn_in:n_iter])\nsigma2b_summary &lt;- posterior_summary(sigma2_b_samples[burn_in:n_iter])\n\nround(beta_summary, 4)\n\n\n         mean     sd    2.5%     50%   97.5%\nbeta0  1.9673 0.1077  1.7537  1.9669  2.1769\nbeta1  0.4405 0.1186  0.2063  0.4425  0.6727\nbeta2 -0.9460 0.1105 -1.1559 -0.9470 -0.7262\nbeta3  1.4319 0.1124  1.2171  1.4315  1.6524\n\n\nCode\nround(rbind(sigma2 = sigma2_summary, sigma2_b = sigma2b_summary), 4)\n\n\n           mean     sd  2.5%    50%  97.5%\nsigma2   1.1276 0.1638 0.852 1.1154 1.5078\nsigma2_b 1.8685 1.2652 0.625 1.5398 4.9971"
+    "text": "Posterior Summaries\n\n\nCode\nposterior_summary &lt;- function(samples, probs = c(0.025, 0.5, 0.975)) {\n  c(mean = mean(samples), sd = sd(samples), quantile(samples, probs = probs))\n}\n\n# Combine chains\nbeta_all &lt;- do.call(rbind, beta_samples)\npi_all &lt;- unlist(pi_samples)\ndelta_all &lt;- do.call(rbind, delta_samples)\n\nbeta_summary &lt;- t(apply(beta_all[burn_in:nrow(beta_all), ], 2, posterior_summary))\nrownames(beta_summary) &lt;- paste0(\"beta\", 0:p)\n\nPIP &lt;- colMeans(delta_all[burn_in:nrow(delta_all), ])\n\nround(beta_summary, 4)\n\n\n         mean     sd    2.5%    50%  97.5%\nbeta0  1.9340 0.0975  1.7469 1.9348 2.1217\nbeta1  1.1750 0.1057  0.9651 1.1759 1.3812\nbeta2  0.0330 0.0750  0.0000 0.0000 0.2550\nbeta3  0.0027 0.0352 -0.0568 0.0000 0.1062\nbeta4 -0.0139 0.0487 -0.1804 0.0000 0.0082\nbeta5  1.6871 0.0974  1.4967 1.6865 1.8798\n\n\nCode\ncat(\"\\nPosterior Inclusion Probabilities (PIP):\\n\")\n\n\n\nPosterior Inclusion Probabilities (PIP):\n\n\nCode\nround(PIP, 3)\n\n\n[1] 1.000 1.000 0.250 0.124 0.159 1.000"
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#trace-plots",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#trace-plots",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#trace-plots",
+    "href": "tutorials/bayesian_spike_and_slab.html#trace-plots",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Trace Plots",
-    "text": "Trace Plots\n\n\nCode\npar(mfrow = c(2, 2))\nfor (j in 1:ncol(X)) {\n  plot(beta_samples[, j], type = \"l\", main = paste(\"Trace: beta\", j - 1),\n       xlab = \"Iteration\", ylab = expression(beta))\n  abline(h = beta_true[j], col = \"red\", lwd = 2, lty = 2)\n}"
+    "text": "Trace Plots\n\n\nCode\npar(mfrow = c(3, 2))\nfor (j in 1:ncol(X)) {\n  plot(beta_samples[[1]][, j], type = \"l\", main = paste(\"Trace: beta\", j - 1, \"(chain 1)\"),\n       xlab = \"Iteration\", ylab = expression(beta))\n  abline(h = beta_true[j], col = \"red\", lwd = 2, lty = 2)\n}"
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#autocorrelation-plots",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#autocorrelation-plots",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#autocorrelation-plots",
+    "href": "tutorials/bayesian_spike_and_slab.html#autocorrelation-plots",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Autocorrelation Plots",
-    "text": "Autocorrelation Plots\n\n\nCode\npar(mfrow = c(2, 2))\nfor (j in 1:ncol(X)) {\n  acf(beta_samples[burn_in:n_iter, j], main = paste(\"ACF: beta\", j - 1))\n}"
+    "text": "Autocorrelation Plots\n\n\nCode\npar(mfrow = c(3, 2))\nfor (j in 1:ncol(X)) {\n  acf(beta_samples[[1]][burn_in:n_iter, j], main = paste(\"ACF: beta\", j - 1))\n}"
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#convergence-diagnostics",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#convergence-diagnostics",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#convergence-diagnostics",
+    "href": "tutorials/bayesian_spike_and_slab.html#convergence-diagnostics",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Convergence Diagnostics",
-    "text": "Convergence Diagnostics\nWe compute autocorrelation, Monte Carlo standard error, Geweke Z-score, Gelman-Rubin (), and effective sample size.\n\n\nCode\n# Simple diagnostics for one chain\nconvergence_stats &lt;- function(samples) {\n  n &lt;- length(samples)\n  ac1 &lt;- cor(samples[-1], samples[-n])\n  mcse &lt;- sd(samples) * sqrt((1 + ac1) / n)\n  a &lt;- floor(0.1 * n); b &lt;- floor(0.5 * n)\n  z &lt;- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /\n       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)\n  ess &lt;- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))\n  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)\n}\n\nconv_results &lt;- t(apply(beta_samples[burn_in:n_iter, ], 2, convergence_stats))\nrownames(conv_results) &lt;- paste0(\"beta\", 0:p)\nround(conv_results, 4)\n\n\n      autocorr1   mcse geweke_z      ess\nbeta0   -0.0055 0.0017   1.0590 4562.500\nbeta1    0.0308 0.0019   0.8929 3641.556\nbeta2   -0.0256 0.0017  -2.4631 4014.290\nbeta3    0.0189 0.0018   0.1831 3634.925"
+    "text": "Convergence Diagnostics\n\n\nCode\nconvergence_stats &lt;- function(samples) {\n  n &lt;- length(samples)\n  ac1 &lt;- cor(samples[-1], samples[-n])\n  mcse &lt;- sd(samples) * sqrt((1 + ac1) / n)\n  a &lt;- floor(0.1 * n); b &lt;- floor(0.5 * n)\n  z &lt;- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /\n       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)\n  ess &lt;- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))\n  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)\n}\n\n# Apply to chain 1\nconv_results &lt;- t(apply(beta_samples[[1]][burn_in:n_iter, ], 2, convergence_stats))\nrownames(conv_results) &lt;- paste0(\"beta\", 0:p)\nround(conv_results, 4)\n\n\n      autocorr1   mcse geweke_z       ess\nbeta0    0.0232 0.0018  -0.9796 2745.9833\nbeta1    0.0374 0.0020   0.5127 2185.3118\nbeta2    0.3956 0.0016   0.4830  878.5174\nbeta3    0.0291 0.0006   0.9637 2597.4558\nbeta4    0.2506 0.0010  -0.4140  971.6853\nbeta5    0.0490 0.0018  -2.8212 3758.3315\n\n\n\nGelman–Rubin R-hat\n\n\nCode\nRhat &lt;- function(ch1, ch2) {\n  n &lt;- nrow(ch1)\n  m &lt;- 2\n  chain_means &lt;- c(colMeans(ch1), colMeans(ch2))\n  overall_mean &lt;- colMeans(rbind(ch1, ch2))\n  B &lt;- n * apply(rbind(colMeans(ch1), colMeans(ch2)), 2, var)\n  W &lt;- (apply(ch1, 2, var) + apply(ch2, 2, var)) / 2\n  var_hat &lt;- ((n - 1) / n) * W + (1 / n) * B\n  sqrt(var_hat / W)\n}\n\nRhat_values &lt;- Rhat(beta_samples[[1]][burn_in:n_iter, ], beta_samples[[2]][burn_in:n_iter, ])\nround(Rhat_values, 3)\n\n\n[1] 1 1 1 1 1 1"
   },
   {
-    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#posterior-mean-vs-true-values",
-    "href": "tutorials/bayesian_linear_regression_conjugate.html#posterior-mean-vs-true-values",
-    "title": "Bayesian Linear Regression with Conjugate Priors",
+    "objectID": "tutorials/bayesian_spike_and_slab.html#posterior-mean-vs-true-values",
+    "href": "tutorials/bayesian_spike_and_slab.html#posterior-mean-vs-true-values",
+    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
     "section": "Posterior Mean vs True Values",
     "text": "Posterior Mean vs True Values\n\n\nCode\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_summary[, \"mean\"], pch = 19, col = \"blue\",\n     xlab = \"True Coefficients\", ylab = \"Posterior Mean Estimates\",\n     main = \"Posterior Mean vs True Coefficients\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\nlegend(\"topleft\", legend = c(\"Posterior Means\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#why-integrate-diverse-data-sources",
-    "href": "slides/introduction_gact_qgg_slides.html#why-integrate-diverse-data-sources",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "Why Integrate Diverse Data Sources?",
-    "text": "Why Integrate Diverse Data Sources?\n\nComplex traits arise from interacting molecular layers — genetic, transcriptomic, proteomic, and metabolic.\n\nSingle data types provide only partial insights complex biological systems (GWAS: DNA → disease phenotype)\n\nIntegration connects variants → genes → pathways → phenotypes may help reveal molecular mechanisms that drive traits and diseases.\nEnables functional interpretation, better prediction, and new discoveries across molecular systems."
+    "objectID": "tutorials/classical_linear_regression_simulation.html",
+    "href": "tutorials/classical_linear_regression_simulation.html",
+    "title": "Classical Linear Regression Simulation in R",
+    "section": "",
+    "text": "This document demonstrates how to simulate data from a classical linear regression model and estimate parameters using Ordinary Least Squares (OLS), including inference and prediction intervals.\nWe also visualize the estimated vs. true regression coefficients."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-discovery",
-    "href": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-discovery",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "From Data Integration to Discovery",
-    "text": "From Data Integration to Discovery"
+    "objectID": "tutorials/classical_linear_regression_simulation.html#introduction",
+    "href": "tutorials/classical_linear_regression_simulation.html#introduction",
+    "title": "Classical Linear Regression Simulation in R",
+    "section": "",
+    "text": "This document demonstrates how to simulate data from a classical linear regression model and estimate parameters using Ordinary Least Squares (OLS), including inference and prediction intervals.\nWe also visualize the estimated vs. true regression coefficients."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#the-gact-r-package",
-    "href": "slides/introduction_gact_qgg_slides.html#the-gact-r-package",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "The gact R Package",
-    "text": "The gact R Package\ngact provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:\n\nEstablishing and populating a database of genomic associations\n\nDownloading and processing biological databases\n\nHandling and processing GWAS summary statistics\n\nLinking genetic markers to genes, proteins, metabolites, and biological pathways\n\nIntegrates with statistical machine learning tools in the qgg R package\n\ngact is intended to serve as a practical implementation of integrative genomics, bridging statistical modeling and biological interpretation, and supporting reproducible and extensible workflows."
+    "objectID": "tutorials/classical_linear_regression_simulation.html#r-code",
+    "href": "tutorials/classical_linear_regression_simulation.html#r-code",
+    "title": "Classical Linear Regression Simulation in R",
+    "section": "R Code",
+    "text": "R Code\n\n\nCode\n# ============================================================\n# Classical Linear Regression: Simulation + OLS Estimation\n# ============================================================\n\nset.seed(123)\n\n# --- 1. Simulate data ---------------------------------------\nn &lt;- 100          # number of observations\np &lt;- 3            # number of predictors (excluding intercept)\n\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))  # include intercept\nbeta_true &lt;- c(2, 0.5, -1, 1.5)            # true coefficients\nsigma_true &lt;- 1                            # true residual SD\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)\n\n# --- 2. Estimate parameters via OLS --------------------------\nbeta_hat &lt;- solve(t(X) %*% X) %*% t(X) %*% y\nresiduals &lt;- y - X %*% beta_hat\nsigma2_hat &lt;- as.numeric(t(residuals) %*% residuals / (n - (p + 1)))\n\n# --- 3. Inference: SEs, t-stats, p-values, CI ---------------\nvar_beta_hat &lt;- sigma2_hat * solve(t(X) %*% X)\nse_beta &lt;- sqrt(diag(var_beta_hat))\n\nt_stats &lt;- beta_hat / se_beta\np_values &lt;- 2 * (1 - pt(abs(t_stats), df = n - (p + 1)))\n\nalpha &lt;- 0.05\nt_crit &lt;- qt(1 - alpha/2, df = n - (p + 1))\nci_lower &lt;- beta_hat - t_crit * se_beta\nci_upper &lt;- beta_hat + t_crit * se_beta\n\n# Combine results into a table\nresults &lt;- data.frame(\n  Estimate = as.numeric(beta_hat),\n  SE = se_beta,\n  t_value = as.numeric(t_stats),\n  p_value = as.numeric(p_values),\n  CI_lower = as.numeric(ci_lower),\n  CI_upper = as.numeric(ci_upper)\n)\nrownames(results) &lt;-  paste0(\"beta\", 0:p)\nprint(round(results, 4))\n\n\n      Estimate     SE t_value p_value CI_lower CI_upper\nbeta0   1.9807 0.1073 18.4517   0e+00   1.7676   2.1937\nbeta1   0.4445 0.1169  3.8036   3e-04   0.2126   0.6765\nbeta2  -0.9538 0.1095 -8.7138   0e+00  -1.1711  -0.7365\nbeta3   1.4426 0.1122 12.8540   0e+00   1.2198   1.6654\n\n\nCode\n# --- 4. Prediction for a new observation ---------------------\nx_new &lt;- c(1, 0.5, -1, 1)  # include intercept term\ny_pred &lt;- as.numeric(x_new %*% beta_hat)\nvar_pred &lt;- sigma2_hat * (1 + t(x_new) %*% solve(t(X) %*% X) %*% x_new)\nse_pred &lt;- sqrt(var_pred)\n\n# 95% prediction interval\npred_interval &lt;- c(\n  lower = y_pred - t_crit * se_pred,\n  upper = y_pred + t_crit * se_pred\n)\n\ncat(\"\\nPredicted y_new =\", round(y_pred, 3), \"\\n\")\n\n\n\nPredicted y_new = 4.599 \n\n\nCode\ncat(\"95% Prediction interval: [\", round(pred_interval[1], 3), \",\",\n    round(pred_interval[2], 3), \"]\\n\")\n\n\n95% Prediction interval: [ 2.48 , 6.718 ]\n\n\nCode\n# --- 5. Visualization: True vs. Estimated Coefficients -------\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_hat, pch = 19, col = \"blue\", cex = 1.3,\n     xlab = \"True Coefficients\", ylab = \"Estimated Coefficients\",\n     main = \"OLS Estimates vs True Values\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\narrows(beta_true, ci_lower, beta_true, ci_upper, angle = 90, code = 3, length = 0.05, col = \"darkgray\")\nlegend(\"topleft\", legend = c(\"OLS Estimates\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#integrating-data-with-gact",
-    "href": "slides/introduction_gact_qgg_slides.html#integrating-data-with-gact",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "Integrating Data with gact",
-    "text": "Integrating Data with gact\nThe gact() function is a single R command that creates and populates the Genomic Association of Complex Traits (GACT) database.\n\nIt automates three main tasks:\n\nInfrastructure creation – sets up a structured folder-based database\n(glist, gstat, gsets, marker, gtex, download, etc.)\nData acquisition – downloads and organizes multiple biological data sources\n(e.g., GWAS Catalog, Ensembl, GTEx, Reactome, STRING, STITCH, DGIdb)\nMarker and feature set generation - integrates data across sources to create curated genomic feature sets that form the basis for the integrative genomic analyses."
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#gwas-regions-rarely-identify-a-unique-causal-variant",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#gwas-regions-rarely-identify-a-unique-causal-variant",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "GWAS Regions Rarely Identify a Unique Causal Variant",
+    "text": "GWAS Regions Rarely Identify a Unique Causal Variant\n\nA GWAS association usually identifies an associated region, not a unique causal variant.\nBecause nearby SNPs are correlated through linkage disequilibrium (LD), several SNPs can show strong association even when only one is causal.\n\nFine-mapping moves from\n\\[\n\\text{associated region}\n\\quad\\longrightarrow\\quad\n\\text{small set of plausible causal variants}.\n\\]\nThe goal is to quantify which variants remain plausible causal explanations after accounting for LD."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#biological-databases-used-by-gact",
-    "href": "slides/introduction_gact_qgg_slides.html#biological-databases-used-by-gact",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "Biological Databases Used by gact",
-    "text": "Biological Databases Used by gact\ngact constructs gene and marker sets from a wide range of curated biological databases:\n\n\nEnsembl — genes, transcripts, and proteins\n\nEnsembl Regulation — regulatory genomic features\n\nGO, Reactome, KEGG — ontology and pathway sets\n\nSTRING, STITCH — protein and chemical complexes\n\nDrugBank, ATC — drug–gene and drug-class associations\n\nDISEASE — disease–gene associations\n\nGTEx — eQTL-based gene sets\n\nGWAS Catalog — trait-associated variants and genes\n\nVEP — functional variant annotations\n\nWe plan to add additional biological resources in gact."
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-connects-association-signals-to-biology",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-connects-association-signals-to-biology",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping Connects Association Signals to Biology",
+    "text": "Fine-Mapping Connects Association Signals to Biology\n\nBiological interpretation: connect associated variants to genes, regulatory elements, and molecular mechanisms.\nFunctional follow-up: prioritize variants, genes, and pathways for experimental studies.\nQuantifying uncertainty: distinguish one strongly supported variant from several LD-linked alternatives.\nFunctional information: combine genetic evidence with eQTL, chromatin, conservation, and coding annotations."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#from-database-to-model-inputs",
-    "href": "slides/introduction_gact_qgg_slides.html#from-database-to-model-inputs",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "From Database to Model Inputs",
-    "text": "From Database to Model Inputs\nThe gact R package includes utility functions to extract and structure data from the GACT database into analysis-ready inputs — \\(\\mathbf{Y}\\) (e.g., summary statistic outcomes) and \\(\\mathbf{X}\\) (genomic or biological features).\n\ngetMarkerStat() — retrieve GWAS summary statistics (Y’s)\n\ngetFeatureStat() — extract gene-, protein-, or pathway-level results (Y’s)\n\ngetMarkerSets() — define biological groupings (basis for X’s)\n\ndesignMatrix() — build feature matrices (X) linking variants or genes to biological feature sets\n\nTogether, these functions form a reproducible workflow for generating standardized input data for Bayesian Hierarchical Models and other machine learning approaches."
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#standard-gwas-tests-one-snp-at-a-time",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#standard-gwas-tests-one-snp-at-a-time",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Standard GWAS Tests One SNP at a Time",
+    "text": "Standard GWAS Tests One SNP at a Time\nIn a standard genome-wide association study (GWAS), each SNP is tested separately for association with the phenotype.\nFor SNP \\(j\\), fit a separate regression:\n\\[\ny_i\n=\n\\mu\n+\nx_{ij}\\beta_j\n+\ne_i,\n\\qquad\ne_i \\sim \\mathcal{N}(0,\\sigma^2).\n\\]\nTest whether the SNP is associated with the phenotype:\n\\[\nH_0:\\beta_j=0\n\\qquad\\text{versus}\\qquad\nH_1:\\beta_j\\neq0.\n\\]\nEach SNP is tested one at a time."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#the-qgg-r-package",
-    "href": "slides/introduction_gact_qgg_slides.html#the-qgg-r-package",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "The qgg R Package",
-    "text": "The qgg R Package\nqgg provides tools for statistical modeling and analysis of large-scale genomic data, including:\n\nFine-mapping of genomic regions using Bayesian Linear Regression (BLR) models\n\nPolygenic scoring using Bayesian Linear Regression (BLR) models\n\nGene set enrichment analysis using Bayesian Linear Regression (BLR) models\n\nqgg handles large-scale genomic data through efficient algorithms and sparse matrix techniques, combined with multi-core processing using OpenMP, multithreaded matrix operations via BLAS libraries (e.g., OpenBLAS, ATLAS, or MKL), and fast, memory-efficient batch processing of genotype data stored in\nbinary formats such as PLINK .bed files."
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#standard-gwas-reports-marginal-evidence",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#standard-gwas-reports-marginal-evidence",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Standard GWAS Reports Marginal Evidence",
+    "text": "Standard GWAS Reports Marginal Evidence\nFor every SNP, GWAS typically reports:\n\nestimated effect \\(\\widehat{\\beta}_j\\)\nstandard error \\(\\operatorname{SE}(\\widehat{\\beta}_j)\\)\n\\(z\\)- or \\(t\\)-statistic\n\\(p\\)-value\n\nThe result is a marker-by-marker summary of marginal association evidence.\nImportant: GWAS identifies associated SNPs, not necessarily the causal SNP."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#tutorials-using-the-qgg-and-gact-r-packages",
-    "href": "slides/introduction_gact_qgg_slides.html#tutorials-using-the-qgg-and-gact-r-packages",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "Tutorials using the qgg and gact R packages",
-    "text": "Tutorials using the qgg and gact R packages\n\nThe tutorials listed below are external resources and are not included in this repository.\n\nGene analysis using VEGAS: Gene analysis using the VEGAS (Versatile Gene-based Association Study) approach using the 1000G LD reference data processed above,\nGene set analysis using Bayesian MAGMA: Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).\nGene ranking using PoPS: Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level statistics derived from VEGAS (work in progress).\nFinemapping using BLR models: Finemapping of gene and LD regions using single trait Bayesian Linear Regression models (Shrestha et al.2025).\nPolygenic scoring using BLR models: Polygenic scoring (PGS) using Bayesian Linear Regression models and biological pathway information (work in progress).\nPolygenic scoring using PGS Catalog: Polygenic scoring (PGS) using summary statistics from PGS catalog and biological pathway information.\nLD score regression: LD score regression for estimating genomic heritability and correlations."
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#ld-makes-multiple-snps-look-associated",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#ld-makes-multiple-snps-look-associated",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "LD Makes Multiple SNPs Look Associated",
+    "text": "LD Makes Multiple SNPs Look Associated\nNearby SNPs are often correlated because of linkage disequilibrium (LD). If SNP \\(j^\\ast\\) is causal,\n\\[\ny=x_{j^\\ast}\\beta_{j^\\ast}+e.\n\\]\nAnother SNP \\(j\\) can still show strong marginal association when\n\\[\n\\operatorname{Cor}(x_j,x_{j^\\ast})\\neq0\n\\qquad\\text{but}\\qquad\n\\beta_j=0.\n\\]\nA GWAS peak can therefore represent an associated region, not a unique causal variant."
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-modeling",
-    "href": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-modeling",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "From Data Integration to Modeling",
-    "text": "From Data Integration to Modeling\nThe gact and qgg R packages bridges data integration, statistical modeling and biological interpretation, enabling reproducible and extensible workflows.\n\nIntegrates biological information across molecular layers — from genome to pathways, complexes, and drug–gene interactions\n\nUses structured priors and hierarchical modeling to share information, regularize effect estimates, and quantify uncertainty\n\nEnables data-driven discovery and prediction\n\nNext Steps\n\nApply the framework to new and relevant use cases\n\nExpand integration with more biological data resources\n\nIncorporate additional statistical and machine learning methods"
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#ld-explains-the-cluster-of-marginal-associations",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#ld-explains-the-cluster-of-marginal-associations",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "LD Explains the Cluster of Marginal Associations",
+    "text": "LD Explains the Cluster of Marginal Associations\nThe same simulated 30-SNP region is shown in both panels. The causal SNP is marked in red.\n\n\nLD with the causal SNP\n\n\n\n\n\n\n\n\n\n\nMarginal GWAS evidence"
   },
   {
-    "objectID": "slides/introduction_gact_qgg_slides.html#further-reading-and-collaboration",
-    "href": "slides/introduction_gact_qgg_slides.html#further-reading-and-collaboration",
-    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
-    "section": "Further Reading and Collaboration",
-    "text": "Further Reading and Collaboration\n💡 We are open to collaboration!\nIf you’re interested in applying BLR methods or contributing to the gact framework, please reach out.\n\nFurther Reading\n\nBayesian Linear Regression – teaching materials\n\ngact – R package documentation\n\nqgg – R package documentation"
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-key-inputs",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-key-inputs",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping: Key Inputs",
+    "text": "Fine-Mapping: Key Inputs\nFine-mapping aims to identify which SNPs within a GWAS-associated region remain plausible causal variants after accounting for LD.\n\nMarker-level association evidence: e.g. marginal effect estimates \\(\\hat{\\beta}_j\\) and their standard errors \\(\\mathrm{SE}(\\hat{\\beta}_j)\\).\nLD between candidate SNPs: represented by the LD correlation matrix, e.g. \\(R=\\operatorname{cor}(X)\\).\nA sparse joint model for genetic effects: e.g. BayesC / spike-and-slab.\n\nHere we use individual-level genotypes and phenotypes. Summary-statistic methods instead combine compatible GWAS evidence with external LD."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-key-outputs",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-key-outputs",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping: Key Outputs",
+    "text": "Fine-Mapping: Key Outputs\n\nPosterior inclusion probabilities (PIPs): probability that each SNP has a non-zero effect.\nPosterior effect estimates: model-averaged SNP effects.\nPrioritized variant sets: small sets of plausible causal variants.\nFine-mapping uncertainty: one leading SNP or several LD-linked alternatives."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-fits-snp-effects-jointly",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-fits-snp-effects-jointly",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping Fits SNP Effects Jointly",
+    "text": "Fine-Mapping Fits SNP Effects Jointly\nAll SNPs are fitted jointly, allowing correlated SNPs to compete to explain the same association signal:\n\\[\ny_i\n=\n\\mu\n+\n\\sum_{j=1}^{m}x_{ij}b_j\n+\ne_i,\n\\qquad\ne_i\\sim\\mathcal{N}(0,\\sigma_e^2).\n\\]\n\n\n\n\\(y\\) — phenotype\n\\(\\mu\\) — overall mean\n\\(X\\) — genotype matrix\n\n\n\n\\(b\\) — SNP effects\n\\(e\\) — residual effects\n\\(\\sigma_e^2\\) — residual variance"
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#bayesc-uses-inclusion-indicators",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#bayesc-uses-inclusion-indicators",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "BayesC Uses Inclusion Indicators",
+    "text": "BayesC Uses Inclusion Indicators\nBayesC assumes that each SNP is either inactive or active. The point mass at zero creates a sparse model in which many SNP effects are exactly zero.\nIntroduce an inclusion indicator:\n\\[\nd_j \\in \\{0,1\\},\n\\qquad\nd_j \\sim \\operatorname{Bernoulli}(\\pi).\n\\]\nConditional on the indicator:\n\\[\nb_j\\mid(d_j=0)=0,\n\\]\n\\[\nb_j\\mid(d_j=1)\n\\sim\n\\mathcal{N}(0,\\sigma_b^2).\n\\]"
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#bayesc-is-a-spike-and-slab-prior",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#bayesc-is-a-spike-and-slab-prior",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "BayesC Is a Spike-and-Slab Prior",
+    "text": "BayesC Is a Spike-and-Slab Prior\nEquivalently,\n\\[\nb_j\n\\sim\n(1-\\pi)\\delta_0\n+\n\\pi\\mathcal{N}(0,\\sigma_b^2).\n\\]\n\n\\(\\pi\\) controls how often SNPs are active; \\(\\sigma_b^2\\) controls the variance of non-zero effects."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#correlated-snps-compete-across-posterior-models",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#correlated-snps-compete-across-posterior-models",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Correlated SNPs Compete Across Posterior Models",
+    "text": "Correlated SNPs Compete Across Posterior Models\nThe sampler repeatedly explores possible explanations of the association signal.\n\n\nMarker state at iteration \\(t\\)\n\\[\nb_j^{(t)}=\n\\begin{cases}\n0, & d_j^{(t)}=0,\\\\\n\\text{non-zero draw}, & d_j^{(t)}=1.\n\\end{cases}\n\\]\nThe sampler updates \\(d_j\\) and \\(b_j\\) conditional on the current states of the other SNPs.\n\nSampled inclusion states"
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#posterior-samples-become-marker-level-evidence",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#posterior-samples-become-marker-level-evidence",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Posterior Samples Become Marker-Level Evidence",
+    "text": "Posterior Samples Become Marker-Level Evidence\n\n\nPosterior inclusion probability\n\\[\n\\begin{aligned}\n\\operatorname{PIP}_j\n&=\\Pr(d_j=1\\mid\\mathcal D), \\\\\n\\widehat{\\operatorname{PIP}}_j\n&=\\frac{1}{T}\\sum_{t=1}^{T}d_j^{(t)}.\n\\end{aligned}\n\\]\nPIP: how often SNP \\(j\\) is needed in posterior models.\n\nPosterior mean effect\n\\[\n\\begin{aligned}\n\\widehat b_j\n&=E(b_j\\mid\\mathcal D), \\\\\n\\widehat b_j\n&=\\frac{1}{T}\\sum_{t=1}^{T}b_j^{(t)}.\n\\end{aligned}\n\\]\nPosterior mean: the effect after averaging across posterior models."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#joint-modelling-redistributes-the-gwas-signal",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#joint-modelling-redistributes-the-gwas-signal",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Joint Modelling Redistributes the GWAS Signal",
+    "text": "Joint Modelling Redistributes the GWAS Signal\nThe marginal GWAS signal is compared with support from the joint BayesC model.\n\n\nMarginal GWAS\n\n\n\n\n\n\n\n\n\n\nBayesC PIPs"
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#pip-and-effect-size-answer-different-questions",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#pip-and-effect-size-answer-different-questions",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "PIP and Effect Size Answer Different Questions",
+    "text": "PIP and Effect Size Answer Different Questions\n\n\nPosterior inclusion probability\n\\[\n\\operatorname{PIP}_j\n=\n\\Pr(b_j\\neq0\\mid\\mathcal D).\n\\]\nMeasures how often SNP \\(j\\) is included in posterior models.\nA SNP can have a high PIP but a moderate effect if it is frequently active with a relatively small effect.\n\nPosterior mean effect\n\\[\nE(b_j\\mid\\mathcal D).\n\\]\nMeasures the model-averaged effect of SNP \\(j\\), including iterations in which its effect is zero.\nA SNP can have a lower PIP but large non-zero effects when it is selected."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#constructing-a-local-0.9-credible-set",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#constructing-a-local-0.9-credible-set",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Constructing a Local 0.9 Credible Set",
+    "text": "Constructing a Local 0.9 Credible Set\nA practical local credible set (LCS) summarizes the leading signal as a small set of plausible causal variants.\n\nIdentify the SNP with the highest PIP.\nSelect its LD neighborhood, for example \\(r^2\\ge0.5\\).\nRank these SNPs by decreasing PIP.\nAdd their PIPs until\n\\[\n\\sum_{j\\in\\mathcal C}\\operatorname{PIP}_j\n\\ge 0.90.\n\\]"
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#interpreting-the-local-credible-set",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#interpreting-the-local-credible-set",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Interpreting the Local Credible Set",
+    "text": "Interpreting the Local Credible Set\n\nPIPs come from the joint model and account for LD.\nA small LCS indicates a well-localized signal.\nA larger LCS indicates uncertainty among correlated SNPs.\nRaw PIPs are used without normalization.\n\nBecause BayesC allows multiple active SNPs, this is a practical local summary, not a formal \\(90\\%\\) posterior coverage set."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-result-local-0.9-credible-set",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#fine-mapping-result-local-0.9-credible-set",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Fine-Mapping Result: Local 0.9 Credible Set",
+    "text": "Fine-Mapping Result: Local 0.9 Credible Set\n\n\nVariants in the LCS\n\n\n\n\n\nmarker\nSNP\nPIP\nr2_with_focal\ncumulative_PIP\ncausal\n\n\n\n\n11\nrs200766023_G\n1\n1\n1\nTRUE\n\n\n\n\n\n\nCumulative PIP\n\n\n\n\n\n\n\n\n\n\nThe LCS contains 1 SNPs and includes the simulated causal SNP: yes."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#functional-information-can-refine-fine-mapping",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#functional-information-can-refine-fine-mapping",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Functional Information Can Refine Fine-Mapping",
+    "text": "Functional Information Can Refine Fine-Mapping\nWhen LD leaves several plausible SNPs, functional information can refine their prior support.\n\n\nFunctional information\nExamples include:\n\ncoding consequences;\nregulatory and eQTL evidence;\nchromatin accessibility;\nconservation and tissue- or cell-specific annotations.\n\n\n\n\nBayesian interpretation\nBayesian updating combines:\n\ngenetic evidence from the locus;\nprior information for each SNP.\n\nIt changes a SNP’s prior plausibility. It does not declare that SNP to be causal."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#annotation-informed-inclusion-probabilities",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#annotation-informed-inclusion-probabilities",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Annotation-Informed Inclusion Probabilities",
+    "text": "Annotation-Informed Inclusion Probabilities\nStandard BayesC gives every SNP the same prior probability of being active:\n\\[\nd_j \\sim \\operatorname{Bernoulli}(\\pi).\n\\]\nAnnotations can make that probability SNP-specific:\n\\[\nP(d_j=1)=\\pi_j.\n\\]\nA relevant annotation may therefore raise a SNP’s prior probability of having a non-zero effect."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#annotation-informed-effect-variances",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#annotation-informed-effect-variances",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Annotation-Informed Effect Variances",
+    "text": "Annotation-Informed Effect Variances\nStandard BayesC uses a common variance for active effects:\n\\[\nb_j\\mid d_j=1 \\sim \\mathcal{N}(0,\\sigma_b^2).\n\\]\nAnnotations can make the active-effect variance SNP-specific:\n\\[\nb_j\\mid d_j=1 \\sim \\mathcal{N}(0,\\sigma_{b,j}^2).\n\\]\nAn annotated SNP may therefore be assigned a larger prior variance for its non-zero effect."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#annotations-reweight-competing-causal-explanations",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#annotations-reweight-competing-causal-explanations",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Annotations Reweight Competing Causal Explanations",
+    "text": "Annotations Reweight Competing Causal Explanations\nSuppose two SNPs have similar statistical evidence because they are in strong LD.\n\n\nEqual versus annotation-informed priors\n\\[\n\\begin{aligned}\nP(d_1=1)=P(d_2=1)&=\\pi\n&&\\text{(equal priors)}, \\\\\nP(d_1=1)=\\pi_1,\\quad P(d_2=1)&=\\pi_2\n&&\\text{(annotation-informed)}.\n\\end{aligned}\n\\]\nwhere a relevant annotation can imply \\(\\pi_1&gt;\\pi_2\\).\n\nSchematic prior reweighting"
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#annotation-informed-fine-mapping-workflow",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#annotation-informed-fine-mapping-workflow",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Annotation-Informed Fine-Mapping Workflow",
+    "text": "Annotation-Informed Fine-Mapping Workflow\n\n\nStandard prior\n\nGWAS and LD evidence\nA common prior across SNPs\nPosterior PIPs\n\n\n\n\nAnnotation-informed prior\n\nGWAS and LD evidence\nSNP-specific prior information\nAnnotation-informed PIPs\n\n\nBoth approaches report PIPs, ranked candidates, posterior effects, and local credible sets.\nOnly the prior assigned to each SNP changes—through its inclusion probability, non-zero effect variance, or both."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#summary",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#summary",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Summary",
+    "text": "Summary\n\n\nFrom association to joint evidence\n\nGWAS peaks identify associated regions, not unique causal variants.\nJoint fitting makes correlated variants compete to explain the signal.\nBayesC represents SNPs as inactive or active.\n\n\n\n\nInterpreting the posterior\n\nPIPs and posterior means answer different questions.\nA BayesC LCS is practical, not automatically a formal \\(90\\%\\) coverage set.\nFunctional annotations modify priors, not the genetic evidence."
+  },
+  {
+    "objectID": "slides/bayesian_fine_mapping_bayesc_slides.html#further-reading",
+    "href": "slides/bayesian_fine_mapping_bayesc_slides.html#further-reading",
+    "title": "Bayesian Fine-Mapping with BayesC",
+    "section": "Further Reading",
+    "text": "Further Reading\nCompanion tutorial: Bayesian Fine-Mapping with BayesC\n\nGenome-wide fine-mapping — SBayesRC: Wu Y, Zheng Z, Thibaut L, Lin T, Feng Q, Cheng H, Yengo L, Goddard ME, Wray NR, Visscher PM, Zeng J. Genome-wide fine-mapping improves identification of causal variants. Nature Genetics 58, 940–951 (2026). DOI: 10.1038/s41588-026-02549-3\nBayesC and BayesR for fine-mapping: Shrestha M, Bai Z, Gholipourshahraki T, Hjelholt A, Rohde P, Fuglsang MK, Sørensen P. Enhanced genetic fine mapping accuracy with Bayesian Linear Regression models in diverse genetic architectures. PLOS Genetics 21(7), e1011783 (2025). DOI: 10.1371/journal.pgen.1011783\nOriginal SBayesRC method and prediction study: Zheng Z et al. Leveraging functional genomic annotations and genome coverage to improve polygenic prediction of complex traits within and between ancestries. Nature Genetics 56, 767–777 (2024). DOI: 10.1038/s41588-024-01704-y"
   },
   {
     "objectID": "slides/advanced_bayesian_linear_regression_slides.html#from-gwas-to-biological-discovery",
@@ -774,7 +1005,7 @@
     "href": "index.html#overview-of-materials",
     "title": "Bayesian Linear Regression",
     "section": "Overview of Materials",
-    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nBLR notes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics.\n\n\nBLR slides\nLecture slides summarizing key theoretical concepts and derivations in Bayesian Linear Regression Analyses.\n\n\nBLR-GSEA slides\nLecture slides introducing Bayesian Linear Regression Models used in Gene Set Analyses.\n\n\nBayesian MAGMA slides\nLecture slides introducing Gene Set Analyses using Bayesian MAGMA Models.\n\n\nClassical Regression tutorial\nSimulation and estimation using ordinary least squares (OLS) in R.\n\n\nBayesian (Gaussian Prior) tutorial\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R.\n\n\nBayesian (Spike & Slab) tutorial\nBayesian regression with spike-and-slab priors for variable selection and sparsity in R.\n\n\nBayesian MAGMA tutorial\nBayesian gene set analysis in R.\n\n\n\nDownload Notes (PDF)\nDownload Slides (PDF)\n\n\n\nFurther Reading\nFurther details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in\nSorensen, D. (2025). Statistical Learning in Genetics: An Introduction Using R. Springer.\nThis book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in quantitative genetics and genomics."
+    "text": "Overview of Materials\n\n\n\nSection\nDescription\n\n\n\n\nBLR notes\nTheoretical notes on Bayesian linear regression, Gibbs sampling, and convergence diagnostics.\n\n\nBLR slides\nLecture slides summarizing key theoretical concepts and derivations in Bayesian Linear Regression Analyses.\n\n\nBLR-GSEA slides\nLecture slides introducing Bayesian Linear Regression Models used in Gene Set Analyses.\n\n\nBayesian MAGMA slides\nLecture slides introducing Gene Set Analyses using Bayesian MAGMA Models.\n\n\nBayesian Fine-Mapping with BayesC — Slides\nLecture slides on joint BayesC fine-mapping, LD, PIPs, local credible sets, and annotation-informed priors.\n\n\nClassical Regression tutorial\nSimulation and estimation using ordinary least squares (OLS) in R.\n\n\nBayesian (Gaussian Prior) tutorial\nBayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R.\n\n\nBayesian (Spike & Slab) tutorial\nBayesian regression with spike-and-slab priors for variable selection and sparsity in R.\n\n\nBayesian MAGMA tutorial\nBayesian gene set analysis in R.\n\n\nBayesian Fine-Mapping with BayesC — Tutorial\nReproducible 30-SNP BayesC fine-mapping example using simulated phenotype data.\n\n\n\nDownload Notes (PDF)\nDownload Data\nDownload Slides (PDF)\n\n\n\nFurther Reading\nFurther details on the theory and computation behind Bayesian linear regression, Gibbs sampling, and hierarchical modeling can be found in\nSorensen, D. (2025). Statistical Learning in Genetics: An Introduction Using R. Springer.\nThis book provides a rigorous and accessible introduction to Bayesian modeling, hierarchical inference, and statistical learning methods in quantitative genetics and genomics."
   },
   {
     "objectID": "index.html#the-qgg-r-package",
@@ -1281,87 +1512,220 @@
     "text": "Learning at Different Levels\n\n\n\n\n\n\n\n\n\n\n\nModel Level\nKey Parameters Learned\nWhat They Represent\nHow They Are Learned\nWhat We Learn Biologically\n\n\n\n\nEffect sizes\n\\(\\boldsymbol{\\beta}\\)\nStrength and direction of association for each feature\nPosterior mean/median given priors and data\nWhich features drive the outcome\n\n\nIndicator variables\n\\(\\delta_j\\) (single trait), \\(\\boldsymbol{\\delta}_j\\) (multi-trait)\nWhether feature \\(j\\) is active (and for which traits)\nEstimated as posterior inclusion probabilities (PIPs)\nWhich features are relevant, and whether effects are shared or trait-specific\n\n\nVariance components\n\\(\\tau^2\\), \\(\\{\\tau_k^2\\}\\), \\(\\{\\tau_{gk}^2\\}\\)\nMagnitude of expected effect sizes; heterogeneity across layers or groups\nInferred hierarchically from the data (via MCMC or EM)\nHow strongly different groups or omic layers contribute\n\n\nCovariance components\n\\(\\boldsymbol{\\Sigma}_b\\), \\(\\{\\boldsymbol{\\Sigma}_{b,g}\\}\\)\nCorrelation of effects across traits or molecular layers\nEstimated from joint posterior\nShared pathways, pleiotropy, and cross-layer architecture"
   },
   {
-    "objectID": "tutorials/classical_linear_regression_simulation.html",
-    "href": "tutorials/classical_linear_regression_simulation.html",
-    "title": "Classical Linear Regression Simulation in R",
+    "objectID": "slides/introduction_gact_qgg_slides.html#why-integrate-diverse-data-sources",
+    "href": "slides/introduction_gact_qgg_slides.html#why-integrate-diverse-data-sources",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "Why Integrate Diverse Data Sources?",
+    "text": "Why Integrate Diverse Data Sources?\n\nComplex traits arise from interacting molecular layers — genetic, transcriptomic, proteomic, and metabolic.\n\nSingle data types provide only partial insights complex biological systems (GWAS: DNA → disease phenotype)\n\nIntegration connects variants → genes → pathways → phenotypes may help reveal molecular mechanisms that drive traits and diseases.\nEnables functional interpretation, better prediction, and new discoveries across molecular systems."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-discovery",
+    "href": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-discovery",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "From Data Integration to Discovery",
+    "text": "From Data Integration to Discovery"
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#the-gact-r-package",
+    "href": "slides/introduction_gact_qgg_slides.html#the-gact-r-package",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "The gact R Package",
+    "text": "The gact R Package\ngact provides an infrastructure for efficient processing of large-scale genomic association data, with core functions for:\n\nEstablishing and populating a database of genomic associations\n\nDownloading and processing biological databases\n\nHandling and processing GWAS summary statistics\n\nLinking genetic markers to genes, proteins, metabolites, and biological pathways\n\nIntegrates with statistical machine learning tools in the qgg R package\n\ngact is intended to serve as a practical implementation of integrative genomics, bridging statistical modeling and biological interpretation, and supporting reproducible and extensible workflows."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#integrating-data-with-gact",
+    "href": "slides/introduction_gact_qgg_slides.html#integrating-data-with-gact",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "Integrating Data with gact",
+    "text": "Integrating Data with gact\nThe gact() function is a single R command that creates and populates the Genomic Association of Complex Traits (GACT) database.\n\nIt automates three main tasks:\n\nInfrastructure creation – sets up a structured folder-based database\n(glist, gstat, gsets, marker, gtex, download, etc.)\nData acquisition – downloads and organizes multiple biological data sources\n(e.g., GWAS Catalog, Ensembl, GTEx, Reactome, STRING, STITCH, DGIdb)\nMarker and feature set generation - integrates data across sources to create curated genomic feature sets that form the basis for the integrative genomic analyses."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#biological-databases-used-by-gact",
+    "href": "slides/introduction_gact_qgg_slides.html#biological-databases-used-by-gact",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "Biological Databases Used by gact",
+    "text": "Biological Databases Used by gact\ngact constructs gene and marker sets from a wide range of curated biological databases:\n\n\nEnsembl — genes, transcripts, and proteins\n\nEnsembl Regulation — regulatory genomic features\n\nGO, Reactome, KEGG — ontology and pathway sets\n\nSTRING, STITCH — protein and chemical complexes\n\nDrugBank, ATC — drug–gene and drug-class associations\n\nDISEASE — disease–gene associations\n\nGTEx — eQTL-based gene sets\n\nGWAS Catalog — trait-associated variants and genes\n\nVEP — functional variant annotations\n\nWe plan to add additional biological resources in gact."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#from-database-to-model-inputs",
+    "href": "slides/introduction_gact_qgg_slides.html#from-database-to-model-inputs",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "From Database to Model Inputs",
+    "text": "From Database to Model Inputs\nThe gact R package includes utility functions to extract and structure data from the GACT database into analysis-ready inputs — \\(\\mathbf{Y}\\) (e.g., summary statistic outcomes) and \\(\\mathbf{X}\\) (genomic or biological features).\n\ngetMarkerStat() — retrieve GWAS summary statistics (Y’s)\n\ngetFeatureStat() — extract gene-, protein-, or pathway-level results (Y’s)\n\ngetMarkerSets() — define biological groupings (basis for X’s)\n\ndesignMatrix() — build feature matrices (X) linking variants or genes to biological feature sets\n\nTogether, these functions form a reproducible workflow for generating standardized input data for Bayesian Hierarchical Models and other machine learning approaches."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#the-qgg-r-package",
+    "href": "slides/introduction_gact_qgg_slides.html#the-qgg-r-package",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "The qgg R Package",
+    "text": "The qgg R Package\nqgg provides tools for statistical modeling and analysis of large-scale genomic data, including:\n\nFine-mapping of genomic regions using Bayesian Linear Regression (BLR) models\n\nPolygenic scoring using Bayesian Linear Regression (BLR) models\n\nGene set enrichment analysis using Bayesian Linear Regression (BLR) models\n\nqgg handles large-scale genomic data through efficient algorithms and sparse matrix techniques, combined with multi-core processing using OpenMP, multithreaded matrix operations via BLAS libraries (e.g., OpenBLAS, ATLAS, or MKL), and fast, memory-efficient batch processing of genotype data stored in\nbinary formats such as PLINK .bed files."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#tutorials-using-the-qgg-and-gact-r-packages",
+    "href": "slides/introduction_gact_qgg_slides.html#tutorials-using-the-qgg-and-gact-r-packages",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "Tutorials using the qgg and gact R packages",
+    "text": "Tutorials using the qgg and gact R packages\n\nThe tutorials listed below are external resources and are not included in this repository.\n\nGene analysis using VEGAS: Gene analysis using the VEGAS (Versatile Gene-based Association Study) approach using the 1000G LD reference data processed above,\nGene set analysis using Bayesian MAGMA: Pathway prioritization using a single and multiple trait Bayesian MAGMA models and gene-level statistics derived from VEGAS (Gholipourshahraki et al.2024).\nGene ranking using PoPS: Polygenic Prioritization Scoring (PoPS) using BLR models and gene-level statistics derived from VEGAS (work in progress).\nFinemapping using BLR models: Finemapping of gene and LD regions using single trait Bayesian Linear Regression models (Shrestha et al.2025).\nPolygenic scoring using BLR models: Polygenic scoring (PGS) using Bayesian Linear Regression models and biological pathway information (work in progress).\nPolygenic scoring using PGS Catalog: Polygenic scoring (PGS) using summary statistics from PGS catalog and biological pathway information.\nLD score regression: LD score regression for estimating genomic heritability and correlations."
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-modeling",
+    "href": "slides/introduction_gact_qgg_slides.html#from-data-integration-to-modeling",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "From Data Integration to Modeling",
+    "text": "From Data Integration to Modeling\nThe gact and qgg R packages bridges data integration, statistical modeling and biological interpretation, enabling reproducible and extensible workflows.\n\nIntegrates biological information across molecular layers — from genome to pathways, complexes, and drug–gene interactions\n\nUses structured priors and hierarchical modeling to share information, regularize effect estimates, and quantify uncertainty\n\nEnables data-driven discovery and prediction\n\nNext Steps\n\nApply the framework to new and relevant use cases\n\nExpand integration with more biological data resources\n\nIncorporate additional statistical and machine learning methods"
+  },
+  {
+    "objectID": "slides/introduction_gact_qgg_slides.html#further-reading-and-collaboration",
+    "href": "slides/introduction_gact_qgg_slides.html#further-reading-and-collaboration",
+    "title": "Integrative Genomics Analyses using the gact and qgg R packages",
+    "section": "Further Reading and Collaboration",
+    "text": "Further Reading and Collaboration\n💡 We are open to collaboration!\nIf you’re interested in applying BLR methods or contributing to the gact framework, please reach out.\n\nFurther Reading\n\nBayesian Linear Regression – teaching materials\n\ngact – R package documentation\n\nqgg – R package documentation"
+  },
+  {
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "",
-    "text": "This document demonstrates how to simulate data from a classical linear regression model and estimate parameters using Ordinary Least Squares (OLS), including inference and prediction intervals.\nWe also visualize the estimated vs. true regression coefficients."
+    "text": "This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics."
   },
   {
-    "objectID": "tutorials/classical_linear_regression_simulation.html#introduction",
-    "href": "tutorials/classical_linear_regression_simulation.html#introduction",
-    "title": "Classical Linear Regression Simulation in R",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#introduction",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#introduction",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "",
-    "text": "This document demonstrates how to simulate data from a classical linear regression model and estimate parameters using Ordinary Least Squares (OLS), including inference and prediction intervals.\nWe also visualize the estimated vs. true regression coefficients."
+    "text": "This document demonstrates Bayesian Linear Regression using conjugate Gaussian and scaled inverse-chi-squared priors. The model and priors follow the theory outlined in the notes above. We implement a Gibbs sampler for inference, summarize posterior distributions, and assess convergence diagnostics."
   },
   {
-    "objectID": "tutorials/classical_linear_regression_simulation.html#r-code",
-    "href": "tutorials/classical_linear_regression_simulation.html#r-code",
-    "title": "Classical Linear Regression Simulation in R",
-    "section": "R Code",
-    "text": "R Code\n\n\nCode\n# ============================================================\n# Classical Linear Regression: Simulation + OLS Estimation\n# ============================================================\n\nset.seed(123)\n\n# --- 1. Simulate data ---------------------------------------\nn &lt;- 100          # number of observations\np &lt;- 3            # number of predictors (excluding intercept)\n\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))  # include intercept\nbeta_true &lt;- c(2, 0.5, -1, 1.5)            # true coefficients\nsigma_true &lt;- 1                            # true residual SD\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)\n\n# --- 2. Estimate parameters via OLS --------------------------\nbeta_hat &lt;- solve(t(X) %*% X) %*% t(X) %*% y\nresiduals &lt;- y - X %*% beta_hat\nsigma2_hat &lt;- as.numeric(t(residuals) %*% residuals / (n - (p + 1)))\n\n# --- 3. Inference: SEs, t-stats, p-values, CI ---------------\nvar_beta_hat &lt;- sigma2_hat * solve(t(X) %*% X)\nse_beta &lt;- sqrt(diag(var_beta_hat))\n\nt_stats &lt;- beta_hat / se_beta\np_values &lt;- 2 * (1 - pt(abs(t_stats), df = n - (p + 1)))\n\nalpha &lt;- 0.05\nt_crit &lt;- qt(1 - alpha/2, df = n - (p + 1))\nci_lower &lt;- beta_hat - t_crit * se_beta\nci_upper &lt;- beta_hat + t_crit * se_beta\n\n# Combine results into a table\nresults &lt;- data.frame(\n  Estimate = as.numeric(beta_hat),\n  SE = se_beta,\n  t_value = as.numeric(t_stats),\n  p_value = as.numeric(p_values),\n  CI_lower = as.numeric(ci_lower),\n  CI_upper = as.numeric(ci_upper)\n)\nrownames(results) &lt;-  paste0(\"beta\", 0:p)\nprint(round(results, 4))\n\n\n      Estimate     SE t_value p_value CI_lower CI_upper\nbeta0   1.9807 0.1073 18.4517   0e+00   1.7676   2.1937\nbeta1   0.4445 0.1169  3.8036   3e-04   0.2126   0.6765\nbeta2  -0.9538 0.1095 -8.7138   0e+00  -1.1711  -0.7365\nbeta3   1.4426 0.1122 12.8540   0e+00   1.2198   1.6654\n\n\nCode\n# --- 4. Prediction for a new observation ---------------------\nx_new &lt;- c(1, 0.5, -1, 1)  # include intercept term\ny_pred &lt;- as.numeric(x_new %*% beta_hat)\nvar_pred &lt;- sigma2_hat * (1 + t(x_new) %*% solve(t(X) %*% X) %*% x_new)\nse_pred &lt;- sqrt(var_pred)\n\n# 95% prediction interval\npred_interval &lt;- c(\n  lower = y_pred - t_crit * se_pred,\n  upper = y_pred + t_crit * se_pred\n)\n\ncat(\"\\nPredicted y_new =\", round(y_pred, 3), \"\\n\")\n\n\n\nPredicted y_new = 4.599 \n\n\nCode\ncat(\"95% Prediction interval: [\", round(pred_interval[1], 3), \",\",\n    round(pred_interval[2], 3), \"]\\n\")\n\n\n95% Prediction interval: [ 2.48 , 6.718 ]\n\n\nCode\n# --- 5. Visualization: True vs. Estimated Coefficients -------\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_hat, pch = 19, col = \"blue\", cex = 1.3,\n     xlab = \"True Coefficients\", ylab = \"Estimated Coefficients\",\n     main = \"OLS Estimates vs True Values\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\narrows(beta_true, ci_lower, beta_true, ci_upper, angle = 90, code = 3, length = 0.05, col = \"darkgray\")\nlegend(\"topleft\", legend = c(\"OLS Estimates\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
-  },
-  {
-    "objectID": "tutorials/bayesian_spike_and_slab.html",
-    "href": "tutorials/bayesian_spike_and_slab.html",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
-    "section": "",
-    "text": "This document demonstrates Bayesian Linear Regression using spike-and-slab priors, as described in the notes. We implement a Gibbs sampler that updates parameters from their full conditionals, computes posterior summaries (including posterior inclusion probabilities), and evaluates convergence using diagnostic statistics."
-  },
-  {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#introduction",
-    "href": "tutorials/bayesian_spike_and_slab.html#introduction",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
-    "section": "",
-    "text": "This document demonstrates Bayesian Linear Regression using spike-and-slab priors, as described in the notes. We implement a Gibbs sampler that updates parameters from their full conditionals, computes posterior summaries (including posterior inclusion probabilities), and evaluates convergence using diagnostic statistics."
-  },
-  {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#model-setup-and-data-simulation",
-    "href": "tutorials/bayesian_spike_and_slab.html#model-setup-and-data-simulation",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#model-setup-and-data-simulation",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#model-setup-and-data-simulation",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Model Setup and Data Simulation",
-    "text": "Model Setup and Data Simulation\n\n\nCode\nset.seed(123)\n\n# Simulate data\nn &lt;- 100\np &lt;- 5\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))\nbeta_true &lt;- c(2, 1.2, 0, 0, 0, 1.5)  # some zeros (spike)\nsigma_true &lt;- 1\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)"
+    "text": "Model Setup and Data Simulation\n\n\nCode\nset.seed(123)\n\n# Simulate data (same as in the classical regression example)\nn &lt;- 100\np &lt;- 3\nX &lt;- cbind(1, matrix(rnorm(n * p), n, p))\nbeta_true &lt;- c(2, 0.5, -1, 1.5)\nsigma_true &lt;- 1\n\ny &lt;- X %*% beta_true + rnorm(n, 0, sigma_true)"
   },
   {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#gibbs-sampler-implementation",
-    "href": "tutorials/bayesian_spike_and_slab.html#gibbs-sampler-implementation",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#gibbs-sampler-implementation",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#gibbs-sampler-implementation",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Gibbs Sampler Implementation",
-    "text": "Gibbs Sampler Implementation\nWe use the following priors:\n\n\\(\\alpha_i \\mid \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2)\\)\n\\(\\delta_i \\mid \\pi \\sim \\text{Bernoulli}(\\pi)\\)\n\\(\\pi \\sim \\text{Beta}(a, b)\\)\n\\(\\sigma_b^2 \\sim S_b \\chi^{-2}(v_b)\\)\n\\(\\sigma^2 \\sim S \\chi^{-2}(v)\\)\n\n\n\nCode\n# Hyperparameters\na_pi &lt;- 1\nb_pi &lt;- 1\nv_b &lt;- 4\nS_b &lt;- 1\nv &lt;- 4\nS &lt;- 1\n\n# Gibbs sampler setup\nn_iter &lt;- 4000\nburn_in &lt;- 1000\nchains &lt;- 2\n\n# Storage\nbeta_samples &lt;- vector(\"list\", chains)\ndelta_samples &lt;- vector(\"list\", chains)\npi_samples &lt;- vector(\"list\", chains)\nsigma2_samples &lt;- vector(\"list\", chains)\nsigma2b_samples &lt;- vector(\"list\", chains)\n\nfor (c in 1:chains) {\n  # Initial values\n  alpha &lt;- rnorm(ncol(X), 0, 1)\n  delta &lt;- rbinom(ncol(X), 1, 0.5)\n  sigma2 &lt;- 1\n  sigma2_b &lt;- 1\n  pi &lt;- 0.5\n  \n  # Containers\n  alpha_chain &lt;- matrix(NA, n_iter, ncol(X))\n  delta_chain &lt;- matrix(NA, n_iter, ncol(X))\n  sigma2_chain &lt;- numeric(n_iter)\n  sigma2b_chain &lt;- numeric(n_iter)\n  pi_chain &lt;- numeric(n_iter)\n  \n  for (t in 1:n_iter) {\n    # Sample each alpha_i given delta_i\n    for (j in 1:ncol(X)) {\n      X_j &lt;- X[, j]\n      r_j &lt;- y - X %*% (alpha * delta) + X_j * alpha[j] * delta[j]\n      \n      if (delta[j] == 1) {\n        var_j &lt;- sigma2 / (t(X_j) %*% X_j + sigma2 / sigma2_b)\n        mean_j &lt;- as.numeric(var_j * t(X_j) %*% r_j / sigma2)\n        alpha[j] &lt;- rnorm(1, mean_j, sqrt(var_j))\n      } else {\n        alpha[j] &lt;- rnorm(1, 0, sqrt(sigma2_b))  # prior draw\n      }\n    }\n    \n    # Sample delta_i given alpha_i\n    for (j in 1:ncol(X)) {\n      X_j &lt;- X[, j]\n      r_j &lt;- y - X %*% (alpha * delta) + X_j * alpha[j] * delta[j]\n      rss0 &lt;- sum((r_j)^2)\n      rss1 &lt;- sum((r_j - X_j * alpha[j])^2)\n      \n      logodds &lt;- 0.5 / sigma2 * (rss0 - rss1) + log(pi) - log(1 - pi)\n      p1 &lt;- 1 / (1 + exp(-logodds))\n      delta[j] &lt;- rbinom(1, 1, p1)\n    }\n    \n    # Update pi\n    pi &lt;- rbeta(1, a_pi + sum(delta), b_pi + ncol(X) - sum(delta))\n    \n    # Update sigma_b^2\n    p_incl &lt;- sum(delta)\n    v_b_tilde &lt;- v_b + p_incl\n    S_b_tilde &lt;- (sum((alpha * delta)^2) + v_b * S_b) / v_b_tilde\n    sigma2_b &lt;- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)\n    \n    # Update sigma^2\n    resid &lt;- y - X %*% (alpha * delta)\n    v_tilde &lt;- v + n\n    S_tilde &lt;- (sum(resid^2) + v * S) / v_tilde\n    sigma2 &lt;- v_tilde * S_tilde / rchisq(1, df = v_tilde)\n    \n    # Store\n    alpha_chain[t, ] &lt;- alpha * delta\n    delta_chain[t, ] &lt;- delta\n    pi_chain[t] &lt;- pi\n    sigma2_chain[t] &lt;- sigma2\n    sigma2b_chain[t] &lt;- sigma2_b\n  }\n  \n  beta_samples[[c]] &lt;- alpha_chain\n  delta_samples[[c]] &lt;- delta_chain\n  pi_samples[[c]] &lt;- pi_chain\n  sigma2_samples[[c]] &lt;- sigma2_chain\n  sigma2b_samples[[c]] &lt;- sigma2b_chain\n}"
+    "text": "Gibbs Sampler Implementation\nWe use conjugate priors:\n\n\\(\\beta \\mid \\sigma^2, \\sigma_b^2 \\sim \\mathcal{N}(0, \\sigma_b^2 I_p)\\)\n\\(\\sigma_b^2 \\sim S_b \\chi^{-2}(v_b)\\)\n\\(\\sigma^2 \\sim S \\chi^{-2}(v)\\)\n\n\n\nCode\n# Hyperparameters\nv_b &lt;- 4\nS_b &lt;- 1\nv &lt;- 4\nS &lt;- 1\n\n# Initialization\nbeta &lt;- rep(0, ncol(X))\nsigma2 &lt;- 1\nsigma2_b &lt;- 1\n\nn_iter &lt;- 5000\nburn_in &lt;- 1000\n\n# Store samples\nbeta_samples &lt;- matrix(NA, n_iter, ncol(X))\nsigma2_samples &lt;- numeric(n_iter)\nsigma2_b_samples &lt;- numeric(n_iter)\n\nfor (t in 1:n_iter) {\n  # Sample beta | sigma2, sigma2_b, y\n  Sigma_beta &lt;- solve(t(X) %*% X / sigma2 + diag(1 / sigma2_b, ncol(X)))\n  mu_beta &lt;- Sigma_beta %*% t(X) %*% y / sigma2\n  beta &lt;- as.numeric(mu_beta + t(chol(Sigma_beta)) %*% rnorm(ncol(X)))\n  \n  # Sample sigma_b^2 | beta\n  v_b_tilde &lt;- v_b + ncol(X)\n  S_b_tilde &lt;- (sum(beta^2) + v_b * S_b) / v_b_tilde\n  sigma2_b &lt;- v_b_tilde * S_b_tilde / rchisq(1, df = v_b_tilde)\n  \n  # Sample sigma^2 | beta, y\n  v_tilde &lt;- v + n\n  resid &lt;- y - X %*% beta\n  S_tilde &lt;- (sum(resid^2) + v * S) / v_tilde\n  sigma2 &lt;- v_tilde * S_tilde / rchisq(1, df = v_tilde)\n  \n  # Store samples\n  beta_samples[t, ] &lt;- beta\n  sigma2_samples[t] &lt;- sigma2\n  sigma2_b_samples[t] &lt;- sigma2_b\n}"
   },
   {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#posterior-summaries",
-    "href": "tutorials/bayesian_spike_and_slab.html#posterior-summaries",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#posterior-summaries",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#posterior-summaries",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Posterior Summaries",
-    "text": "Posterior Summaries\n\n\nCode\nposterior_summary &lt;- function(samples, probs = c(0.025, 0.5, 0.975)) {\n  c(mean = mean(samples), sd = sd(samples), quantile(samples, probs = probs))\n}\n\n# Combine chains\nbeta_all &lt;- do.call(rbind, beta_samples)\npi_all &lt;- unlist(pi_samples)\ndelta_all &lt;- do.call(rbind, delta_samples)\n\nbeta_summary &lt;- t(apply(beta_all[burn_in:nrow(beta_all), ], 2, posterior_summary))\nrownames(beta_summary) &lt;- paste0(\"beta\", 0:p)\n\nPIP &lt;- colMeans(delta_all[burn_in:nrow(delta_all), ])\n\nround(beta_summary, 4)\n\n\n         mean     sd    2.5%    50%  97.5%\nbeta0  1.9340 0.0975  1.7469 1.9348 2.1217\nbeta1  1.1750 0.1057  0.9651 1.1759 1.3812\nbeta2  0.0330 0.0750  0.0000 0.0000 0.2550\nbeta3  0.0027 0.0352 -0.0568 0.0000 0.1062\nbeta4 -0.0139 0.0487 -0.1804 0.0000 0.0082\nbeta5  1.6871 0.0974  1.4967 1.6865 1.8798\n\n\nCode\ncat(\"\\nPosterior Inclusion Probabilities (PIP):\\n\")\n\n\n\nPosterior Inclusion Probabilities (PIP):\n\n\nCode\nround(PIP, 3)\n\n\n[1] 1.000 1.000 0.250 0.124 0.159 1.000"
+    "text": "Posterior Summaries\n\n\nCode\nposterior_summary &lt;- function(samples, probs = c(0.025, 0.5, 0.975)) {\n  c(\n    mean = mean(samples),\n    sd = sd(samples),\n    quantile(samples, probs = probs)\n  )\n}\n\n# Summaries for betas\nbeta_summary &lt;- t(apply(beta_samples[burn_in:n_iter, ], 2, posterior_summary))\nrownames(beta_summary) &lt;- paste0(\"beta\", 0:p)\n\n# Summaries for variance parameters\nsigma2_summary &lt;- posterior_summary(sigma2_samples[burn_in:n_iter])\nsigma2b_summary &lt;- posterior_summary(sigma2_b_samples[burn_in:n_iter])\n\nround(beta_summary, 4)\n\n\n         mean     sd    2.5%     50%   97.5%\nbeta0  1.9673 0.1077  1.7537  1.9669  2.1769\nbeta1  0.4405 0.1186  0.2063  0.4425  0.6727\nbeta2 -0.9460 0.1105 -1.1559 -0.9470 -0.7262\nbeta3  1.4319 0.1124  1.2171  1.4315  1.6524\n\n\nCode\nround(rbind(sigma2 = sigma2_summary, sigma2_b = sigma2b_summary), 4)\n\n\n           mean     sd  2.5%    50%  97.5%\nsigma2   1.1276 0.1638 0.852 1.1154 1.5078\nsigma2_b 1.8685 1.2652 0.625 1.5398 4.9971"
   },
   {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#trace-plots",
-    "href": "tutorials/bayesian_spike_and_slab.html#trace-plots",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#trace-plots",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#trace-plots",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Trace Plots",
-    "text": "Trace Plots\n\n\nCode\npar(mfrow = c(3, 2))\nfor (j in 1:ncol(X)) {\n  plot(beta_samples[[1]][, j], type = \"l\", main = paste(\"Trace: beta\", j - 1, \"(chain 1)\"),\n       xlab = \"Iteration\", ylab = expression(beta))\n  abline(h = beta_true[j], col = \"red\", lwd = 2, lty = 2)\n}"
+    "text": "Trace Plots\n\n\nCode\npar(mfrow = c(2, 2))\nfor (j in 1:ncol(X)) {\n  plot(beta_samples[, j], type = \"l\", main = paste(\"Trace: beta\", j - 1),\n       xlab = \"Iteration\", ylab = expression(beta))\n  abline(h = beta_true[j], col = \"red\", lwd = 2, lty = 2)\n}"
   },
   {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#autocorrelation-plots",
-    "href": "tutorials/bayesian_spike_and_slab.html#autocorrelation-plots",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#autocorrelation-plots",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#autocorrelation-plots",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Autocorrelation Plots",
-    "text": "Autocorrelation Plots\n\n\nCode\npar(mfrow = c(3, 2))\nfor (j in 1:ncol(X)) {\n  acf(beta_samples[[1]][burn_in:n_iter, j], main = paste(\"ACF: beta\", j - 1))\n}"
+    "text": "Autocorrelation Plots\n\n\nCode\npar(mfrow = c(2, 2))\nfor (j in 1:ncol(X)) {\n  acf(beta_samples[burn_in:n_iter, j], main = paste(\"ACF: beta\", j - 1))\n}"
   },
   {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#convergence-diagnostics",
-    "href": "tutorials/bayesian_spike_and_slab.html#convergence-diagnostics",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#convergence-diagnostics",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#convergence-diagnostics",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Convergence Diagnostics",
-    "text": "Convergence Diagnostics\n\n\nCode\nconvergence_stats &lt;- function(samples) {\n  n &lt;- length(samples)\n  ac1 &lt;- cor(samples[-1], samples[-n])\n  mcse &lt;- sd(samples) * sqrt((1 + ac1) / n)\n  a &lt;- floor(0.1 * n); b &lt;- floor(0.5 * n)\n  z &lt;- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /\n       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)\n  ess &lt;- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))\n  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)\n}\n\n# Apply to chain 1\nconv_results &lt;- t(apply(beta_samples[[1]][burn_in:n_iter, ], 2, convergence_stats))\nrownames(conv_results) &lt;- paste0(\"beta\", 0:p)\nround(conv_results, 4)\n\n\n      autocorr1   mcse geweke_z       ess\nbeta0    0.0232 0.0018  -0.9796 2745.9833\nbeta1    0.0374 0.0020   0.5127 2185.3118\nbeta2    0.3956 0.0016   0.4830  878.5174\nbeta3    0.0291 0.0006   0.9637 2597.4558\nbeta4    0.2506 0.0010  -0.4140  971.6853\nbeta5    0.0490 0.0018  -2.8212 3758.3315\n\n\n\nGelman–Rubin R-hat\n\n\nCode\nRhat &lt;- function(ch1, ch2) {\n  n &lt;- nrow(ch1)\n  m &lt;- 2\n  chain_means &lt;- c(colMeans(ch1), colMeans(ch2))\n  overall_mean &lt;- colMeans(rbind(ch1, ch2))\n  B &lt;- n * apply(rbind(colMeans(ch1), colMeans(ch2)), 2, var)\n  W &lt;- (apply(ch1, 2, var) + apply(ch2, 2, var)) / 2\n  var_hat &lt;- ((n - 1) / n) * W + (1 / n) * B\n  sqrt(var_hat / W)\n}\n\nRhat_values &lt;- Rhat(beta_samples[[1]][burn_in:n_iter, ], beta_samples[[2]][burn_in:n_iter, ])\nround(Rhat_values, 3)\n\n\n[1] 1 1 1 1 1 1"
+    "text": "Convergence Diagnostics\nWe compute autocorrelation, Monte Carlo standard error, Geweke Z-score, Gelman-Rubin (), and effective sample size.\n\n\nCode\n# Simple diagnostics for one chain\nconvergence_stats &lt;- function(samples) {\n  n &lt;- length(samples)\n  ac1 &lt;- cor(samples[-1], samples[-n])\n  mcse &lt;- sd(samples) * sqrt((1 + ac1) / n)\n  a &lt;- floor(0.1 * n); b &lt;- floor(0.5 * n)\n  z &lt;- (mean(samples[1:a]) - mean(samples[(n - b + 1):n])) /\n       sqrt(var(samples[1:a]) / a + var(samples[(n - b + 1):n]) / b)\n  ess &lt;- n / (1 + 2 * sum(acf(samples, plot = FALSE)$acf[-1]))\n  c(autocorr1 = ac1, mcse = mcse, geweke_z = z, ess = ess)\n}\n\nconv_results &lt;- t(apply(beta_samples[burn_in:n_iter, ], 2, convergence_stats))\nrownames(conv_results) &lt;- paste0(\"beta\", 0:p)\nround(conv_results, 4)\n\n\n      autocorr1   mcse geweke_z      ess\nbeta0   -0.0055 0.0017   1.0590 4562.500\nbeta1    0.0308 0.0019   0.8929 3641.556\nbeta2   -0.0256 0.0017  -2.4631 4014.290\nbeta3    0.0189 0.0018   0.1831 3634.925"
   },
   {
-    "objectID": "tutorials/bayesian_spike_and_slab.html#posterior-mean-vs-true-values",
-    "href": "tutorials/bayesian_spike_and_slab.html#posterior-mean-vs-true-values",
-    "title": "Bayesian Linear Regression with Spike-and-Slab Priors",
+    "objectID": "tutorials/bayesian_linear_regression_conjugate.html#posterior-mean-vs-true-values",
+    "href": "tutorials/bayesian_linear_regression_conjugate.html#posterior-mean-vs-true-values",
+    "title": "Bayesian Linear Regression with Conjugate Priors",
     "section": "Posterior Mean vs True Values",
     "text": "Posterior Mean vs True Values\n\n\nCode\npar(mar = c(5, 5, 4, 2))\nplot(beta_true, beta_summary[, \"mean\"], pch = 19, col = \"blue\",\n     xlab = \"True Coefficients\", ylab = \"Posterior Mean Estimates\",\n     main = \"Posterior Mean vs True Coefficients\")\nabline(0, 1, col = \"red\", lwd = 2, lty = 2)\nlegend(\"topleft\", legend = c(\"Posterior Means\", \"y = x line\"), \n       col = c(\"blue\", \"red\"), pch = c(19, NA), lty = c(NA, 2))"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html",
+    "href": "tutorials/bayesian_magma_tutorial.html",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "",
+    "text": "This tutorial introduces Bayesian MAGMA — a gene set prioritization approach utilizing Bayesian Linear Regression (BLR) models within the MAGMA gene set analysis framework.\nThe figure below shows a schematic overview of the workflow.\nIn the initial step, GWAS summary data for the traits of interest are used to compute gene-level Z-scores using the VEGAS (Versatile Gene-Based Association Study) approach.\nNext, a design matrix linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).\nThe Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.\nThis results in posterior inclusion probabilities (PIPs) for each gene set, representing the probability that the set is included in the model.\nGene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.\nThe approach can also be extended to multi-trait analyses, enabling cross-trait exploration of pathway relevance.\nSee full details in Gholipourshahraki T, et al. PLOS Genet. 20, e1011463 (2024).\n\n\n Figure 1. Schematic overview of the Bayesian MAGMA workflow."
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#introduction",
+    "href": "tutorials/bayesian_magma_tutorial.html#introduction",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "",
+    "text": "This tutorial introduces Bayesian MAGMA — a gene set prioritization approach utilizing Bayesian Linear Regression (BLR) models within the MAGMA gene set analysis framework.\nThe figure below shows a schematic overview of the workflow.\nIn the initial step, GWAS summary data for the traits of interest are used to compute gene-level Z-scores using the VEGAS (Versatile Gene-Based Association Study) approach.\nNext, a design matrix linking genes to gene sets is constructed to integrate curated pathway databases (e.g., KEGG).\nThe Bayesian MAGMA model is then fitted using this design matrix as input predictors and the gene-level Z-scores as the response variable.\nThis results in posterior inclusion probabilities (PIPs) for each gene set, representing the probability that the set is included in the model.\nGene sets with higher PIPs are prioritized, highlighting pathways most likely to explain genetic associations.\nThe approach can also be extended to multi-trait analyses, enabling cross-trait exploration of pathway relevance.\nSee full details in Gholipourshahraki T, et al. PLOS Genet. 20, e1011463 (2024).\n\n\n Figure 1. Schematic overview of the Bayesian MAGMA workflow."
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#simulation-set-up",
+    "href": "tutorials/bayesian_magma_tutorial.html#simulation-set-up",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Simulation set up",
+    "text": "Simulation set up\nThis tutorial demonstrates how to simulate gene-level association statistics and overlapping gene sets (pathways) for enrichment analysis using MAGMA-style approaches, implemented either as OLS joint estimation or via Bayesian inference with BayesC or BayesR priors.\nThe tutorial includes the following key steps:\n\nSimulate gene-level Z-scores with causal genes.\n\nCreate overlapping pathways with realistic size distributions.\n\nEnrich specific pathways with causal genes.\n\nVisualize pathway sizes and overlaps.\n\nPerform gene set analysis using magma()-style models (linear and Bayesian)."
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-0-load-libraries",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-0-load-libraries",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 0: Load libraries",
+    "text": "Step 0: Load libraries\n\n\nCode\nlibrary(qgg)\nlibrary(ggplot2)"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-1-basic-parameters",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-1-basic-parameters",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 1: Basic Parameters",
+    "text": "Step 1: Basic Parameters\n\n\nCode\nset.seed(123)\nn_genes &lt;- 20000\nn_assoc &lt;-  100\nn_pathways &lt;- 100\neffect_mean &lt;- 2\neffect_sd &lt;- 1"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-2-simulate-gene-level-association-statistics",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-2-simulate-gene-level-association-statistics",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 2: Simulate Gene-Level Association Statistics",
+    "text": "Step 2: Simulate Gene-Level Association Statistics\nIn this step, we simulate gene-level Z-scores for 20,000 genes,\nwhere a subset of 100 are truly associated (causal).\nWe then visualize the results using a QQ plot that distinguishes\ncausal genes (red) from null genes (grey).\n\n\nCode\ngenes &lt;- paste0(\"Gene\", seq_len(n_genes))\n\n# --- Step 1: Null genes centered around 0 ---\nz_scores &lt;- rnorm(n_genes, mean = 0, sd = 1)\nnames(z_scores) &lt;- genes\n\n# --- Step 2: Define causal genes (stronger, possibly positive or negative) ---\nassociated_genes &lt;- sample(genes, n_assoc)\nz_scores[associated_genes] &lt;- rnorm(n_assoc, mean = effect_mean, sd = effect_sd)\n\n# --- Step 3: Compute two-tailed p-values (VEGAS-style) ---\np_values &lt;- 2 * pnorm(-abs(z_scores))\n\n# --- Step 4: QQ plot ---\ndf &lt;- data.frame(\n  Gene = genes,\n  P = p_values,\n  causal = genes %in% associated_genes\n)\ndf &lt;- df[order(df$P), ]\ndf$expected &lt;- -log10(ppoints(n_genes))\ndf$observed &lt;- -log10(df$P)\n\ncol_map &lt;- c(\"FALSE\" = \"grey60\", \"TRUE\" = \"firebrick\")\n\nplot(df$expected, df$observed,\n     pch = 19, cex = 0.6,\n     col = col_map[as.character(df$causal)],\n     xlab = expression(Expected~~-log[10](italic(p))),\n     ylab = expression(Observed~~-log[10](italic(p))),\n     main = \"QQ Plot of Simulated VEGAS-Style Gene Z-scores\")\n\nabline(0, 1, col = \"black\", lwd = 2)\nlegend(\"topleft\",\n       legend = c(\"Null genes\", \"Causal genes\"),\n       col = c(\"grey60\", \"firebrick\"), pch = 19, bty = \"n\")\n\n\n\n\n\nQQ plot of simulated gene-level associations showing causal (red) and null (grey) genes."
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-3-draw-realistic-gene-set-sizes",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-3-draw-realistic-gene-set-sizes",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 3: Draw Realistic Gene Set Sizes",
+    "text": "Step 3: Draw Realistic Gene Set Sizes\nWe use a log-normal distribution to simulate pathway sizes, resulting in a right-skewed distribution (many small pathways, few large ones).\n\n\nCode\nsizes_raw &lt;- round(rlnorm(n_pathways, meanlog = log(80), sdlog = 0.6))\nsizes &lt;- pmin(pmax(sizes_raw, 15), 500)  # truncate to 15–500\nsummary(sizes)\n\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  15.00   53.75   75.00   92.77  119.25  259.00"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-4-create-overlapping-pathways",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-4-create-overlapping-pathways",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 4: Create Overlapping Pathways",
+    "text": "Step 4: Create Overlapping Pathways\nHere, we simulate overlapping pathways. Each pathway shares some genes with previous ones, mimicking realistic biological redundancy.\n\n\nCode\npathway_list &lt;- vector(\"list\", n_pathways)\nnames(pathway_list) &lt;- paste0(\"Pathway_\", seq_len(n_pathways))\n\nfor (i in seq_len(n_pathways)) {\n  size &lt;- sizes[i]\n  \n  if (i &gt; 1 && runif(1) &lt; 0.9) {  # 90% chance to overlap\n    j &lt;- sample(seq_len(i - 1), 1)  # pick existing pathway\n    target_overlap &lt;- round(size * runif(1, 0.20, 0.50))  # 20–50% overlap\n    overlap_pool &lt;- pathway_list[[j]]\n    k &lt;- min(target_overlap, length(overlap_pool), size)\n    overlap_genes &lt;- if (k &gt; 0) sample(overlap_pool, k) else character(0)\n    remaining_pool &lt;- setdiff(genes, overlap_genes)\n    n_remaining &lt;- size - length(overlap_genes)\n    new_genes &lt;- if (n_remaining &gt; 0) sample(remaining_pool, n_remaining) else character(0)\n    pathway_list[[i]] &lt;- unique(c(overlap_genes, new_genes))\n  } else {\n    pathway_list[[i]] &lt;- sample(genes, size)\n  }\n}"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-5-create-causal-pathways",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-5-create-causal-pathways",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 5: Create Causal Pathways",
+    "text": "Step 5: Create Causal Pathways\nWe enrich 1–2 pathways with truly associated genes to simulate signal.\n\n\nCode\nn_enriched_paths &lt;- 2\nenriched_paths &lt;- sample(names(pathway_list), n_enriched_paths)\n\nfor (p in enriched_paths) {\n  n_enriched_genes &lt;- 30\n  enriched_genes &lt;- sample(associated_genes, n_enriched_genes)\n  pathway_list[[p]] &lt;- unique(c(pathway_list[[p]], enriched_genes))\n}\n\ncat(\"Created\", n_pathways, \"pathways (15–500 genes each)\\n\")\n\n\nCreated 100 pathways (15–500 genes each)\n\n\nCode\ncat(\"Causal pathways:\", paste(enriched_paths, collapse = \", \"), \"\\n\")\n\n\nCausal pathways: Pathway_75, Pathway_53"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-6-visualize-pathway-size-distribution",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-6-visualize-pathway-size-distribution",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 6: Visualize Pathway Size Distribution",
+    "text": "Step 6: Visualize Pathway Size Distribution\n\n\nCode\nsizes_df &lt;- data.frame(Pathway = names(pathway_list), Size = sizes)\n\nggplot(sizes_df, aes(x = Size)) +\n  geom_histogram(bins = 30, fill = \"steelblue\", color = \"white\") +\n  theme_minimal(base_size = 13) +\n  labs(\n    title = \"Distribution of Simulated Pathway Sizes\",\n    x = \"Number of genes per pathway\",\n    y = \"Count\"\n  )"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-7-visualize-pathway-overlap",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-7-visualize-pathway-overlap",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 7: Visualize Pathway Overlap",
+    "text": "Step 7: Visualize Pathway Overlap\nWe calculate the Jaccard index (|A∩B| / |A∪B|) between pathways and visualize it with a heatmap.\n\n\nCode\nn_show &lt;- 30  # display subset\noverlap_matrix &lt;- matrix(NA, n_show, n_show,\n                         dimnames = list(names(pathway_list)[1:n_show],\n                                         names(pathway_list)[1:n_show]))\n\nfor (i in seq_len(n_show)) {\n  for (j in seq_len(n_show)) {\n    g1 &lt;- pathway_list[[i]]\n    g2 &lt;- pathway_list[[j]]\n    overlap_matrix[i, j] &lt;- length(intersect(g1, g2)) / length(union(g1, g2))\n  }\n}\n\nif (requireNamespace(\"pheatmap\", quietly = TRUE)) {\n  library(pheatmap)\n  pheatmap(\n    overlap_matrix,\n    main = \"Pathway Overlap (Jaccard Index)\",\n    color = colorRampPalette(c(\"white\", \"red\"))(50),\n    border_color = NA\n  )\n}"
+  },
+  {
+    "objectID": "tutorials/bayesian_magma_tutorial.html#step-8-run-and-compare-magma-style-gene-set-analyses",
+    "href": "tutorials/bayesian_magma_tutorial.html#step-8-run-and-compare-magma-style-gene-set-analyses",
+    "title": "Pathway Prioritization Using a Bayesian MAGMA Model",
+    "section": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses",
+    "text": "Step 8: Run and Compare MAGMA-Style Gene Set Analyses\nHere we compare three approaches implemented in qgg::magma():\n\n\n\n\n\n\n\n\n\nMethod\nModel Type\nConcept\nOutput\n\n\n\n\nJoint (fitM)\nLinear regression\nTests all pathways simultaneously\nβ-coefficients, SEs, p-values\n\n\nBayesC (fitC)\nBayesian spike-and-slab\nSelects relevant pathways by posterior inclusion probability (PIP)\nPosterior means, PIPs\n\n\nBayesR (fitR)\nBayesian mixture prior\nAllows pathways to have small, moderate, or large effects\nPosterior means, PIPs\n\n\n\n\nClassical joint model (standard MAGMA-style regression)\n\n\nCode\nfitM &lt;- magma(stat = z_scores, sets = pathway_list, type = \"joint\")\nhead(fitM)\n\n\n           ID  m      b    seb      z            p\n53 Pathway_53 45 0.0586 0.0072 8.1323 2.105592e-16\n75 Pathway_75 76 0.0446 0.0076 5.8493 2.467936e-09\n71 Pathway_71 63 0.0191 0.0083 2.2936 1.090724e-02\n49 Pathway_49 61 0.0156 0.0082 1.9083 2.817681e-02\n82 Pathway_82 85 0.0167 0.0091 1.8455 3.248288e-02\n74 Pathway_74 54 0.0130 0.0072 1.7987 3.603322e-02\n\n\n\n\nBayesian sparse model (BayesC)\n\n\nCode\nfitC &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesC\")\nhead(fitC)\n\n\n           ID   m      b    PIP\n53 Pathway_53  45 0.0586 1.0000\n75 Pathway_75  76 0.0441 1.0000\n28 Pathway_28  48 0.0000 0.0020\n62 Pathway_62 109 0.0000 0.0018\n71 Pathway_71  63 0.0000 0.0018\n13 Pathway_13 119 0.0000 0.0016\n\n\n\n\nBayesian mixture model (BayesR)\n\n\nCode\nfitR &lt;- magma(stat = z_scores, sets = pathway_list, method = \"bayesR\")\nhead(fitR)\n\n\n           ID   m       b    PIP\n53 Pathway_53  45  0.0586 1.0000\n75 Pathway_75  76  0.0440 1.0000\n28 Pathway_28  48 -0.0005 0.0284\n82 Pathway_82  85  0.0003 0.0166\n13 Pathway_13 119 -0.0002 0.0146\n63 Pathway_63 187 -0.0002 0.0130\n\n\n\n\nSummarize and Compare Outputs\n\n\nCode\n# Extract comparable metrics\nresults &lt;- list(\n  Joint = fitM[, c(\"ID\", \"b\", \"p\")],\n  BayesC = fitC[, c(\"ID\", \"b\", \"PIP\")],\n  BayesR = fitR[, c(\"ID\", \"b\", \"PIP\")]\n)\n\n# Merge results by Pathway ID\nmerged_results &lt;- Reduce(function(x, y) merge(x, y, by = \"ID\", all = TRUE), results)\ncolnames(merged_results) &lt;- c(\"Pathway\", \"b_joint\", \"p_joint\", \"b_bayesC\", \"PIP_bayesC\", \"b_bayesR\", \"PIP_bayesR\")\nmerged_results$is_enriched &lt;- merged_results$Pathway %in% enriched_paths\n\nhead(merged_results[order(-merged_results$PIP_bayesC), ])\n\n\n      Pathway b_joint      p_joint b_bayesC PIP_bayesC b_bayesR PIP_bayesR\n50 Pathway_53  0.0586 2.105592e-16   0.0586     1.0000   0.0586     1.0000\n74 Pathway_75  0.0446 2.467936e-09   0.0441     1.0000   0.0440     1.0000\n22 Pathway_28 -0.0188 9.947193e-01   0.0000     0.0020  -0.0005     0.0284\n60 Pathway_62  0.0134 3.969070e-02   0.0000     0.0018   0.0001     0.0120\n70 Pathway_71  0.0191 1.090724e-02   0.0000     0.0018   0.0001     0.0068\n6  Pathway_13 -0.0154 9.553190e-01   0.0000     0.0016  -0.0002     0.0146\n   is_enriched\n50        TRUE\n74        TRUE\n22       FALSE\n60       FALSE\n70       FALSE\n6        FALSE\n\n\n\n\nVisualize Comparison of Evidence\n\n\nCode\nlibrary(ggplot2)\n\nggplot(merged_results, aes(x = -log10(p_joint), y = PIP_bayesC, color = is_enriched)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text(data = subset(merged_results, is_enriched), aes(label = Pathway),\n            vjust = -1, size = 3.2) +\n  scale_color_manual(values = c(\"FALSE\" = \"grey60\", \"TRUE\" = \"firebrick\")) +\n  labs(\n    x = expression(-log[10](italic(p))~~\"(Joint model)\"),\n    y = \"Posterior Inclusion Probability (BayesC)\",\n    title = \"Comparison of Classical and Bayesian MAGMA Results\"\n  ) +\n  theme_minimal(base_size = 13)\n\n\n\n\n\n\n\n\n\n\n\nInterpretation\nThe joint linear model detects a broad set of pathways with small effects but cannot quantify inclusion evidence. BayesC and BayesR provide posterior probabilities reflecting uncertainty and sparsity. In this simulation, truly enriched pathways (in red) show both low p-values and high PIPs (&gt;0.9), illustrating consistency between classical and Bayesian inference while offering a probabilistic measure of pathway relevance."
   }
 ]
