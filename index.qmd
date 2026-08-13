@@ -21,7 +21,7 @@ Explore the sections below to find the corresponding materials.
 | [**BLR slides**](slides/bayesian_linear_regression_slides.html) | Lecture slides summarizing key theoretical concepts and derivations in Bayesian Linear Regression Analyses. |
 | [**BLR-GSEA slides**](slides/advanced_bayesian_linear_regression_slides.html) | Lecture slides introducing Bayesian Linear Regression Models used in Gene Set Analyses. |
 | [**Bayesian MAGMA slides**](slides/bayesian_magma_slides.html) | Lecture slides introducing Gene Set Analyses using Bayesian MAGMA Models. |
-| [**Bayesian Fine-Mapping with BayesC — Slides**](slides/bayesian_fine_mapping_bayesc_slides.html) | Lecture slides on joint BayesC fine-mapping, LD, PIPs, local credible sets, and annotation-informed priors. |
+| [**Bayesian Fine-Mapping with BayesC — Slides**](slides/bayesian_fine_mapping_bayesc_slides_final.html) | Lecture slides on joint BayesC fine-mapping, LD, PIPs, local credible sets, and annotation-informed priors. |
 | [**Classical Regression tutorial**](tutorials/classical_linear_regression_simulation.html) | Simulation and estimation using ordinary least squares (OLS) in R. |
 | [**Bayesian (Gaussian Prior)  tutorial**](tutorials/bayesian_linear_regression_conjugate.html) | Bayesian regression with conjugate Gaussian priors and closed-form Gibbs sampling in R. |
 | [**Bayesian (Spike & Slab)  tutorial**](tutorials/bayesian_spike_and_slab.html) | Bayesian regression with spike-and-slab priors for variable selection and sparsity in R. |
